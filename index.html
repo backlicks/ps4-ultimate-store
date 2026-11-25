@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090711">
-<title>PS4 ULTIMATE STORE — 0.5.0</title>
+<title>PS4 ULTIMATE STORE — 0.6.0</title>
 <style>
 :root{--bg:#090711;--panel:#141020;--panel2:#1c1530;--purple:#a855f7;--pink:#d946ef;--muted:#a69bb8;--line:#302342}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#291344 0,transparent 38%),var(--bg);color:#f7f2ff;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -35,18 +35,18 @@ a.inline{color:#d8b6ff}
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><div class="brand">PS4 <span>ULTIMATE STORE</span></div><div class="pill">VERSION 0.5.0 · PUBLIC CATALOG</div></div></header>
+<header><div class="wrap nav"><div class="brand">PS4 <span>ULTIMATE STORE</span></div><div class="pill">VERSION 0.6.0 · PUBLIC CATALOG</div></div></header>
 <main class="wrap">
 <section class="hero">
 <div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
 <h1>Больше возможностей<br><span style="color:#c084fc">для PS4.</span></h1>
 <p>Каталог приложений и инструментов для PlayStation 4. Изучай описания, проверяй совместимость и переходи к источникам проектов.</p>
-<div class="hero-actions"><button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button><button class="btn secondary" onclick="showInfo()">Что нового в 0.5.0</button></div>
-<div class="stats"><span><b id="count">18</b> приложений</span><span><b>5</b> категорий</span><span><b>RU</b> интерфейс</span><span class="version">Релиз 0.5.0</span></div>
+<div class="hero-actions"><button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button><button class="btn secondary" onclick="showInfo()">Что нового в 0.6.0</button></div>
+<div class="stats"><span><b id="count">22</b> приложений</span><span><b>5</b> категорий</span><span><b>RU</b> интерфейс</span><span class="version">Релиз 0.6.0</span></div>
 </section>
-<div class="notice">ℹ️ Версия 0.5.0: добавлены Playtube, Playfin, JoPlay, PS4 Ambilight и orbisRPC. Это сторонние homebrew-проекты для консолей с GoldHEN — перед установкой изучи требования и README разработчика по ссылке «Источник».</div>
+<div class="notice">ℹ️ Версия 0.6.0: добавлены RemotePad NG, EmuSuNi, Iconit (PS4) и Remote PKG Installer. Это сторонние homebrew-проекты — перед установкой изучи требования и README разработчика по ссылке «Источник».</div>
 <section id="catalog">
-<div class="section-head"><div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div><div class="muted" id="shown">Показано: 18</div></div>
+<div class="section-head"><div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div><div class="muted" id="shown">Показано: 22</div></div>
 <div class="toolbar"><input id="search" class="search" placeholder="⌕  Найти приложение..." autocomplete="off"></div>
 <div class="filters" id="filters">
 <button class="filter active" data-filter="Все">Все</button><button class="filter" data-filter="Создание видео">Видео</button><button class="filter" data-filter="Удалённая игра">Удалённая игра</button><button class="filter" data-filter="Медиа">Медиа</button><button class="filter" data-filter="Музыка">Музыка</button><button class="filter" data-filter="Homebrew">Homebrew</button>
@@ -75,7 +75,11 @@ const apps=[
 {name:"Playfin",icon:"🧊",category:"Медиа",desc:"Клиент Jellyfin для PS4: просмотр библиотеки своего медиасервера, вход через Quick Connect или логин/пароль.",version:"Требуется сервер Jellyfin 10.10+; версию приложения смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/LowganDev/PlayfinPS4/releases"},
 {name:"JoPlay",icon:"🎞️",category:"Медиа",desc:"Современный плеер для PS4, работающий с аддонами Stremio: разделы Home, Discover, Library и Search.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/JVK3R/JoPlay/releases"},
 {name:"PS4 Ambilight",icon:"💡",category:"Homebrew",desc:"Подсветка адресуемой RGB-ленты (WLED) в такт происходящему на экране, включая необязательный режим подсветки вне игр.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); нужна совместимая RGB-лента/WLED-контроллер",source:"GitHub проекта",url:"https://github.com/mitchshimy/PS4-Ambilight/releases"},
-{name:"orbisRPC",icon:"🟣",category:"Homebrew",desc:"Discord Rich Presence для PS4: показывает в Discord игру, обложку и таймер сессии. Работает прямо на консоли.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); использование токена аккаунта Discord — на свой риск",source:"GitHub проекта",url:"https://github.com/SirHumza/orbisRPC/releases"}
+{name:"orbisRPC",icon:"🟣",category:"Homebrew",desc:"Discord Rich Presence для PS4: показывает в Discord игру, обложку и таймер сессии. Работает прямо на консоли.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); использование токена аккаунта Discord — на свой риск",source:"GitHub проекта",url:"https://github.com/SirHumza/orbisRPC/releases"},
+{name:"RemotePad NG",icon:"🎮",category:"Homebrew",desc:"GoldHEN-плагин: играй на PS4 с телефона, клавиатуры или геймпада Xbox, DualSense, Switch Pro. Поддерживаемый форк remotePad.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/MoHadiShibli/remotePad-ng/releases"},
+{name:"EmuSuNi",icon:"🕹️",category:"Homebrew",desc:"Лончер двадцати классических консолей и аркадных плат в одном приложении: HD-рендер, читы, поддержка RetroAchievements.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/arturofuentes1988/EmuSuNi/releases"},
+{name:"Iconit (PS4)",icon:"🖼️",category:"Homebrew",desc:"Windows-приложение для автоматической смены иконок XMB и аватаров профиля на джейлбрейкнутой PS4 через FTP-пейлоад.",version:"Актуальную версию смотри у разработчика",compat:"Windows + PS4 с FTP-пейлоадом (homebrew)",source:"GitHub проекта",url:"https://github.com/OfficialAhmed/Iconit-PS4"},
+{name:"Remote PKG Installer",icon:"📡",category:"Homebrew",desc:"Установка PKG на PS4 по сети с любого устройства: HTTP/REST API, живой прогресс передачи с паузой/возобновлением, параллельная загрузка по частям.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/AldySan/ps4_remote_pkg_installer_nextgen/releases"}
 ];
 let active="Все";
 const grid=document.getElementById("grid"),search=document.getElementById("search");
@@ -94,7 +98,7 @@ function details(name){
  const a=apps.find(x=>x.name===name);
  openModal(`<h2>${a.icon} ${a.name}</h2><span class="tag">${a.category}</span><p>${a.desc}</p><p><b>Версия:</b> ${a.version}<br><b>Совместимость:</b> ${a.compat}<br><b>Источник:</b> ${a.source}</p><p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Открыть ссылку на PKG ↗":"Открыть источник ↗"}</a></p><p class="muted">${a.download?"Внимание: это сторонний установочный файл по ссылке пользователя. Его безопасность, подлинность и содержимое независимо не проверены. Перед загрузкой оцени источник и используй только контент, на который у тебя есть права.":"Проверяй авторство, требования и совместимость перед использованием."}</p>`);
 }
-function showInfo(){openModal(`<h2>Что нового в 0.5.0</h2><ul><li>Добавлены Playtube, Playfin и JoPlay (категория «Медиа»).</li><li>Добавлены PS4 Ambilight и orbisRPC (категория «Homebrew»).</li><li>Обновлены счётчик приложений и информация о релизе.</li><li>Сохранены поиск, фильтры, карточки и мобильная адаптация.</li></ul>`)}
+function showInfo(){openModal(`<h2>Что нового в 0.6.0</h2><ul><li>Добавлен RemotePad NG — игра на PS4 с телефона и сторонних геймпадов.</li><li>Добавлен EmuSuNi — лончер ретро-консолей и аркадных плат.</li><li>Добавлен Iconit (PS4) — смена иконок XMB и аватаров.</li><li>Добавлен Remote PKG Installer — установка PKG по сети без флешки.</li><li>Обновлены счётчик приложений и информация о релизе.</li></ul>`)}
 render();
 </script>
 </body>
