@@ -1,104 +1,301 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090711">
-<title>PS4 ULTIMATE STORE — 0.6.0</title>
+<title>PS4 ULTIMATE STORE 0.7.0</title>
 <style>
-:root{--bg:#090711;--panel:#141020;--panel2:#1c1530;--purple:#a855f7;--pink:#d946ef;--muted:#a69bb8;--line:#302342}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#291344 0,transparent 38%),var(--bg);color:#f7f2ff;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
-header{position:sticky;top:0;z-index:5;background:#0b0813ef;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.wrap{max-width:1150px;margin:auto;padding:0 20px}.nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:15px}
-.brand{font-weight:900;letter-spacing:.6px;font-size:19px}.brand span{color:var(--purple)}.pill{border:1px solid #563078;color:#d9b7ff;padding:5px 10px;border-radius:30px;font-size:11px;letter-spacing:1px}
-.hero{padding:55px 0 34px}.eyebrow{color:#c084fc;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}
-h1{font-size:clamp(34px,6vw,58px);line-height:1.04;margin:12px 0}.hero p{max-width:700px;color:var(--muted);font-size:16px}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.btn{border:0;border-radius:12px;padding:12px 17px;font-weight:800;cursor:pointer;background:linear-gradient(110deg,var(--purple),var(--pink));color:white}.btn.secondary{background:#211832;border:1px solid var(--line)}
-.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:30px;color:var(--muted);font-size:13px}.stats b{color:white}
-.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 22px}.search{flex:1;min-width:210px;background:#120d1d;border:1px solid var(--line);border-radius:12px;padding:13px 15px;color:white;font:inherit;outline:none}.search:focus{border-color:var(--purple)}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}.filter{background:#171123;border:1px solid var(--line);color:#c8bdd6;padding:8px 13px;border-radius:30px;cursor:pointer}.filter.active{background:#51217b;border-color:#a855f7;color:white}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 16px}.section-head h2{margin:0;font-size:23px}.muted{color:var(--muted);font-size:13px}
+:root {
+  --bg:#090711;
+  --panel:#141020;
+  --purple:#a855f7;
+  --pink:#d946ef;
+  --muted:#a69bb8;
+  --line:#302342;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0;background:radial-gradient(ellipse at 15% 0%,#291344 0,transparent 38%),var(--bg);
+ color:#f7f2ff;font:15px/1.5 system-ui,Arial;
+}
+header{
+ position:sticky;top:0;z-index:5;
+ background:#0b0813ef;backdrop-filter:blur(14px);
+ border-bottom:1px solid var(--line);
+}
+.wrap{max-width:1150px;margin:auto;padding:0 20px}
+.nav{
+ min-height:70px;display:flex;align-items:center;
+ justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.brand{font-weight:900;font-size:19px}
+.brand span{color:var(--purple)}
+.pill{border:1px solid #563078;color:#d9b7ff;padding:5px 10px;border-radius:30px;font-size:11px}
+.hero{padding:50px 0 30px}
+.eyebrow{color:#c084fc;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.04;margin:12px 0}
+.hero p{max-width:700px;color:var(--muted);font-size:16px}
+.btn{
+ border:0;border-radius:12px;padding:12px 17px;font-weight:800;
+ cursor:pointer;background:linear-gradient(110deg,var(--purple),var(--pink));color:white;
+ text-decoration:none;display:inline-block;
+}
+.btn.secondary{background:#211832;border:1px solid var(--line)}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:25px;color:var(--muted);font-size:13px}
+.stats b{color:white}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 16px}
+.section-head h2{margin:0;font-size:23px}
+.muted{color:var(--muted);font-size:13px}
+.platform-tabs,.filters{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+.platform-tab,.filter{
+ background:#171123;border:1px solid var(--line);color:#c8bdd6;
+ padding:10px 15px;border-radius:12px;cursor:pointer;font-weight:800;
+}
+.platform-tab.active,.filter.active{
+ background:linear-gradient(110deg,#7130a8,#a855f7);
+ border-color:#a855f7;color:white;
+}
+.toolbar{display:flex;gap:12px;margin:18px 0}
+.search{
+ width:100%;background:#120d1d;border:1px solid var(--line);
+ border-radius:12px;padding:13px 15px;color:white;font:inherit;outline:none;
+}
+.search:focus{border-color:var(--purple)}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:55px}
-.card{background:linear-gradient(145deg,#191326,#100d18);border:1px solid var(--line);border-radius:18px;padding:17px;display:flex;flex-direction:column;min-height:260px;transition:.2s}
-.card:hover{transform:translateY(-3px);border-color:#7441a0;box-shadow:0 12px 35px #0005}
-.card-top{display:flex;align-items:center;gap:13px}.app-icon{width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#54217c,#241538);font-size:25px}
-.card h3{margin:0;font-size:17px}.tag{display:inline-block;color:#d8b6ff;background:#321b49;border:1px solid #4d2a69;border-radius:20px;padding:3px 8px;font-size:10px;margin-top:5px}
-.desc{color:var(--muted);font-size:13px;margin:15px 0;flex:1}.meta{display:flex;justify-content:space-between;gap:8px;color:#9487a5;font-size:11px;margin-bottom:13px}
-.card-actions{display:flex;gap:8px}.card-actions button,.card-actions a{flex:1;text-align:center;padding:9px 10px;border-radius:10px;font-weight:700;cursor:pointer;text-decoration:none;font-size:12px}
-.details{background:#271a38;color:#e8d9f7;border:1px solid #49305f}.source{background:linear-gradient(110deg,#8b35d1,#bd38c9);color:white;border:0}
-.notice{border:1px solid #49345d;background:#171021;border-radius:14px;padding:14px 16px;color:#bfb2cd;font-size:12px;margin:0 0 25px}
-.version{color:#d8b6ff;font-size:12px;font-weight:800}
+.card{
+ background:linear-gradient(145deg,#191326,#100d18);
+ border:1px solid var(--line);border-radius:18px;padding:17px;
+ display:flex;flex-direction:column;min-height:250px;transition:.2s;
+}
+.card:hover{transform:translateY(-3px);border-color:#7441a0}
+.card-top{display:flex;align-items:center;gap:13px}
+.app-icon{
+ width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;
+ border-radius:15px;background:linear-gradient(145deg,#54217c,#241538);font-size:25px;
+}
+.card h3{margin:0;font-size:17px}
+.tag{
+ display:inline-block;color:#d8b6ff;background:#321b49;
+ border:1px solid #4d2a69;border-radius:20px;padding:3px 8px;font-size:10px;margin-top:5px;
+}
+.platform-label{font-size:10px;color:#c084fc;margin-top:5px}
+.desc{color:var(--muted);font-size:13px;margin:15px 0;flex:1}
+.meta{display:flex;justify-content:space-between;gap:8px;color:#9487a5;font-size:11px;margin-bottom:13px}
+.card-actions{display:flex;gap:8px}
+.card-actions button,.card-actions a{
+ flex:1;text-align:center;padding:9px 7px;border-radius:10px;
+ font-weight:700;cursor:pointer;text-decoration:none;font-size:12px;
+}
+.details{background:#271a38;color:#e8d9f7;border:1px solid #49305f}
+.source{background:linear-gradient(110deg,#8b35d1,#bd38c9);color:white;border:0}
+.notice{border:1px solid #49345d;background:#171021;border-radius:14px;padding:14px;color:#bfb2cd;font-size:12px}
 footer{border-top:1px solid var(--line);padding:24px 0 35px;color:#82758f;font-size:12px}
-.modal{position:fixed;inset:0;background:#05030bd9;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.open{display:flex}.modal-box{max-width:540px;width:100%;max-height:85vh;overflow:auto;background:#171122;border:1px solid #624080;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0009}.modal-box h2{margin:0 0 10px}.modal-box p{color:var(--muted)}.close{float:right;background:#2a2036;color:white;border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
+.modal{position:fixed;inset:0;background:#05030bd9;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal.open{display:flex}
+.modal-box{max-width:540px;width:100%;max-height:85vh;overflow:auto;background:#171122;border:1px solid #624080;border-radius:18px;padding:22px}
+.modal-box p{color:var(--muted)}
+.close{float:right;background:#2a2036;color:white;border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
 a.inline{color:#d8b6ff}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.wrap{padding:0 14px}.grid{grid-template-columns:1fr}.hero{padding-top:40px}.nav{min-height:62px}.brand{font-size:16px}.pill{font-size:9px}}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){
+ .wrap{padding:0 14px}.grid{grid-template-columns:1fr}
+ .hero{padding-top:35px}.nav{padding:12px 0}
+ .platform-tab{flex:1;padding:10px 7px;font-size:12px}
+}
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><div class="brand">PS4 <span>ULTIMATE STORE</span></div><div class="pill">VERSION 0.6.0 · PUBLIC CATALOG</div></div></header>
+
+<header>
+<div class="wrap nav">
+ <div class="brand">PS4 <span>ULTIMATE STORE</span></div>
+ <div class="pill">VERSION 0.7.0 · PUBLIC CATALOG</div>
+</div>
+</header>
+
 <main class="wrap">
 <section class="hero">
-<div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
-<h1>Больше возможностей<br><span style="color:#c084fc">для PS4.</span></h1>
-<p>Каталог приложений и инструментов для PlayStation 4. Изучай описания, проверяй совместимость и переходи к источникам проектов.</p>
-<div class="hero-actions"><button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button><button class="btn secondary" onclick="showInfo()">Что нового в 0.6.0</button></div>
-<div class="stats"><span><b id="count">22</b> приложений</span><span><b>5</b> категорий</span><span><b>RU</b> интерфейс</span><span class="version">Релиз 0.6.0</span></div>
+ <div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
+ <h1>Всё для твоих устройств.<br><span style="color:#c084fc">В одном месте.</span></h1>
+ <p>Приложения для PlayStation 4, телефонов и компьютеров. Выбирай платформу и находи нужные программы.</p>
+ <div class="hero-actions">
+  <button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button>
+  <a class="btn secondary" href="https://t.me/proshivkaj" target="_blank">✈️ Telegram</a>
+ </div>
+ <div class="stats">
+  <span><b id="count">0</b> приложений</span>
+  <span><b>3</b> платформы</span>
+  <span><b>RU</b> интерфейс</span>
+  <span>Релиз 0.7.0</span>
+ </div>
 </section>
-<div class="notice">ℹ️ Версия 0.6.0: добавлены RemotePad NG, EmuSuNi, Iconit (PS4) и Remote PKG Installer. Это сторонние homebrew-проекты — перед установкой изучи требования и README разработчика по ссылке «Источник».</div>
-<section id="catalog">
-<div class="section-head"><div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div><div class="muted" id="shown">Показано: 22</div></div>
-<div class="toolbar"><input id="search" class="search" placeholder="⌕  Найти приложение..." autocomplete="off"></div>
-<div class="filters" id="filters">
-<button class="filter active" data-filter="Все">Все</button><button class="filter" data-filter="Создание видео">Видео</button><button class="filter" data-filter="Удалённая игра">Удалённая игра</button><button class="filter" data-filter="Медиа">Медиа</button><button class="filter" data-filter="Музыка">Музыка</button><button class="filter" data-filter="Homebrew">Homebrew</button>
+
+<div class="notice">
+ ℹ️ Каталог постепенно пополняется. Проверяй совместимость, требования и источники приложений перед установкой.
 </div>
-<div class="grid" id="grid"></div>
+
+<section id="catalog">
+ <div class="section-head">
+  <div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div>
+  <div class="muted" id="shown">Показано: 0</div>
+ </div>
+
+ <div class="platform-tabs" id="platformTabs">
+  <button class="platform-tab active" data-platform="PS4">🎮 PS4</button>
+  <button class="platform-tab" data-platform="Телефоны">📱 Телефоны</button>
+  <button class="platform-tab" data-platform="ПК">💻 ПК</button>
+  <button class="platform-tab" data-platform="Все">🌐 Все</button>
+ </div>
+
+ <div class="toolbar">
+  <input id="search" class="search" placeholder="⌕ Найти приложение..." autocomplete="off">
+ </div>
+
+ <div class="filters" id="filters">
+  <button class="filter active" data-filter="Все">Все категории</button>
+  <button class="filter" data-filter="Homebrew">Homebrew</button>
+  <button class="filter" data-filter="Эмуляторы">Эмуляторы</button>
+  <button class="filter" data-filter="Медиа">Медиа</button>
+  <button class="filter" data-filter="Утилиты">Утилиты</button>
+  <button class="filter" data-filter="Игры">Игры</button>
+ </div>
+
+ <div class="grid" id="grid"></div>
 </section>
 </main>
-<footer><div class="wrap">PS4 ULTIMATE STORE · Независимый каталог сообщества. Не связан с Sony Interactive Entertainment. Ссылки ведут на страницы проектов или внешние источники.</div></footer>
-<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modal-box"><button class="close" onclick="closeModal()">Закрыть ✕</button><div id="modal-content"></div></div></div>
+
+<footer><div class="wrap">
+PS4 ULTIMATE STORE · Независимый каталог сообщества. Не связан с Sony Interactive Entertainment.
+</div></footer>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+ <div class="modal-box">
+  <button class="close" onclick="closeModal()">Закрыть ✕</button>
+  <div id="modal-content"></div>
+ </div>
+</div>
+
 <script>
 const apps=[
-{name:"SHAREfactory",icon:"🎬",category:"Создание видео",desc:"Редактируй игровые клипы и скриншоты прямо на PS4: обрезай видео, добавляй оформление и собирай ролики.",version:"Обновляется через PS Store",compat:"PlayStation 4; доступность проверь в PS Store",source:"Официальная справка PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
-{name:"PS Remote Play",icon:"📱",category:"Удалённая игра",desc:"Играй на своей PS4 через совместимый смартфон, планшет или компьютер по сети.",version:"Актуальная версия на сайте",compat:"PS4 + совместимое устройство + аккаунт PlayStation",source:"Официальный сайт PS Remote Play",url:"https://remoteplay.dl.playstation.net/remoteplay/"},
-{name:"Media Player",icon:"▶️",category:"Медиа",desc:"Воспроизводи поддерживаемые видео, музыку и фотографии на консоли. Приложение загружается из PlayStation Store.",version:"Обновляется через PS Store",compat:"PlayStation 4; доступность проверь в PS Store",source:"Официальная справка PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
-{name:"Spotify",icon:"🎵",category:"Музыка",desc:"Слушай музыку во время игры, если приложение и сервис доступны в твоём регионе.",version:"Обновляется через PS Store",compat:"PlayStation 4; требуется аккаунт Spotify",source:"Официальная справка PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
-{name:"PlayStation App",icon:"🎮",category:"Удалённая игра",desc:"Официальное приложение-компаньон: общайся с друзьями, смотри профиль и управляй некоторыми функциями PlayStation с телефона.",version:"Актуальная версия в магазине приложений",compat:"Android / iOS; часть функций связана с PS4",source:"Официальная страница PlayStation App",url:"https://www.playstation.com/en-us/playstation-app/"},
-{name:"GnmScale",icon:"✨",category:"Homebrew",desc:"Homebrew-приложение GnmScale. Назначение и совместимость конкретной прошивки требуют дополнительной проверки.",version:"Не подтверждена; файл IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg",compat:"Требования и совместимость не подтверждены",source:"MediaFire — ссылка предоставлена пользователем",url:"https://www.mediafire.com/file/lnrwap92lqeli6y/IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg/file",download:true},
-{name:"Jobee'sLair",icon:"🧰",category:"Homebrew",desc:"Homebrew-инструмент для PS4. Перед использованием изучи описание проекта и требования разработчика.",version:"1.1.4 (по имени ранее указанного PKG)",compat:"Совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/JVK3R/JobeesLair-PS4/releases"},
-{name:"Apollo Save Tool",icon:"💾",category:"Homebrew",desc:"Утилита для резервного копирования и управления сохранениями игр и данными трофеев.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/bucanero/apollo-ps4/releases"},
-{name:"PS4-Xplorer",icon:"📁",category:"Homebrew",desc:"Файловый менеджер для просмотра файлов и папок на PS4.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/Lapy055/PS4-Xplorer/releases"},
-{name:"Itemzflow",icon:"🗂️",category:"Homebrew",desc:"Менеджер библиотеки приложений и игр для PS4. Используй только со своими легальными данными.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/LightningMods/Itemzflow"},
-{name:"PS MTP Explorer",icon:"🔌",category:"Homebrew",desc:"Инструмент для обмена файлами между PS4 и совместимыми устройствами через MTP.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/nueex/ps-mtp-explorer"},
-{name:"Homebrew Store",icon:"🏪",category:"Homebrew",desc:"Каталог сообщества с homebrew-приложениями. Проверяй автора, лицензию и источник каждого приложения.",version:"Актуальную версию смотри у разработчика",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"ConsoleMods Wiki",url:"https://consolemods.org/wiki/PS4:Recommended_Setup"},
-{name:"NULL Store",icon:"⬇️",category:"Homebrew",desc:"Стороннее приложение-каталог с функциями очереди загрузок. Пользуйся только для получения контента, на который у тебя есть права.",version:"1.0.0 (по адресу релиза)",compat:"Совместимость с конкретной прошивкой и требования к системной среде не подтверждены",source:"GitHub Releases — ссылка предоставлена пользователем",url:"https://github.com/lastrowcritic/null-store-ps4/releases/download/v1.0.0/NULL_store-PS4-1.0.pkg",download:true},
-{name:"Playtube",icon:"📺",category:"Медиа",desc:"YouTube-клиент для PS4 с GoldHEN: без рекламы, пропуск спонсорских вставок (SponsorBlock), вход в свой аккаунт по желанию.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/LowganDev/PlaytubePS4/releases"},
-{name:"Playfin",icon:"🧊",category:"Медиа",desc:"Клиент Jellyfin для PS4: просмотр библиотеки своего медиасервера, вход через Quick Connect или логин/пароль.",version:"Требуется сервер Jellyfin 10.10+; версию приложения смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/LowganDev/PlayfinPS4/releases"},
-{name:"JoPlay",icon:"🎞️",category:"Медиа",desc:"Современный плеер для PS4, работающий с аддонами Stremio: разделы Home, Discover, Library и Search.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/JVK3R/JoPlay/releases"},
-{name:"PS4 Ambilight",icon:"💡",category:"Homebrew",desc:"Подсветка адресуемой RGB-ленты (WLED) в такт происходящему на экране, включая необязательный режим подсветки вне игр.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); нужна совместимая RGB-лента/WLED-контроллер",source:"GitHub проекта",url:"https://github.com/mitchshimy/PS4-Ambilight/releases"},
-{name:"orbisRPC",icon:"🟣",category:"Homebrew",desc:"Discord Rich Presence для PS4: показывает в Discord игру, обложку и таймер сессии. Работает прямо на консоли.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); использование токена аккаунта Discord — на свой риск",source:"GitHub проекта",url:"https://github.com/SirHumza/orbisRPC/releases"},
-{name:"RemotePad NG",icon:"🎮",category:"Homebrew",desc:"GoldHEN-плагин: играй на PS4 с телефона, клавиатуры или геймпада Xbox, DualSense, Switch Pro. Поддерживаемый форк remotePad.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/MoHadiShibli/remotePad-ng/releases"},
-{name:"EmuSuNi",icon:"🕹️",category:"Homebrew",desc:"Лончер двадцати классических консолей и аркадных плат в одном приложении: HD-рендер, читы, поддержка RetroAchievements.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/arturofuentes1988/EmuSuNi/releases"},
-{name:"Iconit (PS4)",icon:"🖼️",category:"Homebrew",desc:"Windows-приложение для автоматической смены иконок XMB и аватаров профиля на джейлбрейкнутой PS4 через FTP-пейлоад.",version:"Актуальную версию смотри у разработчика",compat:"Windows + PS4 с FTP-пейлоадом (homebrew)",source:"GitHub проекта",url:"https://github.com/OfficialAhmed/Iconit-PS4"},
-{name:"Remote PKG Installer",icon:"📡",category:"Homebrew",desc:"Установка PKG на PS4 по сети с любого устройства: HTTP/REST API, живой прогресс передачи с паузой/возобновлением, параллельная загрузка по частям.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/AldySan/ps4_remote_pkg_installer_nextgen/releases"}
+{name:"SHAREfactory",icon:"🎬",category:"Медиа",platforms:["PS4"],desc:"Редактирование игровых клипов и скриншотов прямо на PS4.",version:"PS Store",compat:"PlayStation 4",source:"PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
+{name:"PS Remote Play",icon:"📱",category:"Утилиты",platforms:["Телефоны","ПК"],desc:"Играй на своей PS4 через смартфон, планшет или компьютер.",version:"Актуальная версия на сайте",compat:"PS4 и совместимое устройство",source:"PlayStation Remote Play",url:"https://remoteplay.dl.playstation.net/remoteplay/"},
+{name:"Media Player",icon:"▶️",category:"Медиа",platforms:["PS4"],desc:"Воспроизведение поддерживаемых видео, музыки и фотографий.",version:"PS Store",compat:"PlayStation 4",source:"PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
+{name:"Spotify",icon:"🎵",category:"Медиа",platforms:["PS4","Телефоны","ПК"],desc:"Музыка и плейлисты во время игры и на других устройствах.",version:"Актуальная версия",compat:"Зависит от региона и устройства",source:"Spotify",url:"https://www.spotify.com/download/"},
+{name:"PlayStation App",icon:"🎮",category:"Утилиты",platforms:["Телефоны"],desc:"Официальное приложение-компаньон PlayStation для смартфонов.",version:"Актуальная версия",compat:"Android / iOS",source:"PlayStation",url:"https://www.playstation.com/en-us/playstation-app/"},
+{name:"GnmScale",icon:"✨",category:"Homebrew",platforms:["PS4"],desc:"Homebrew-приложение GnmScale.",version:"PKG",compat:"Требования не подтверждены",source:"MediaFire",url:"https://www.mediafire.com/file/lnrwap92lqeli6y/IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg/file",download:true},
+{name:"Jobee'sLair",icon:"🧰",category:"Homebrew",platforms:["PS4"],desc:"Homebrew-инструмент для PS4.",version:"1.1.4",compat:"Проверь требования разработчика",source:"GitHub",url:"https://github.com/JVK3R/JobeesLair-PS4/releases"},
+{name:"Apollo Save Tool",icon:"💾",category:"Утилиты",platforms:["PS4"],desc:"Управление и резервное копирование сохранений игр.",version:"Последняя версия",compat:"PS4 homebrew",source:"GitHub",url:"https://github.com/bucanero/apollo-ps4/releases"},
+{name:"PS4-Xplorer",icon:"📁",category:"Утилиты",platforms:["PS4"],desc:"Файловый менеджер для PS4.",version:"Последняя версия",compat:"PS4 homebrew",source:"GitHub",url:"https://github.com/Lapy055/PS4-Xplorer/releases"},
+{name:"Itemzflow",icon:"🗂️",category:"Утилиты",platforms:["PS4"],desc:"Менеджер библиотеки приложений и игр.",version:"Последняя версия",compat:"PS4 homebrew",source:"GitHub",url:"https://github.com/LightningMods/Itemzflow"},
+{name:"PS MTP Explorer",icon:"🔌",category:"Утилиты",platforms:["PS4","ПК"],desc:"Обмен файлами между PS4 и совместимыми устройствами.",version:"Последняя версия",compat:"PS4 homebrew; ПК",source:"GitHub",url:"https://github.com/nueex/ps-mtp-explorer"},
+{name:"Homebrew Store",icon:"🏪",category:"Homebrew",platforms:["PS4"],desc:"Каталог homebrew-приложений сообщества.",version:"Последняя версия",compat:"PS4 homebrew",source:"ConsoleMods",url:"https://consolemods.org/wiki/PS4:Recommended_Setup"},
+{name:"NULL Store",icon:"⬇️",category:"Homebrew",platforms:["PS4"],desc:"Сторонний каталог приложений для PS4.",version:"1.0.0",compat:"Совместимость не подтверждена",source:"GitHub Releases",url:"https://github.com/lastrowcritic/null-store-ps4/releases/download/v1.0.0/NULL_store-PS4-1.0.pkg",download:true},
+{name:"Playtube",icon:"📺",category:"Медиа",platforms:["PS4"],desc:"YouTube-клиент для PS4.",version:"Последняя версия",compat:"Требования проекта",source:"GitHub",url:"https://github.com/LowganDev/PlaytubePS4/releases"},
+{name:"Playfin",icon:"🧊",category:"Медиа",platforms:["PS4"],desc:"Клиент Jellyfin для личной медиатеки.",version:"Последняя версия",compat:"Требуется сервер Jellyfin",source:"GitHub",url:"https://github.com/LowganDev/PlayfinPS4/releases"},
+{name:"JoPlay",icon:"🎞️",category:"Медиа",platforms:["PS4"],desc:"Медиаплеер для PS4.",version:"Последняя версия",compat:"Проверь требования проекта",source:"GitHub",url:"https://github.com/JVK3R/JoPlay/releases"},
+{name:"PS4 Ambilight",icon:"💡",category:"Утилиты",platforms:["PS4"],desc:"Проект подсветки телевизора с совместимым оборудованием.",version:"Последняя версия",compat:"Нужно совместимое оборудование",source:"GitHub",url:"https://github.com/mitchshimy/PS4-Ambilight/releases"},
+{name:"orbisRPC",icon:"🟣",category:"Утилиты",platforms:["PS4"],desc:"Discord Rich Presence для PS4.",version:"Последняя версия",compat:"Проверь требования проекта",source:"GitHub",url:"https://github.com/SirHumza/orbisRPC/releases"},
+{name:"RemotePad NG",icon:"🎮",category:"Утилиты",platforms:["PS4"],desc:"Управление PS4 с совместимых устройств.",version:"Последняя версия",compat:"Требуется совместимая среда",source:"GitHub",url:"https://github.com/MoHadiShibli/remotePad-ng/releases"},
+{name:"EmuSuNi",icon:"🕹️",category:"Эмуляторы",platforms:["PS4"],desc:"Лончер ретро-консолей и аркадных систем.",version:"Последняя версия",compat:"PS4 homebrew",source:"GitHub",url:"https://github.com/arturofuentes1988/EmuSuNi/releases"},
+{name:"Iconit (PS4)",icon:"🖼️",category:"Утилиты",platforms:["ПК"],desc:"Windows-программа для настройки иконок и аватаров PS4.",version:"Последняя версия",compat:"Windows",source:"GitHub",url:"https://github.com/OfficialAhmed/Iconit-PS4"},
+{name:"Remote PKG Installer",icon:"📡",category:"Утилиты",platforms:["PS4","ПК"],desc:"Инструмент сетевой передачи установочных файлов.",version:"Последняя версия",compat:"Проверь требования проекта",source:"GitHub",url:"https://github.com/AldySan/ps4_remote_pkg_installer_nextgen/releases"},
+{name:"RetroArch (PS4)",icon:"🕹️",category:"Эмуляторы",platforms:["PS4"],desc:"Мультисистемная оболочка с ядрами NES, SNES, Genesis, GBA и других платформ.",version:"Зависит от сборки",compat:"Неофициальный порт PS4",source:"RArch PS4",url:"https://github.com/gen04177/rarch-ps4"},
+{name:"PCSX ReARMed",icon:"🎮",category:"Эмуляторы",platforms:["PS4"],desc:"Эмуляционное ядро PlayStation 1 для RetroArch.",version:"Зависит от сборки",compat:"Зависит от сборки RetroArch",source:"RArch PS4",url:"https://github.com/gen04177/rarch-ps4"},
+{name:"PPSSPP (PS4)",icon:"🎯",category:"Эмуляторы",platforms:["PS4"],desc:"Эмулятор портативной консоли PSP.",version:"Зависит от сборки",compat:"Совместимость требует проверки",source:"PS4 RetroBox",url:"https://github.com/danyboy666/ps4-retrobox/releases"},
+{name:"Mupen64Plus",icon:"🟢",category:"Эмуляторы",platforms:["PS4"],desc:"Эмуляционное ядро Nintendo 64.",version:"Зависит от сборки",compat:"Совместимость требует проверки",source:"PS4 RetroBox",url:"https://github.com/danyboy666/ps4-retrobox/releases"},
+{name:"Flycast",icon:"💿",category:"Эмуляторы",platforms:["PS4"],desc:"Эмулятор Sega Dreamcast.",version:"Не подтверждена",compat:"Наличие рабочего порта PS4 не подтверждено",source:"Поиск GitHub",url:"https://github.com/search?q=Flycast+PS4&type=repositories"},
+{name:"FinalBurn Neo",icon:"👾",category:"Эмуляторы",platforms:["PS4"],desc:"Ядро для эмуляции аркадных автоматов.",version:"Зависит от сборки",compat:"Зависит от RetroArch-сборки",source:"PS4 RetroBox",url:"https://github.com/danyboy666/ps4-retrobox/releases"},
+{name:"Snes9x",icon:"🟣",category:"Эмуляторы",platforms:["PS4"],desc:"Эмуляционное ядро Super Nintendo.",version:"Зависит от сборки",compat:"Зависит от RetroArch-сборки",source:"PS4 RetroBox",url:"https://github.com/danyboy666/ps4-retrobox/releases"},
+{name:"DobieStation",icon:"⚙️",category:"Эмуляторы",platforms:["PS4"],desc:"Экспериментальный эмулятор PlayStation 2.",version:"Не подтверждена",compat:"Отдельный порт PS4 не подтверждён",source:"Поиск GitHub",url:"https://github.com/search?q=DobieStation+PS4&type=repositories"},
+{name:"ZArchiver",icon:"📦",category:"Утилиты",platforms:["Телефоны"],desc:"Архиватор для Android: работа с ZIP и другими архивами.",version:"Google Play",compat:"Android",source:"Google Play",url:"https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver"},
+{name:"VLC",icon:"🎬",category:"Медиа",platforms:["Телефоны","ПК"],desc:"Универсальный медиаплеер для видео и музыки.",version:"Последняя версия",compat:"Android, iOS, Windows, macOS, Linux",source:"Официальный сайт VLC",url:"https://www.videolan.org/vlc/"},
+{name:"Discord",icon:"💬",category:"Утилиты",platforms:["Телефоны","ПК"],desc:"Общение, голосовые каналы и сообщества.",version:"Последняя версия",compat:"Android, iOS, Windows, macOS",source:"Официальный сайт Discord",url:"https://discord.com/download"},
+{name:"Telegram",icon:"✈️",category:"Утилиты",platforms:["Телефоны","ПК"],desc:"Мессенджер для общения и передачи файлов.",version:"Последняя версия",compat:"Android, iOS, Windows, macOS, Linux",source:"Официальный сайт Telegram",url:"https://telegram.org/apps"},
+{name:"7-Zip",icon:"🗜️",category:"Утилиты",platforms:["ПК"],desc:"Бесплатный архиватор для Windows.",version:"Последняя версия",compat:"Windows",source:"Официальный сайт",url:"https://www.7-zip.org/"},
+{name:"ShareX",icon:"📸",category:"Утилиты",platforms:["ПК"],desc:"Инструмент для скриншотов и записи экрана Windows.",version:"Последняя версия",compat:"Windows",source:"Официальный сайт",url:"https://getsharex.com/"},
+{name:"GIMP",icon:"🎨",category:"Утилиты",platforms:["ПК"],desc:"Бесплатный редактор изображений.",version:"Последняя версия",compat:"Windows, macOS, Linux",source:"Официальный сайт",url:"https://www.gimp.org/"},
+{name:"Android Studio",icon:"🤖",category:"Утилиты",platforms:["ПК"],desc:"Среда разработки Android-приложений.",version:"Последняя версия",compat:"Windows, macOS, Linux",source:"Официальный сайт",url:"https://developer.android.com/studio"}
 ];
+
 let active="Все";
-const grid=document.getElementById("grid"),search=document.getElementById("search");
+let activePlatform="PS4";
+const grid=document.getElementById("grid");
+const search=document.getElementById("search");
+
 function render(){
  const q=search.value.toLowerCase().trim();
- const list=apps.filter(a=>(active==="Все"||a.category===active)&&(a.name+" "+a.desc+" "+a.category).toLowerCase().includes(q));
- grid.innerHTML=list.map(a=>`<article class="card"><div class="card-top"><div class="app-icon">${a.icon}</div><div><h3>${a.name}</h3><span class="tag">${a.category}</span></div></div><p class="desc">${a.desc}</p><div class="meta"><span>PS4 / PlayStation</span><span>${a.download?"Ссылка на PKG":"Источник проекта"}</span></div><div class="card-actions"><button class="details" onclick="details('${a.name}')">Подробнее</button><a class="source" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Скачать PKG ↗":"Источник ↗"}</a></div></article>`).join("");
+ const list=apps.filter(a=>
+  (activePlatform==="Все"||a.platforms.includes(activePlatform))&&
+  (active==="Все"||a.category===active)&&
+  (a.name+" "+a.desc+" "+a.category+" "+a.platforms.join(" ")).toLowerCase().includes(q)
+ );
+
+ grid.innerHTML=list.map((a,i)=>`
+ <article class="card">
+  <div class="card-top">
+   <div class="app-icon">${a.icon}</div>
+   <div>
+    <h3>${a.name}</h3>
+    <span class="tag">${a.category}</span>
+    <div class="platform-label">${a.platforms.join(" · ")}</div>
+   </div>
+  </div>
+  <p class="desc">${a.desc}</p>
+  <div class="meta"><span>${a.version}</span><span>${a.download?"PKG":"Источник"}</span></div>
+  <div class="card-actions">
+   <button class="details" onclick="details(${i})">Подробнее</button>
+   <a class="source" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Скачать ↗":"Источник ↗"}</a>
+  </div>
+ </article>`).join("");
+
  document.getElementById("shown").textContent="Показано: "+list.length;
  document.getElementById("count").textContent=apps.length;
 }
-document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");active=b.dataset.filter;render()}));
+
+document.querySelectorAll(".filter").forEach(b=>{
+ b.addEventListener("click",()=>{
+  document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  active=b.dataset.filter;
+  render();
+ });
+});
+
+document.querySelectorAll(".platform-tab").forEach(b=>{
+ b.addEventListener("click",()=>{
+  document.querySelectorAll(".platform-tab").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  activePlatform=b.dataset.platform;
+  render();
+ });
+});
+
 search.addEventListener("input",render);
-function openModal(html){document.getElementById("modal-content").innerHTML=html;document.getElementById("modal").classList.add("open")}
-function closeModal(){document.getElementById("modal").classList.remove("open")}
-function details(name){
- const a=apps.find(x=>x.name===name);
- openModal(`<h2>${a.icon} ${a.name}</h2><span class="tag">${a.category}</span><p>${a.desc}</p><p><b>Версия:</b> ${a.version}<br><b>Совместимость:</b> ${a.compat}<br><b>Источник:</b> ${a.source}</p><p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Открыть ссылку на PKG ↗":"Открыть источник ↗"}</a></p><p class="muted">${a.download?"Внимание: это сторонний установочный файл по ссылке пользователя. Его безопасность, подлинность и содержимое независимо не проверены. Перед загрузкой оцени источник и используй только контент, на который у тебя есть права.":"Проверяй авторство, требования и совместимость перед использованием."}</p>`);
+
+function openModal(html){
+ document.getElementById("modal-content").innerHTML=html;
+ document.getElementById("modal").classList.add("open");
 }
-function showInfo(){openModal(`<h2>Что нового в 0.6.0</h2><ul><li>Добавлен RemotePad NG — игра на PS4 с телефона и сторонних геймпадов.</li><li>Добавлен EmuSuNi — лончер ретро-консолей и аркадных плат.</li><li>Добавлен Iconit (PS4) — смена иконок XMB и аватаров.</li><li>Добавлен Remote PKG Installer — установка PKG по сети без флешки.</li><li>Обновлены счётчик приложений и информация о релизе.</li></ul>`)}
+function closeModal(){
+ document.getElementById("modal").classList.remove("open");
+}
+function details(index){
+ const a=apps[index];
+ openModal(`
+ <h2>${a.icon} ${a.name}</h2>
+ <span class="tag">${a.category}</span>
+ <p>${a.desc}</p>
+ <p><b>Платформы:</b> ${a.platforms.join(", ")}<br>
+ <b>Версия:</b> ${a.version}<br>
+ <b>Совместимость:</b> ${a.compat}<br>
+ <b>Источник:</b> ${a.source}</p>
+ <p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">Открыть источник ↗</a></p>
+ <p class="muted">Проверяй требования разработчика и используй только приложения и материалы, на которые у тебя есть права.</p>
+ `);
+}
 render();
 </script>
 </body>
