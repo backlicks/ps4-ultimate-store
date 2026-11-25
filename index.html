@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090711">
-<title>PS4 ULTIMATE STORE — 0.4.0</title>
+<title>PS4 ULTIMATE STORE — 0.5.0</title>
 <style>
 :root{--bg:#090711;--panel:#141020;--panel2:#1c1530;--purple:#a855f7;--pink:#d946ef;--muted:#a69bb8;--line:#302342}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#291344 0,transparent 38%),var(--bg);color:#f7f2ff;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -35,18 +35,18 @@ a.inline{color:#d8b6ff}
 </style>
 </head>
 <body>
-<header><div class="wrap nav"><div class="brand">PS4 <span>ULTIMATE STORE</span></div><div class="pill">VERSION 0.4.0 · PUBLIC CATALOG</div></div></header>
+<header><div class="wrap nav"><div class="brand">PS4 <span>ULTIMATE STORE</span></div><div class="pill">VERSION 0.5.0 · PUBLIC CATALOG</div></div></header>
 <main class="wrap">
 <section class="hero">
 <div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
 <h1>Больше возможностей<br><span style="color:#c084fc">для PS4.</span></h1>
 <p>Каталог приложений и инструментов для PlayStation 4. Изучай описания, проверяй совместимость и переходи к источникам проектов.</p>
-<div class="hero-actions"><button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button><button class="btn secondary" onclick="showInfo()">Что нового в 0.4.0</button></div>
-<div class="stats"><span><b id="count">13</b> приложений</span><span><b>5</b> категорий</span><span><b>RU</b> интерфейс</span><span class="version">Релиз 0.4.0</span></div>
+<div class="hero-actions"><button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button><button class="btn secondary" onclick="showInfo()">Что нового в 0.5.0</button></div>
+<div class="stats"><span><b id="count">18</b> приложений</span><span><b>5</b> категорий</span><span><b>RU</b> интерфейс</span><span class="version">Релиз 0.5.0</span></div>
 </section>
-<div class="notice">ℹ️ Версия 0.4.0: добавлена карточка NULL Store. Ссылка на PKG предоставлена пользователем; безопасность, подлинность файла и совместимость с конкретной прошивкой независимо не подтверждены. Используй только контент, на который у тебя есть права, и проверяй файлы перед установкой.</div>
+<div class="notice">ℹ️ Версия 0.5.0: добавлены Playtube, Playfin, JoPlay, PS4 Ambilight и orbisRPC. Это сторонние homebrew-проекты для консолей с GoldHEN — перед установкой изучи требования и README разработчика по ссылке «Источник».</div>
 <section id="catalog">
-<div class="section-head"><div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div><div class="muted" id="shown">Показано: 13</div></div>
+<div class="section-head"><div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div><div class="muted" id="shown">Показано: 18</div></div>
 <div class="toolbar"><input id="search" class="search" placeholder="⌕  Найти приложение..." autocomplete="off"></div>
 <div class="filters" id="filters">
 <button class="filter active" data-filter="Все">Все</button><button class="filter" data-filter="Создание видео">Видео</button><button class="filter" data-filter="Удалённая игра">Удалённая игра</button><button class="filter" data-filter="Медиа">Медиа</button><button class="filter" data-filter="Музыка">Музыка</button><button class="filter" data-filter="Homebrew">Homebrew</button>
@@ -70,7 +70,12 @@ const apps=[
 {name:"Itemzflow",icon:"🗂️",category:"Homebrew",desc:"Менеджер библиотеки приложений и игр для PS4. Используй только со своими легальными данными.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/LightningMods/Itemzflow"},
 {name:"PS MTP Explorer",icon:"🔌",category:"Homebrew",desc:"Инструмент для обмена файлами между PS4 и совместимыми устройствами через MTP.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/nueex/ps-mtp-explorer"},
 {name:"Homebrew Store",icon:"🏪",category:"Homebrew",desc:"Каталог сообщества с homebrew-приложениями. Проверяй автора, лицензию и источник каждого приложения.",version:"Актуальную версию смотри у разработчика",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"ConsoleMods Wiki",url:"https://consolemods.org/wiki/PS4:Recommended_Setup"},
-{name:"NULL Store",icon:"⬇️",category:"Homebrew",desc:"Стороннее приложение-каталог с функциями очереди загрузок. Пользуйся только для получения контента, на который у тебя есть права.",version:"1.0.0 (по адресу релиза)",compat:"Совместимость с конкретной прошивкой и требования к системной среде не подтверждены",source:"GitHub Releases — ссылка предоставлена пользователем",url:"https://github.com/lastrowcritic/null-store-ps4/releases/download/v1.0.0/NULL_store-PS4-1.0.pkg",download:true}
+{name:"NULL Store",icon:"⬇️",category:"Homebrew",desc:"Стороннее приложение-каталог с функциями очереди загрузок. Пользуйся только для получения контента, на который у тебя есть права.",version:"1.0.0 (по адресу релиза)",compat:"Совместимость с конкретной прошивкой и требования к системной среде не подтверждены",source:"GitHub Releases — ссылка предоставлена пользователем",url:"https://github.com/lastrowcritic/null-store-ps4/releases/download/v1.0.0/NULL_store-PS4-1.0.pkg",download:true},
+{name:"Playtube",icon:"📺",category:"Медиа",desc:"YouTube-клиент для PS4 с GoldHEN: без рекламы, пропуск спонсорских вставок (SponsorBlock), вход в свой аккаунт по желанию.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/LowganDev/PlaytubePS4/releases"},
+{name:"Playfin",icon:"🧊",category:"Медиа",desc:"Клиент Jellyfin для PS4: просмотр библиотеки своего медиасервера, вход через Quick Connect или логин/пароль.",version:"Требуется сервер Jellyfin 10.10+; версию приложения смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/LowganDev/PlayfinPS4/releases"},
+{name:"JoPlay",icon:"🎞️",category:"Медиа",desc:"Современный плеер для PS4, работающий с аддонами Stremio: разделы Home, Discover, Library и Search.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew)",source:"GitHub проекта",url:"https://github.com/JVK3R/JoPlay/releases"},
+{name:"PS4 Ambilight",icon:"💡",category:"Homebrew",desc:"Подсветка адресуемой RGB-ленты (WLED) в такт происходящему на экране, включая необязательный режим подсветки вне игр.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); нужна совместимая RGB-лента/WLED-контроллер",source:"GitHub проекта",url:"https://github.com/mitchshimy/PS4-Ambilight/releases"},
+{name:"orbisRPC",icon:"🟣",category:"Homebrew",desc:"Discord Rich Presence для PS4: показывает в Discord игру, обложку и таймер сессии. Работает прямо на консоли.",version:"Актуальную версию смотри в релизах",compat:"PS4 с GoldHEN (homebrew); использование токена аккаунта Discord — на свой риск",source:"GitHub проекта",url:"https://github.com/SirHumza/orbisRPC/releases"}
 ];
 let active="Все";
 const grid=document.getElementById("grid"),search=document.getElementById("search");
@@ -89,7 +94,7 @@ function details(name){
  const a=apps.find(x=>x.name===name);
  openModal(`<h2>${a.icon} ${a.name}</h2><span class="tag">${a.category}</span><p>${a.desc}</p><p><b>Версия:</b> ${a.version}<br><b>Совместимость:</b> ${a.compat}<br><b>Источник:</b> ${a.source}</p><p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Открыть ссылку на PKG ↗":"Открыть источник ↗"}</a></p><p class="muted">${a.download?"Внимание: это сторонний установочный файл по ссылке пользователя. Его безопасность, подлинность и содержимое независимо не проверены. Перед загрузкой оцени источник и используй только контент, на который у тебя есть права.":"Проверяй авторство, требования и совместимость перед использованием."}</p>`);
 }
-function showInfo(){openModal(`<h2>Что нового в 0.4.0</h2><ul><li>Добавлена карточка NULL Store 1.0.0.</li><li>Добавлена кнопка перехода к указанному PKG.</li><li>Обновлены счётчик приложений и информация о релизе.</li><li>Сохранены поиск, фильтры, карточки и мобильная адаптация.</li><li>Добавлено предупреждение о непроверенном стороннем файле.</li></ul>`)}
+function showInfo(){openModal(`<h2>Что нового в 0.5.0</h2><ul><li>Добавлены Playtube, Playfin и JoPlay (категория «Медиа»).</li><li>Добавлены PS4 Ambilight и orbisRPC (категория «Homebrew»).</li><li>Обновлены счётчик приложений и информация о релизе.</li><li>Сохранены поиск, фильтры, карточки и мобильная адаптация.</li></ul>`)}
 render();
 </script>
 </body>
