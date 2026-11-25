@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090711">
+<title>PS4 ULTIMATE STORE — 0.3.1</title>
+<style>
+:root{--bg:#090711;--panel:#141020;--panel2:#1c1530;--purple:#a855f7;--pink:#d946ef;--muted:#a69bb8;--line:#302342}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#291344 0,transparent 38%),var(--bg);color:#f7f2ff;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+header{position:sticky;top:0;z-index:5;background:#0b0813ef;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1150px;margin:auto;padding:0 20px}.nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{font-weight:900;letter-spacing:.6px;font-size:19px}.brand span{color:var(--purple)}.pill{border:1px solid #563078;color:#d9b7ff;padding:5px 10px;border-radius:30px;font-size:11px;letter-spacing:1px}
+.hero{padding:55px 0 34px}.eyebrow{color:#c084fc;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.04;margin:12px 0}.hero p{max-width:650px;color:var(--muted);font-size:16px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.btn{border:0;border-radius:12px;padding:12px 17px;font-weight:800;cursor:pointer;background:linear-gradient(110deg,var(--purple),var(--pink));color:white}.btn.secondary{background:#211832;border:1px solid var(--line)}
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:30px;color:var(--muted);font-size:13px}.stats b{color:white}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 22px}.search{flex:1;min-width:210px;background:#120d1d;border:1px solid var(--line);border-radius:12px;padding:13px 15px;color:white;font:inherit;outline:none}.search:focus{border-color:var(--purple)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}.filter{background:#171123;border:1px solid var(--line);color:#c8bdd6;padding:8px 13px;border-radius:30px;cursor:pointer}.filter.active{background:#51217b;border-color:#a855f7;color:white}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 16px}.section-head h2{margin:0;font-size:23px}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:55px}
+.card{background:linear-gradient(145deg,#191326,#100d18);border:1px solid var(--line);border-radius:18px;padding:17px;display:flex;flex-direction:column;min-height:260px;transition:.2s}
+.card:hover{transform:translateY(-3px);border-color:#7441a0;box-shadow:0 12px 35px #0005}
+.card-top{display:flex;align-items:center;gap:13px}.app-icon{width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#54217c,#241538);font-size:25px}
+.card h3{margin:0;font-size:17px}.tag{display:inline-block;color:#d8b6ff;background:#321b49;border:1px solid #4d2a69;border-radius:20px;padding:3px 8px;font-size:10px;margin-top:5px}
+.desc{color:var(--muted);font-size:13px;margin:15px 0;flex:1}.meta{display:flex;justify-content:space-between;gap:8px;color:#9487a5;font-size:11px;margin-bottom:13px}
+.card-actions{display:flex;gap:8px}.card-actions button,.card-actions a{flex:1;text-align:center;padding:9px 10px;border-radius:10px;font-weight:700;cursor:pointer;text-decoration:none;font-size:12px}
+.details{background:#271a38;color:#e8d9f7;border:1px solid #49305f}.source{background:linear-gradient(110deg,#8b35d1,#bd38c9);color:white;border:0}
+.notice{border:1px solid #49345d;background:#171021;border-radius:14px;padding:14px 16px;color:#bfb2cd;font-size:12px;margin:0 0 25px}
+.version{color:#d8b6ff;font-size:12px;font-weight:800}
+footer{border-top:1px solid var(--line);padding:24px 0 35px;color:#82758f;font-size:12px}
+.modal{position:fixed;inset:0;background:#05030bd9;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.modal.open{display:flex}.modal-box{max-width:540px;width:100%;max-height:85vh;overflow:auto;background:#171122;border:1px solid #624080;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0009}.modal-box h2{margin:0 0 10px}.modal-box p{color:var(--muted)}.close{float:right;background:#2a2036;color:white;border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
+a.inline{color:#d8b6ff}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.wrap{padding:0 14px}.grid{grid-template-columns:1fr}.hero{padding-top:40px}.nav{min-height:62px}.brand{font-size:16px}.pill{font-size:9px}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><div class="brand">PS4 <span>ULTIMATE STORE</span></div><div class="pill">VERSION 0.3.1 · PUBLIC CATALOG</div></div></header>
+<main class="wrap">
+<section class="hero">
+<div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
+<h1>Больше возможностей<br><span style="color:#c084fc">для PS4.</span></h1>
+<p>Подборка полезных приложений и функций для PlayStation 4: создание видео, удалённая игра, музыка и мультимедиа. У каждой карточки есть описание и ссылка на официальный источник.</p>
+<div class="hero-actions"><button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button><button class="btn secondary" onclick="showInfo()">Что нового в 0.2.0</button></div>
+<div class="stats"><span><b id="count">5</b> приложений</span><span><b>5</b> категорий</span><span><b>RU</b> интерфейс</span><span class="version">Релиз 0.3.1</span></div>
+</section>
+<div class="notice">ℹ️ Версия 0.3.1: каталог обновлён, добавлены официальные ссылки и фильтры. Доступность отдельных приложений может зависеть от региона и текущего ассортимента PlayStation Store. Перед установкой проверяй страницу приложения на своей консоли.</div>
+<section id="catalog">
+<div class="section-head"><div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div><div class="muted" id="shown">Показано: 5</div></div>
+<div class="toolbar"><input id="search" class="search" placeholder="⌕  Найти приложение..." autocomplete="off"></div>
+<div class="filters" id="filters">
+<button class="filter active" data-filter="Все">Все</button><button class="filter" data-filter="Создание видео">Видео</button><button class="filter" data-filter="Удалённая игра">Удалённая игра</button><button class="filter" data-filter="Медиа">Медиа</button><button class="filter" data-filter="Музыка">Музыка</button><button class="filter" data-filter="Homebrew">Homebrew</button>
+</div>
+<div class="grid" id="grid"></div>
+</section>
+</main>
+<footer><div class="wrap">PS4 ULTIMATE STORE · Независимый каталог сообщества. Не связан с Sony Interactive Entertainment. Ссылки ведут на страницы проектов и официальные ресурсы.</div></footer>
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modal-box"><button class="close" onclick="closeModal()">Закрыть ✕</button><div id="modal-content"></div></div></div>
+<script>
+const apps=[
+{name:"SHAREfactory",icon:"🎬",category:"Создание видео",desc:"Редактируй игровые клипы и скриншоты прямо на PS4: обрезай видео, добавляй оформление и собирай ролики.",version:"Обновляется через PS Store",compat:"PlayStation 4; доступность проверь в PS Store",source:"Официальная справка PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
+{name:"PS Remote Play",icon:"📱",category:"Удалённая игра",desc:"Играй на своей PS4 через совместимый смартфон, планшет или компьютер по сети.",version:"Актуальная версия на сайте",compat:"PS4 + совместимое устройство + аккаунт PlayStation",source:"Официальный сайт PS Remote Play",url:"https://remoteplay.dl.playstation.net/remoteplay/"},
+{name:"Media Player",icon:"▶️",category:"Медиа",desc:"Воспроизводи поддерживаемые видео, музыку и фотографии на консоли. Приложение загружается из PlayStation Store.",version:"Обновляется через PS Store",compat:"PlayStation 4; доступность проверь в PS Store",source:"Официальная справка PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
+{name:"Spotify",icon:"🎵",category:"Музыка",desc:"Слушай музыку во время игры, если приложение и сервис доступны в твоём регионе.",version:"Обновляется через PS Store",compat:"PlayStation 4; требуется аккаунт Spotify",source:"Официальная справка PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
+{name:"PlayStation App",icon:"🎮",category:"Удалённая игра",desc:"Официальное приложение-компаньон: общайся с друзьями, смотри профиль и управляй некоторыми функциями PlayStation с телефона.",version:"Актуальная версия в магазине приложений",compat:"Android / iOS; часть функций связана с PS4",source:"Официальная страница PlayStation App",url:"https://www.playstation.com/en-us/playstation-app/"},
+{name:"GnmScale",icon:"✨",category:"Homebrew",desc:"Homebrew-приложение GnmScale. Ссылка на PKG добавлена по запросу пользователя; назначение и совместимость конкретной прошивки требуют проверки.",version:"Не подтверждена; имя файла: IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg",compat:"Требования к системной среде и совместимость конкретной прошивки не подтверждены",source:"MediaFire — ссылка предоставлена пользователем; файл 31,25 МБ, загрузка от 30.10.2026",url:"https://www.mediafire.com/file/lnrwap92lqeli6y/IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg/file",download:true},
+{name:"Jobee'sLair",icon:"🧰",category:"Homebrew",desc:"Каталог и менеджер для PS4 homebrew: показывает приложения, сведения об обновлениях и управляет файлами. Используй только легальные homebrew-программы и контент, на который у тебя есть права.",version:"1.1.4 (по имени загруженного PKG)",compat:"Для homebrew-среды PS4; точную совместимость прошивки проверь у разработчика",source:"Официальный GitHub разработчика",url:"https://github.com/JVK3R/JobeesLair-PS4/releases",localFile:true},
+{name:"Apollo Save Tool",icon:"💾",category:"Homebrew",desc:"Утилита для резервного копирования и управления сохранениями игр и данными трофеев.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/bucanero/apollo-ps4/releases"},
+{name:"PS4-Xplorer",icon:"📁",category:"Homebrew",desc:"Файловый менеджер для просмотра файлов и папок на PS4.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/Lapy055/PS4-Xplorer/releases"},
+{name:"Itemzflow",icon:"🗂️",category:"Homebrew",desc:"Менеджер библиотеки приложений и игр для PS4. Используй только с собственными легальными данными.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/LightningMods/Itemzflow"},
+{name:"PS MTP Explorer",icon:"🔌",category:"Homebrew",desc:"Инструмент для обмена файлами между PS4 и совместимыми устройствами через MTP.",version:"Актуальную версию смотри в релизах",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"GitHub проекта",url:"https://github.com/nueex/ps-mtp-explorer"},
+{name:"Homebrew Store",icon:"🏪",category:"Homebrew",desc:"Каталог сообщества с homebrew-приложениями и небольшими проектами для PS4. Проверяй автора, лицензию и источник каждого приложения.",version:"Актуальную версию смотри у разработчика",compat:"PS4 homebrew; совместимость зависит от системной среды",source:"Страница проекта в ConsoleMods Wiki",url:"https://consolemods.org/wiki/PS4:Recommended_Setup"}
+];
+let active="Все";
+const grid=document.getElementById("grid"),search=document.getElementById("search");
+function render(){
+ const q=search.value.toLowerCase().trim();
+ const list=apps.filter(a=>(active==="Все"||a.category===active)&&(a.name+" "+a.desc+" "+a.category).toLowerCase().includes(q));
+ grid.innerHTML=list.map(a=>`<article class="card"><div class="card-top"><div class="app-icon">${a.icon}</div><div><h3>${a.name}</h3><span class="tag">${a.category}</span></div></div><p class="desc">${a.desc}</p><div class="meta"><span>PS4 / PlayStation</span><span>${a.download?"Ссылка на PKG":"Источник проекта"}</span></div><div class="card-actions"><button class="details" onclick="details('${a.name}')">Подробнее</button>${a.url?`<a class="source" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Скачать PKG ↗":"Источник ↗"}</a>`:`<span class="source" style="display:grid;place-items:center;opacity:.7">Файл в проекте</span>`}</div></article>`).join("");
+ document.getElementById("shown").textContent="Показано: "+list.length;
+ document.getElementById("count").textContent=apps.length;
+}
+document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");active=b.dataset.filter;render()}));
+search.addEventListener("input",render);
+function openModal(html){document.getElementById("modal-content").innerHTML=html;document.getElementById("modal").classList.add("open")}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function details(name){
+ const a=apps.find(x=>x.name===name);
+ openModal(`<h2>${a.icon} ${a.name}</h2><span class="tag">${a.category}</span><p>${a.desc}</p><p><b>Версия:</b> ${a.version}<br><b>Совместимость:</b> ${a.compat}<br><b>Источник:</b> ${a.source}</p>${a.url?`<p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Открыть страницу загрузки ↗":"Открыть источник ↗"}</a></p>`:`<p class="muted">В карточке указан загруженный тобой PKG. Сам файл не вшит в HTML-каталог и не размещён на сайте.</p>`}<p class="muted">${a.download?"Внимание: ссылка ведёт на сторонний файл MediaFire, предоставленный пользователем. Его безопасность, подлинность и содержимое не проверены — учитывай это перед загрузкой.":"Каталог не раздаёт установочные файлы сторонних проектов. Проверяй авторство и совместимость перед использованием."}</p>`);
+}
+function showInfo(){openModal(`<h2>Что нового в 0.2.0</h2><ul><li>Каталог расширен до 12 карточек.</li><li>Добавлен раздел Homebrew и две карточки по загруженным тобой PKG.</li><li>Добавлены прямые ссылки на официальные страницы.</li><li>Добавлен поиск по названию и описанию.</li><li>Фильтры разделены по назначению, включая Homebrew.</li><li>Карточки показывают совместимость и способ получения.</li><li>Обновлена мобильная адаптация.</li></ul><p>В каталоге размещаются обычные приложения и официальные функции. Ссылки на неофициальные сборки, обход защиты и нечестные игровые преимущества не добавляются.</p>`)}
+render();
+</script>
+</body>
+</html>
