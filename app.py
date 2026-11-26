@@ -1391,7 +1391,7 @@ def admin_users():
 
 @app.route("/api/admin/users/<int:user_id>", methods=["PATCH"])
 @require_csrf
-@require_roles("owner", "admin")
+@require_roles("owner", "admin", "torrent_manager")
 def update_user(user_id):
     data = request.get_json(silent=True)
 
