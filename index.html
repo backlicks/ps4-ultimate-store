@@ -3,179 +3,299 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#090711">
-<title>PS4 ULTIMATE STORE 0.7.0</title>
+<meta name="theme-color" content="#080808">
+<title>PS4 ULTIMATE STORE 0.8.0</title>
 <style>
-:root {
-  --bg:#090711;
-  --panel:#141020;
-  --purple:#a855f7;
-  --pink:#d946ef;
-  --muted:#a69bb8;
-  --line:#302342;
+:root{
+  --bg:#080808;
+  --surface:#111111;
+  --surface-2:#171717;
+  --surface-3:#202020;
+  --red:#e50914;
+  --red-2:#ff2633;
+  --red-dark:#65070d;
+  --text:#f5f5f5;
+  --muted:#999;
+  --line:#303030;
+  --radius:18px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
- margin:0;background:radial-gradient(ellipse at 15% 0%,#291344 0,transparent 38%),var(--bg);
- color:#f7f2ff;font:15px/1.5 system-ui,Arial;
+  margin:0;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at 50% -15%,rgba(229,9,20,.23),transparent 42%),
+    radial-gradient(ellipse at 100% 45%,rgba(120,0,8,.10),transparent 35%),
+    var(--bg);
+  font:15px/1.55 Inter,system-ui,-apple-system,Arial,sans-serif;
 }
+button,input{font:inherit}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 40px));margin:auto}
 header{
- position:sticky;top:0;z-index:5;
- background:#0b0813ef;backdrop-filter:blur(14px);
- border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:20;
+  background:rgba(8,8,8,.88);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
 }
-.wrap{max-width:1150px;margin:auto;padding:0 20px}
-.nav{
- min-height:70px;display:flex;align-items:center;
- justify-content:space-between;gap:12px;flex-wrap:wrap;
+.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:950;letter-spacing:.5px;font-size:18px}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  color:white;background:linear-gradient(145deg,#ff2935,#9e0009);
+  box-shadow:0 0 24px rgba(229,9,20,.32);font-size:19px
 }
-.brand{font-weight:900;font-size:19px}
-.brand span{color:var(--purple)}
-.pill{border:1px solid #563078;color:#d9b7ff;padding:5px 10px;border-radius:30px;font-size:11px}
-.hero{padding:50px 0 30px}
-.eyebrow{color:#c084fc;text-transform:uppercase;letter-spacing:2px;font-size:11px;font-weight:800}
-h1{font-size:clamp(34px,6vw,58px);line-height:1.04;margin:12px 0}
-.hero p{max-width:700px;color:var(--muted);font-size:16px}
+.brand span{color:var(--red-2)}
+.nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.version{
+  border:1px solid #4a2023;background:#1b0d0e;color:#ff9ba1;
+  border-radius:30px;padding:6px 11px;font-size:10px;font-weight:850;letter-spacing:1px
+}
+.nav-link{
+  color:#ddd;text-decoration:none;font-size:13px;font-weight:750;
+  padding:9px 12px;border-radius:10px;transition:.2s
+}
+.nav-link:hover{background:#1d1112;color:#fff}
+.hero{padding:72px 0 52px;position:relative}
+.hero:before{
+  content:"";position:absolute;right:4%;top:34px;width:300px;height:300px;
+  border-radius:50%;background:rgba(229,9,20,.12);filter:blur(90px);pointer-events:none
+}
+.hero-inner{position:relative;max-width:790px}
+.eyebrow{
+  display:flex;align-items:center;gap:9px;color:#ff626b;text-transform:uppercase;
+  letter-spacing:3px;font-size:11px;font-weight:900
+}
+.eyebrow:before{content:"";width:27px;height:2px;background:var(--red)}
+h1{font-size:clamp(38px,7vw,76px);line-height:.99;letter-spacing:-2.7px;margin:20px 0 18px;font-weight:950}
+h1 .accent{
+  color:var(--red-2);
+  text-shadow:0 0 34px rgba(229,9,20,.24)
+}
+.hero p{max-width:660px;color:#aaa;font-size:16px;margin:0}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
 .btn{
- border:0;border-radius:12px;padding:12px 17px;font-weight:800;
- cursor:pointer;background:linear-gradient(110deg,var(--purple),var(--pink));color:white;
- text-decoration:none;display:inline-block;
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:13px 19px;border-radius:11px;border:1px solid transparent;
+  text-decoration:none;font-weight:850;font-size:13px;cursor:pointer;transition:.2s
 }
-.btn.secondary{background:#211832;border:1px solid var(--line)}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.stats{display:flex;gap:22px;flex-wrap:wrap;margin-top:25px;color:var(--muted);font-size:13px}
-.stats b{color:white}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:30px 0 16px}
-.section-head h2{margin:0;font-size:23px}
-.muted{color:var(--muted);font-size:13px}
-.platform-tabs,.filters{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+.btn-primary{
+  color:white;background:linear-gradient(110deg,#f01420,#a9000b);
+  box-shadow:0 8px 26px rgba(229,9,20,.2)
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(229,9,20,.34)}
+.btn-ghost{background:#151515;border-color:#383838;color:#eee}
+.btn-ghost:hover{border-color:#8f252b;background:#1b1112}
+.stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:35px;padding-top:22px;border-top:1px solid #292929;color:#888;font-size:12px}
+.stats b{display:block;color:white;font-size:19px;line-height:1.2;margin-bottom:3px}
+.notice{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:15px 17px;border:1px solid #3d2527;border-left:3px solid var(--red);
+  background:linear-gradient(100deg,rgba(229,9,20,.09),rgba(20,20,20,.85));
+  border-radius:12px;color:#aaa;font-size:12px
+}
+.notice strong{color:#eee}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:55px 0 18px}
+.section-kicker{color:#f04b54;text-transform:uppercase;letter-spacing:2.5px;font-size:10px;font-weight:900}
+.section-head h2{font-size:27px;line-height:1.15;margin:5px 0 0;letter-spacing:-.5px}
+.muted{color:var(--muted);font-size:12px}
+#shown{white-space:nowrap}
+.platform-tabs,.filters{display:flex;gap:9px;flex-wrap:wrap}
+.platform-tabs{margin:22px 0 15px}
 .platform-tab,.filter{
- background:#171123;border:1px solid var(--line);color:#c8bdd6;
- padding:10px 15px;border-radius:12px;cursor:pointer;font-weight:800;
+  background:#141414;border:1px solid #303030;color:#aaa;
+  border-radius:10px;padding:11px 16px;cursor:pointer;font-weight:800;font-size:12px;transition:.2s
 }
-.platform-tab.active,.filter.active{
- background:linear-gradient(110deg,#7130a8,#a855f7);
- border-color:#a855f7;color:white;
+.platform-tab:hover,.filter:hover{border-color:#76272c;color:white}
+.platform-tab.active{
+  color:white;border-color:#e50914;
+  background:linear-gradient(120deg,#a9000b,#e50914);
+  box-shadow:0 5px 20px rgba(229,9,20,.17)
 }
-.toolbar{display:flex;gap:12px;margin:18px 0}
+.toolbar{display:flex;gap:12px;margin:18px 0 14px}
+.search-wrap{position:relative;width:100%}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#777;font-size:18px;pointer-events:none}
 .search{
- width:100%;background:#120d1d;border:1px solid var(--line);
- border-radius:12px;padding:13px 15px;color:white;font:inherit;outline:none;
+  width:100%;background:#111;border:1px solid #303030;border-radius:11px;
+  padding:14px 15px 14px 43px;color:white;outline:none
 }
-.search:focus{border-color:var(--purple)}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:55px}
+.search::placeholder{color:#707070}
+.search:focus{border-color:#b3232b;box-shadow:0 0 0 3px rgba(229,9,20,.09)}
+.filters{margin:14px 0 22px}
+.filter{padding:8px 13px;font-size:11px;border-radius:30px}
+.filter.active{background:#321012;border-color:#a52a31;color:#ff9ba1}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;padding-bottom:65px}
 .card{
- background:linear-gradient(145deg,#191326,#100d18);
- border:1px solid var(--line);border-radius:18px;padding:17px;
- display:flex;flex-direction:column;min-height:250px;transition:.2s;
+  position:relative;overflow:hidden;min-height:260px;padding:18px;
+  display:flex;flex-direction:column;
+  background:linear-gradient(145deg,#171717,#101010 70%);
+  border:1px solid #2d2d2d;border-radius:16px;transition:transform .22s,border-color .22s,box-shadow .22s
 }
-.card:hover{transform:translateY(-3px);border-color:#7441a0}
-.card-top{display:flex;align-items:center;gap:13px}
+.card:before{
+  content:"";position:absolute;inset:0 0 auto;height:2px;
+  background:linear-gradient(90deg,transparent,#d20a15,transparent);opacity:0;transition:.2s
+}
+.card:hover{transform:translateY(-4px);border-color:#76252a;box-shadow:0 14px 34px rgba(0,0,0,.35),0 0 24px rgba(229,9,20,.06)}
+.card:hover:before{opacity:1}
+.card-top{display:flex;align-items:center;gap:13px;min-width:0}
 .app-icon{
- width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;
- border-radius:15px;background:linear-gradient(145deg,#54217c,#241538);font-size:25px;
+  width:55px;height:55px;flex:0 0 55px;display:grid;place-items:center;
+  border:1px solid #542126;border-radius:14px;
+  background:linear-gradient(145deg,#3b1115,#191011);font-size:25px;
+  box-shadow:inset 0 0 18px rgba(229,9,20,.08)
 }
-.card h3{margin:0;font-size:17px}
+.card h3{margin:0;font-size:16px;line-height:1.3;overflow-wrap:anywhere}
 .tag{
- display:inline-block;color:#d8b6ff;background:#321b49;
- border:1px solid #4d2a69;border-radius:20px;padding:3px 8px;font-size:10px;margin-top:5px;
+  display:inline-block;margin-top:6px;padding:3px 8px;border-radius:5px;
+  color:#ff9da3;background:#2b1113;border:1px solid #552126;font-size:9px;font-weight:850;
+  text-transform:uppercase;letter-spacing:.5px
 }
-.platform-label{font-size:10px;color:#c084fc;margin-top:5px}
-.desc{color:var(--muted);font-size:13px;margin:15px 0;flex:1}
-.meta{display:flex;justify-content:space-between;gap:8px;color:#9487a5;font-size:11px;margin-bottom:13px}
+.platform-label{font-size:10px;color:#777;margin-top:5px}
+.desc{color:#999;font-size:12px;margin:17px 0;flex:1}
+.meta{display:flex;justify-content:space-between;gap:8px;color:#777;font-size:10px;margin-bottom:13px}
 .card-actions{display:flex;gap:8px}
 .card-actions button,.card-actions a{
- flex:1;text-align:center;padding:9px 7px;border-radius:10px;
- font-weight:700;cursor:pointer;text-decoration:none;font-size:12px;
+  flex:1;text-align:center;padding:10px 8px;border-radius:9px;
+  font-weight:800;cursor:pointer;text-decoration:none;font-size:11px;transition:.2s
 }
-.details{background:#271a38;color:#e8d9f7;border:1px solid #49305f}
-.source{background:linear-gradient(110deg,#8b35d1,#bd38c9);color:white;border:0}
-.notice{border:1px solid #49345d;background:#171021;border-radius:14px;padding:14px;color:#bfb2cd;font-size:12px}
-footer{border-top:1px solid var(--line);padding:24px 0 35px;color:#82758f;font-size:12px}
-.modal{position:fixed;inset:0;background:#05030bd9;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.details{background:#1b1b1b;color:#ddd;border:1px solid #3a3a3a}
+.details:hover{border-color:#a52a31;color:white}
+.source{background:linear-gradient(110deg,#b40812,#ed101d);color:white;border:1px solid #ed101d}
+.source:hover{filter:brightness(1.15)}
+.empty{
+  grid-column:1/-1;text-align:center;padding:48px 20px;color:#888;
+  border:1px dashed #393939;border-radius:15px;background:#101010
+}
+footer{border-top:1px solid #292929;padding:26px 0 38px;color:#777;font-size:11px}
+.footer-row{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.footer-brand{font-weight:900;color:#ddd;letter-spacing:.7px}
+.footer-brand span{color:var(--red)}
+.footer-links{display:flex;gap:15px;flex-wrap:wrap}
+.footer-links a{color:#999;text-decoration:none}
+.footer-links a:hover{color:#ff6b73}
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;
+  align-items:center;justify-content:center;padding:18px;z-index:50;backdrop-filter:blur(7px)
+}
 .modal.open{display:flex}
-.modal-box{max-width:540px;width:100%;max-height:85vh;overflow:auto;background:#171122;border:1px solid #624080;border-radius:18px;padding:22px}
-.modal-box p{color:var(--muted)}
-.close{float:right;background:#2a2036;color:white;border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
-a.inline{color:#d8b6ff}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){
- .wrap{padding:0 14px}.grid{grid-template-columns:1fr}
- .hero{padding-top:35px}.nav{padding:12px 0}
- .platform-tab{flex:1;padding:10px 7px;font-size:12px}
+.modal-box{
+  max-width:560px;width:100%;max-height:86vh;overflow:auto;
+  background:linear-gradient(145deg,#1b1b1b,#101010);
+  border:1px solid #713036;border-radius:17px;padding:23px;
+  box-shadow:0 20px 80px rgba(0,0,0,.6),0 0 35px rgba(229,9,20,.08)
+}
+.modal-box h2{margin:10px 0;font-size:24px}
+.modal-box p{color:#aaa;font-size:13px}
+.modal-box b{color:#eee}
+.close{float:right;background:#242424;color:#ddd;border:1px solid #414141;border-radius:8px;padding:8px 11px;cursor:pointer}
+.close:hover{border-color:#b72a33;color:white}
+a.inline{color:#ff737b}
+.support-float{
+  position:fixed;right:22px;bottom:22px;z-index:30;
+  display:flex;align-items:center;gap:9px;padding:13px 17px;
+  color:white;text-decoration:none;font-size:12px;font-weight:900;
+  border:1px solid #ff4650;border-radius:30px;
+  background:linear-gradient(110deg,#b40812,#ed101d);
+  box-shadow:0 8px 30px rgba(229,9,20,.32);transition:.2s
+}
+.support-float:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(229,9,20,.45)}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+  .wrap{width:calc(100% - 28px)}
+  .nav{min-height:66px}
+  .brand{font-size:14px}
+  .brand-mark{width:33px;height:33px}
+  .version{font-size:9px;padding:5px 8px}
+  .nav-link{display:none}
+  .hero{padding:54px 0 38px}
+  h1{letter-spacing:-1.6px}
+  .hero p{font-size:14px}
+  .stats{gap:18px}
+  .section-head{margin-top:42px}
+  .section-head h2{font-size:23px}
+  .grid{grid-template-columns:1fr;gap:12px}
+  .card{min-height:235px}
+  .platform-tab{flex:1;padding:10px 7px;font-size:11px}
+  .support-float{right:13px;bottom:13px;padding:12px 14px}
 }
 </style>
 </head>
 <body>
-
 <header>
-<div class="wrap nav">
- <div class="brand">PS4 <span>ULTIMATE STORE</span></div>
- <div class="pill">VERSION 0.7.0 · PUBLIC CATALOG</div>
-</div>
+  <div class="wrap nav">
+    <div class="brand"><div class="brand-mark">P</div><div>PS4 <span>ULTIMATE STORE</span></div></div>
+    <div class="nav-right">
+      <a class="nav-link" href="#catalog">Каталог</a>
+      <a class="nav-link" href="https://t.me/proshivkaj" target="_blank" rel="noopener noreferrer">Telegram ↗</a>
+      <div class="version">VERSION 0.8.0 · BLACK RED</div>
+    </div>
+  </div>
 </header>
 
 <main class="wrap">
 <section class="hero">
- <div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
- <h1>Всё для твоих устройств.<br><span style="color:#c084fc">В одном месте.</span></h1>
- <p>Приложения для PlayStation 4, телефонов и компьютеров. Выбирай платформу и находи нужные программы.</p>
- <div class="hero-actions">
-  <button class="btn" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог ↓</button>
-  <a class="btn secondary" href="https://t.me/proshivkaj" target="_blank">✈️ Telegram</a>
- </div>
- <div class="stats">
-  <span><b id="count">0</b> приложений</span>
-  <span><b>3</b> платформы</span>
-  <span><b>RU</b> интерфейс</span>
-  <span>Релиз 0.7.0</span>
- </div>
+  <div class="hero-inner">
+    <div class="eyebrow">Твоя PlayStation. Твои возможности.</div>
+    <h1>Технологии.<br><span class="accent">Игры. Свобода.</span></h1>
+    <p>Единая библиотека приложений для PlayStation 4, телефонов и компьютеров. Выбирай устройство, изучай каталог и находи нужные инструменты.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Открыть каталог <span>↓</span></button>
+      <a class="btn btn-ghost" href="https://t.me/proshivkaj" target="_blank" rel="noopener noreferrer">✈ Telegram</a>
+    </div>
+    <div class="stats">
+      <span><b id="count">0</b>приложений</span>
+      <span><b>03</b>платформы</span>
+      <span><b>RU</b>язык интерфейса</span>
+      <span><b>0.8.0</b>версия сайта</span>
+    </div>
+  </div>
 </section>
 
-<div class="notice">
- ℹ️ Каталог постепенно пополняется. Проверяй совместимость, требования и источники приложений перед установкой.
-</div>
+<div class="notice"><span>⚠️</span><div><strong>Информация о каталоге.</strong> Каталог постепенно пополняется. Перед установкой проверяй совместимость, системные требования и источник приложения.</div></div>
 
 <section id="catalog">
- <div class="section-head">
-  <div><div class="eyebrow">Библиотека</div><h2>Каталог приложений</h2></div>
-  <div class="muted" id="shown">Показано: 0</div>
- </div>
+  <div class="section-head">
+    <div><div class="section-kicker">Библиотека приложений</div><h2>Выбери своё приложение</h2></div>
+    <div class="muted" id="shown">Показано: 0</div>
+  </div>
 
- <div class="platform-tabs" id="platformTabs">
-  <button class="platform-tab active" data-platform="PS4">🎮 PS4</button>
-  <button class="platform-tab" data-platform="Телефоны">📱 Телефоны</button>
-  <button class="platform-tab" data-platform="ПК">💻 ПК</button>
-  <button class="platform-tab" data-platform="Все">🌐 Все</button>
- </div>
+  <div class="platform-tabs" id="platformTabs">
+    <button class="platform-tab active" data-platform="PS4">🎮 PS4</button>
+    <button class="platform-tab" data-platform="Телефоны">📱 Телефоны</button>
+    <button class="platform-tab" data-platform="ПК">💻 ПК</button>
+    <button class="platform-tab" data-platform="Все">🌐 Все</button>
+  </div>
 
- <div class="toolbar">
-  <input id="search" class="search" placeholder="⌕ Найти приложение..." autocomplete="off">
- </div>
+  <div class="toolbar">
+    <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" class="search" placeholder="Поиск приложений по названию или категории..." autocomplete="off"></div>
+  </div>
 
- <div class="filters" id="filters">
-  <button class="filter active" data-filter="Все">Все категории</button>
-  <button class="filter" data-filter="Homebrew">Homebrew</button>
-  <button class="filter" data-filter="Эмуляторы">Эмуляторы</button>
-  <button class="filter" data-filter="Медиа">Медиа</button>
-  <button class="filter" data-filter="Утилиты">Утилиты</button>
-  <button class="filter" data-filter="Игры">Игры</button>
- </div>
+  <div class="filters" id="filters">
+    <button class="filter active" data-filter="Все">Все категории</button>
+    <button class="filter" data-filter="Homebrew">Homebrew</button>
+    <button class="filter" data-filter="Эмуляторы">Эмуляторы</button>
+    <button class="filter" data-filter="Медиа">Медиа</button>
+    <button class="filter" data-filter="Утилиты">Утилиты</button>
+    <button class="filter" data-filter="Игры">Игры</button>
+  </div>
 
- <div class="grid" id="grid"></div>
+  <div class="grid" id="grid"></div>
 </section>
 </main>
 
-<footer><div class="wrap">
-PS4 ULTIMATE STORE · Независимый каталог сообщества. Не связан с Sony Interactive Entertainment.
+<footer><div class="wrap footer-row">
+  <div><div class="footer-brand">PS4 <span>ULTIMATE STORE</span></div><div>Независимый каталог сообщества. Не связан с Sony Interactive Entertainment.</div></div>
+  <div class="footer-links"><a href="https://t.me/proshivkaj" target="_blank" rel="noopener noreferrer">Telegram</a><a href="https://t.me/ArticSupport_bot" target="_blank" rel="noopener noreferrer">Поддержка</a></div>
 </div></footer>
 
+<a class="support-float" href="https://t.me/ArticSupport_bot" target="_blank" rel="noopener noreferrer">🎫 Поддержка</a>
+
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
- <div class="modal-box">
-  <button class="close" onclick="closeModal()">Закрыть ✕</button>
-  <div id="modal-content"></div>
- </div>
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">Закрыть ✕</button>
+    <div id="modal-content"></div>
+  </div>
 </div>
 
 <script>
@@ -226,76 +346,76 @@ const grid=document.getElementById("grid");
 const search=document.getElementById("search");
 
 function render(){
- const q=search.value.toLowerCase().trim();
- const list=apps.filter(a=>
-  (activePlatform==="Все"||a.platforms.includes(activePlatform))&&
-  (active==="Все"||a.category===active)&&
-  (a.name+" "+a.desc+" "+a.category+" "+a.platforms.join(" ")).toLowerCase().includes(q)
- );
+  const q=search.value.toLowerCase().trim();
+  const list=apps.map((a,index)=>({...a,index})).filter(a=>
+    (activePlatform==="Все"||a.platforms.includes(activePlatform))&&
+    (active==="Все"||a.category===active)&&
+    (a.name+" "+a.desc+" "+a.category+" "+a.platforms.join(" ")).toLowerCase().includes(q)
+  );
+  grid.innerHTML=list.length?list.map(a=>`
+    <article class="card">
+      <div class="card-top">
+        <div class="app-icon">${a.icon}</div>
+        <div>
+          <h3>${a.name}</h3>
+          <span class="tag">${a.category}</span>
+          <div class="platform-label">${a.platforms.join(" · ")}</div>
+        </div>
+      </div>
+      <p class="desc">${a.desc}</p>
+      <div class="meta"><span>${a.version}</span><span>${a.download?"PKG":"Источник"}</span></div>
+      <div class="card-actions">
+        <button class="details" onclick="details(${a.index})">Подробнее</button>
+        <a class="source" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Скачать ↗":"Источник ↗"}</a>
+      </div>
+    </article>`).join(""):`<div class="empty">Ничего не найдено. Попробуй изменить запрос или категорию.</div>`;
 
- grid.innerHTML=list.map((a,i)=>`
- <article class="card">
-  <div class="card-top">
-   <div class="app-icon">${a.icon}</div>
-   <div>
-    <h3>${a.name}</h3>
-    <span class="tag">${a.category}</span>
-    <div class="platform-label">${a.platforms.join(" · ")}</div>
-   </div>
-  </div>
-  <p class="desc">${a.desc}</p>
-  <div class="meta"><span>${a.version}</span><span>${a.download?"PKG":"Источник"}</span></div>
-  <div class="card-actions">
-   <button class="details" onclick="details(${i})">Подробнее</button>
-   <a class="source" href="${a.url}" target="_blank" rel="noopener noreferrer">${a.download?"Скачать ↗":"Источник ↗"}</a>
-  </div>
- </article>`).join("");
-
- document.getElementById("shown").textContent="Показано: "+list.length;
- document.getElementById("count").textContent=apps.length;
+  document.getElementById("shown").textContent="Показано: "+list.length;
+  document.getElementById("count").textContent=apps.length;
 }
 
 document.querySelectorAll(".filter").forEach(b=>{
- b.addEventListener("click",()=>{
-  document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  active=b.dataset.filter;
-  render();
- });
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    active=b.dataset.filter;
+    render();
+  });
 });
 
 document.querySelectorAll(".platform-tab").forEach(b=>{
- b.addEventListener("click",()=>{
-  document.querySelectorAll(".platform-tab").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  activePlatform=b.dataset.platform;
-  render();
- });
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".platform-tab").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    activePlatform=b.dataset.platform;
+    render();
+  });
 });
 
 search.addEventListener("input",render);
 
 function openModal(html){
- document.getElementById("modal-content").innerHTML=html;
- document.getElementById("modal").classList.add("open");
+  document.getElementById("modal-content").innerHTML=html;
+  document.getElementById("modal").classList.add("open");
 }
 function closeModal(){
- document.getElementById("modal").classList.remove("open");
+  document.getElementById("modal").classList.remove("open");
 }
 function details(index){
- const a=apps[index];
- openModal(`
- <h2>${a.icon} ${a.name}</h2>
- <span class="tag">${a.category}</span>
- <p>${a.desc}</p>
- <p><b>Платформы:</b> ${a.platforms.join(", ")}<br>
- <b>Версия:</b> ${a.version}<br>
- <b>Совместимость:</b> ${a.compat}<br>
- <b>Источник:</b> ${a.source}</p>
- <p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">Открыть источник ↗</a></p>
- <p class="muted">Проверяй требования разработчика и используй только приложения и материалы, на которые у тебя есть права.</p>
- `);
+  const a=apps[index];
+  openModal(`
+    <h2>${a.icon} ${a.name}</h2>
+    <span class="tag">${a.category}</span>
+    <p>${a.desc}</p>
+    <p><b>Платформы:</b> ${a.platforms.join(", ")}<br>
+    <b>Версия:</b> ${a.version}<br>
+    <b>Совместимость:</b> ${a.compat}<br>
+    <b>Источник:</b> ${a.source}</p>
+    <p><a class="inline" href="${a.url}" target="_blank" rel="noopener noreferrer">Открыть источник ↗</a></p>
+    <p class="muted">Проверяй требования разработчика и используй только приложения и материалы, на которые у тебя есть права.</p>
+  `);
 }
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 render();
 </script>
 </body>
