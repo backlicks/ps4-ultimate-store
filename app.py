@@ -1,4 +1,3 @@
-
 import os
 import re
 import json
@@ -274,151 +273,12 @@ def init_db():
         connection.close()
 
 
+#
 # ==========================================
 # INITIAL CATALOG
 # ==========================================
 
 INITIAL_CATALOG = [
-    {
-        "name": "SHAREfactory",
-        "category": "Медиа",
-        "description": "Редактирование игровых клипов и скриншотов прямо на PS4.",
-        "version": "PS Store",
-        "compatibility": "PlayStation 4",
-        "source": "PlayStation",
-        "url": "https://www.playstation.com/en-us/support/hardware/ps4/",
-        "icon": "🎬",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "PS Remote Play",
-        "category": "Утилиты",
-        "description": "Играй на своей PS4 через смартфон, планшет или компьютер.",
-        "version": "Актуальная версия",
-        "compatibility": "PS4 и совместимое устройство",
-        "source": "PlayStation Remote Play",
-        "url": "https://remoteplay.dl.playstation.net/remoteplay/",
-        "icon": "📱",
-        "platforms": ["Телефоны", "ПК"]
-    },
-    {
-        "name": "Media Player",
-        "category": "Медиа",
-        "description": "Воспроизведение поддерживаемых видео, музыки и фотографий.",
-        "version": "PS Store",
-        "compatibility": "PlayStation 4",
-        "source": "PlayStation",
-        "url": "https://www.playstation.com/en-us/support/hardware/ps4/",
-        "icon": "▶️",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Spotify",
-        "category": "Медиа",
-        "description": "Музыка и плейлисты во время игры.",
-        "version": "Актуальная версия",
-        "compatibility": "Зависит от региона и устройства",
-        "source": "Spotify",
-        "url": "https://www.spotify.com/download/",
-        "icon": "🎵",
-        "platforms": ["PS4", "Телефоны", "ПК"]
-    },
-    {
-        "name": "PlayStation App",
-        "category": "Утилиты",
-        "description": "Официальное приложение-компаньон PlayStation.",
-        "version": "Актуальная версия",
-        "compatibility": "Android / iOS",
-        "source": "PlayStation",
-        "url": "https://www.playstation.com/en-us/playstation-app/",
-        "icon": "🎮",
-        "platforms": ["Телефоны"]
-    },
-    {
-        "name": "Apollo Save Tool",
-        "category": "Утилиты",
-        "description": "Управление и резервное копирование сохранений игр.",
-        "version": "Последняя версия",
-        "compatibility": "PS4 homebrew",
-        "source": "GitHub",
-        "url": "https://github.com/bucanero/apollo-ps4/releases",
-        "icon": "💾",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "PS4-Xplorer",
-        "category": "Утилиты",
-        "description": "Файловый менеджер для PS4.",
-        "version": "Последняя версия",
-        "compatibility": "PS4 homebrew",
-        "source": "GitHub",
-        "url": "https://github.com/Lapy055/PS4-Xplorer/releases",
-        "icon": "📁",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Itemzflow",
-        "category": "Утилиты",
-        "description": "Менеджер библиотеки приложений и игр.",
-        "version": "Последняя версия",
-        "compatibility": "PS4 homebrew",
-        "source": "GitHub",
-        "url": "https://github.com/LightningMods/Itemzflow",
-        "icon": "🗂️",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Homebrew Store",
-        "category": "Homebrew",
-        "description": "Каталог homebrew-приложений сообщества.",
-        "version": "Последняя версия",
-        "compatibility": "PS4 homebrew",
-        "source": "ConsoleMods",
-        "url": "https://consolemods.org/wiki/PS4:Recommended_Setup",
-        "icon": "🏪",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Playtube",
-        "category": "Медиа",
-        "description": "YouTube-клиент для PS4.",
-        "version": "Последняя версия",
-        "compatibility": "Требования проекта",
-        "source": "GitHub",
-        "url": "https://github.com/LowganDev/PlaytubePS4/releases",
-        "icon": "📺",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Playfin",
-        "category": "Медиа",
-        "description": "Клиент Jellyfin для личной медиатеки.",
-        "version": "Последняя версия",
-        "compatibility": "Требуется сервер Jellyfin",
-        "source": "GitHub",
-        "url": "https://github.com/LowganDev/PlayfinPS4/releases",
-        "icon": "🧊",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "RetroArch (PS4)",
-        "category": "Эмуляторы",
-        "description": "Мультисистемная оболочка для ретро-эмуляции.",
-        "version": "Зависит от сборки",
-        "compatibility": "Неофициальный порт PS4",
-        "source": "GitHub",
-        "url": "https://github.com/gen04177/rarch-ps4",
-        "icon": "🕹️",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "ZArchiver",
-        "category": "Утилиты",
-        "description": "Архиватор для Android.",
-        "version": "Google Play",
-        "compatibility": "Android",
-        "source": "Google Play",
-        "url": "https:INITIAL_CATALOG = [
     {
         "name": "SHAREfactory",
         "category": "Медиа",
@@ -488,7 +348,7 @@ INITIAL_CATALOG = [
     {
         "name": "Jobee'sLair",
         "category": "Homebrew",
-        "description": "Каталог homebrew-приложений, инструментов и эмуляторов для PS4.",
+        "description": "Каталог homebrew-приложений и инструментов для PS4.",
         "version": "Последняя версия",
         "compatibility": "PS4 с GoldHEN",
         "source": "GitHub",
@@ -532,7 +392,7 @@ INITIAL_CATALOG = [
     {
         "name": "PS MTP Explorer",
         "category": "Утилиты",
-        "description": "Передача файлов между Android, USB-накопителем и PS4.",
+        "description": "Передача файлов между Android, USB и PS4.",
         "version": "Последняя версия",
         "compatibility": "PS4 с GoldHEN",
         "source": "GitHub",
@@ -554,7 +414,7 @@ INITIAL_CATALOG = [
     {
         "name": "NULL Store",
         "category": "Homebrew",
-        "description": "Приложение-каталог для PS4. Проверяй происхождение и разрешения контента.",
+        "description": "Приложение-каталог для PS4.",
         "version": "Последняя версия",
         "compatibility": "Зависит от сборки",
         "source": "GitHub",
@@ -600,7 +460,7 @@ INITIAL_CATALOG = [
         "category": "Утилиты",
         "description": "Проект подсветки Ambilight для PS4.",
         "version": "Последняя версия",
-        "compatibility": "Зависит от оборудования и сборки",
+        "compatibility": "Зависит от оборудования",
         "source": "GitHub",
         "url": "https://github.com/search?q=PS4+Ambilight&type=repositories",
         "icon": "💡",
@@ -631,7 +491,7 @@ INITIAL_CATALOG = [
     {
         "name": "EmuSuNi",
         "category": "Эмуляторы",
-        "description": "Оболочка для запуска классических игровых систем и эмуляторов на PS4.",
+        "description": "Оболочка для классических игровых систем.",
         "version": "Последняя версия",
         "compatibility": "PS4 с GoldHEN",
         "source": "GitHub",
@@ -675,7 +535,7 @@ INITIAL_CATALOG = [
     {
         "name": "PCSX ReARMed",
         "category": "Эмуляторы",
-        "description": "Эмулятор PlayStation 1. Совместимость зависит от используемой PS4-сборки.",
+        "description": "Эмулятор PlayStation 1.",
         "version": "Последняя версия",
         "compatibility": "Зависит от порта",
         "source": "GitHub",
@@ -697,7 +557,7 @@ INITIAL_CATALOG = [
     {
         "name": "Mupen64Plus",
         "category": "Эмуляторы",
-        "description": "Эмулятор классической игровой системы Nintendo 64.",
+        "description": "Эмулятор Nintendo 64.",
         "version": "Последняя версия",
         "compatibility": "Зависит от порта",
         "source": "GitHub",
@@ -838,6 +698,7 @@ INITIAL_CATALOG = [
         "platforms": ["ПК"]
     }
 ]
+
 
 
 def seed_catalog():
