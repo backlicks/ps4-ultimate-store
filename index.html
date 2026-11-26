@@ -591,31 +591,94 @@ return ['https:','http:'].includes(u.protocol)?u.href:null;
 }catch{return null}
 }
 
+
 async function getCsrf(){
-let r=await fetch(API+'/api/csrf',{credentials:'include'});
-if(!r.ok)throw Error('Не удалось получить CSRF-токен');
-let d=await r.json();
-csrfToken=d.csrf_token||'';
-return csrfToken;
+    const r = await fetch(API + '/api/csrf', {
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-store',
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+
+    let d = {};
+    try {
+        d = await r.json();
+    } catch {}
+
+    if (!r.ok) {
+        throw Error(d.error || 'Не удалось получить CSRF-токен');
+    }
+
+    if (!d.csrf_token) {
+        throw Error('Сервер не вернул CSRF-токен');
+    }
+
+    csrfToken = d.csrf_token;
+    return csrfToken;
 }
 
-async function api(path,options={}){
-let headers={'Content-Type':'application/json',...(options.headers||{})};
-if(options.method&&options.method!=='GET'){
-if(!csrfToken)await getCsrf();
-headers['X-CSRF-Token']=csrfToken;
-}
-let r=await fetch(API+path,{
-...options,headers,credentials:'include'
-});
-let d={};
-try{d=await r.json()}catch{}
-if(!r.ok)throw Error(d.error||`Ошибка API (${r.status})`);
-return d;
+async function api(path, options = {}) {
+    const method = (options.method || 'GET').toUpperCase();
+    const needsCsrf = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+
+    const makeRequest = async (token = '') => {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+        };
+
+        if (needsCsrf) {
+            headers['X-CSRF-Token'] = token;
+        }
+
+        return fetch(API + path, {
+            ...options,
+            method,
+            headers,
+            credentials: 'include',
+            mode: 'cors'
+        });
+    };
+
+    let r;
+
+    if (needsCsrf) {
+        const token = await getCsrf();
+        r = await makeRequest(token);
+    } else {
+        r = await makeRequest();
+    }
+
+    let d = {};
+    try {
+        d = await r.json();
+    } catch {}
+
+    // Если сервер отклонил CSRF-токен — обновляем и повторяем запрос один раз.
+    if (
+        needsCsrf &&
+        r.status === 403 &&
+        /csrf/i.test(d.error || '')
+    ) {
+        const freshToken = await getCsrf();
+        r = await makeRequest(freshToken);
+
+        d = {};
+        try {
+            d = await r.json();
+        } catch {}
+    }
+
+    if (!r.ok) {
+        throw Error(d.error || `Ошибка API (${r.status})`);
+    }
+
+    return d;
 }
 
-function fallback(){
-return [
 {
 name:'PS Remote Play',icon:'📱',category:'Утилиты',
 platforms:['Телефоны','ПК'],
