@@ -1393,7 +1393,10 @@ def admin_users():
 @require_csrf
 @require_roles("owner", "admin")
 def update_user(user_id):
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return response_error("Некорректные данные")
 
     target = db().execute(
         "SELECT * FROM users WHERE id = ?",
@@ -1411,80 +1414,65 @@ def update_user(user_id):
             403
         )
 
-    if actor["role"] == "admin" and target["role"] == "admin":
+    if (
+        actor["role"] == "admin"
+        and target["role"] == "admin"
+    ):
         return response_error(
             "Администратор не может изменять другого администратора",
             403
         )
 
-    if "is_banned" in data:
-        db().execute(
-            "UPDATE users SET is_banned = ? WHERE id = ?",
-            (int(bool(data["is_banned"])), user_id)
-        )
+    # Сначала проверяем все данные, ничего не изменяя в БД.
+    new_role = None
+    new_banned = None
 
     if "role" in data:
-        new_role = data["role"]
-
         if actor["role"] != "owner":
             return response_error(
                 "Только владелец может менять роли",
                 403
             )
 
-        if new_role not in ("user", "admin"):
+        new_role = data["role"]
+
+        if new_role not in (
+            "user",
+            "admin",
+            "torrent_manager"
+        ):
             return response_error("Недопустимая роль")
 
+    if "is_banned" in data:
+        if not isinstance(data["is_banned"], bool):
+            return response_error(
+                "is_banned должен иметь значение true или false"
+            )
+
+        new_banned = int(data["is_banned"])
+
+    if new_role is None and new_banned is None:
+        return response_error("Нет данных для обновления")
+
+    if new_role is not None:
         db().execute(
             "UPDATE users SET role = ? WHERE id = ?",
             (new_role, user_id)
         )
 
+    if new_banned is not None:
+        db().execute(
+            "UPDATE users SET is_banned = ? WHERE id = ?",
+            (new_banned, user_id)
+        )
+
     db().commit()
 
     return jsonify({"success": True})
 
 
-@app.route("/api/admin/users/<int:user_id>", methods=["DELETE"])
-@require_csrf
-@require_roles("owner", "admin")
-def remove_user(user_id):
-    target = db().execute(
-        "SELECT * FROM users WHERE id = ?",
-        (user_id,)
-    ).fetchone()
 
-    if not target:
-        return response_error("Пользователь не найден", 404)
 
-    if target["role"] == "owner":
-        return response_error(
-            "Нельзя удалить владельца",
-            403
-        )
-
-    if (
-        g.current_user["role"] == "admin"
-        and target["role"] == "admin"
-    ):
-        return response_error(
-            "Администратор не может удалить другого администратора",
-            403
-        )
-
-    db().execute(
-        "DELETE FROM support_tickets WHERE user_id = ?",
-        (user_id,)
-    )
-
-    db().execute(
-        "DELETE FROM users WHERE id = ?",
-        (user_id,)
-    )
-
-    db().commit()
-
-    return jsonify({"success": True})
 
 
 # ==========================================
