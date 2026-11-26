@@ -1,4 +1,4 @@
-
+6
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -1051,7 +1051,398 @@ $('createSupportBtn').onclick=createSupportTicket;
 $('supportReplyBtn').onclick=sendSupportReply;
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+/* ==========================================
+   TORRENTS SYSTEM — PS4 ULTIMATE STORE
+========================================== */
 
+(function initTorrentSystem(){
+
+const style=document.createElement('style');
+style.textContent=`
+.torrent-cover{
+width:100%;height:150px;object-fit:cover;border-radius:12px;
+background:#241316;border:1px solid #333;margin-bottom:12px
+}
+.torrent-meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+.torrent-meta span{
+font-size:12px;color:#ff9ca2;background:#351317;
+border:1px solid #61252c;border-radius:20px;padding:4px 9px
+}
+.torrent-admin-actions{display:flex;gap:7px;flex-wrap:wrap}
+.torrent-admin-actions button{flex:1}
+.torrent-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.torrent-form textarea{grid-column:1/-1}
+.torrent-card .desc{white-space:pre-wrap}
+`;
+document.head.appendChild(style);
+
+/* Кнопка навигации */
+const nav=document.querySelector('.navlinks');
+if(nav&&!document.querySelector('[data-view="torrentsView"]')){
+const btn=document.createElement('button');
+btn.dataset.view='torrentsView';
+btn.textContent='Торренты';
+btn.onclick=()=>showView('torrentsView');
+nav.insertBefore(btn,nav.querySelector('[data-view="supportView"]'));
+}
+
+/* Страница торрентов */
+const main=document.querySelector('main');
+const section=document.createElement('section');
+section.className='view';
+section.id='torrentsView';
+section.innerHTML=`
+<div class="view-top">
+<button class="back" onclick="showView('homeView')">← Главная</button>
+<span class="muted">TORRENTS / 1.0.0</span>
+</div>
+
+<div class="heading">
+<h1>Торренты<span class="accent">.</span></h1>
+<p class="lead">Раздачи разрешённых к распространению игр, homebrew и других файлов.</p>
+</div>
+
+<div class="toolbar">
+<input id="torrentSearch" placeholder="Поиск раздач...">
+<span class="muted" id="torrentCount">Загрузка...</span>
+</div>
+
+<div id="torrentGrid" class="grid">
+<div class="empty">Загрузка раздач...</div>
+</div>
+
+<div class="notice">
+Добавляйте только файлы, которые разрешено распространять.
+Коммерческие игры и материалы без разрешения правообладателя не допускаются.
+</div>
+`;
+main.appendChild(section);
+
+/* Панель администратора */
+const admin=document.getElementById('adminView');
+const adminPanel=document.createElement('div');
+adminPanel.className='panel';
+adminPanel.style.marginTop='15px';
+adminPanel.id='torrentAdminPanel';
+adminPanel.innerHTML=`
+<h2>Управление торрентами</h2>
+<p class="muted">Добавление и удаление разрешённых к распространению раздач.</p>
+
+<div class="torrent-form" id="torrentForm">
+<input id="torrentName" maxlength="100" placeholder="Название">
+<input id="torrentCategory" maxlength="60" placeholder="Категория">
+<input id="torrentVersion" maxlength="50" placeholder="Версия">
+<input id="torrentSize" maxlength="50" placeholder="Размер">
+<input id="torrentPlatform" maxlength="50" value="PS4" placeholder="Платформа">
+<input id="torrentCover" placeholder="Ссылка на обложку HTTPS">
+<input id="torrentUrl" placeholder="Magnet-ссылка или HTTPS .torrent">
+<textarea id="torrentDescription" maxlength="3000" placeholder="Описание"></textarea>
+<label style="display:flex;gap:9px;align-items:center;grid-column:1/-1">
+<input type="checkbox" id="torrentRights" style="width:auto">
+Я подтверждаю, что имею право распространять этот файл.
+</label>
+</div>
+
+<div class="actions">
+<button class="btn primary" id="torrentAddBtn">Добавить раздачу</button>
+<button class="btn" id="torrentCancelEdit" hidden>Отмена редактирования</button>
+</div>
+
+<div class="message" id="torrentAdminMessage"></div>
+
+<h3>Список раздач</h3>
+<div class="tablewrap">
+<table>
+<thead>
+<tr><th>ID</th><th>Название</th><th>Категория</th><th>Действия</th></tr>
+</thead>
+<tbody id="torrentAdminBody">
+<tr><td colspan="4">Загрузка...</td></tr>
+</tbody>
+</table>
+</div>
+`;
+admin.appendChild(adminPanel);
+
+let torrentItems=[];
+let editingTorrentId=null;
+
+function torrentLinkValid(value){
+value=String(value||'').trim();
+
+if(value.toLowerCase().startsWith('magnet:?')){
+try{
+const u=new URL(value);
+return u.searchParams.getAll('xt').some(x=>
+/^urn:(btih|btmh):/i.test(x)
+);
+}catch{return false;}
+}
+
+try{
+const u=new URL(value);
+return u.protocol==='https:'&&!u.username&&!u.password;
+}catch{return false;}
+}
+
+function torrentCover(value){
+try{
+const u=new URL(value);
+return u.protocol==='https:'?u.href:'';
+}catch{return '';}
+}
+
+function torrentCard(t){
+const cover=torrentCover(t.cover_url);
+const image=cover
+?`<img class="torrent-cover" src="${safeText(cover)}" alt="Обложка" loading="lazy">`
+:'<div class="torrent-cover" style="display:grid;place-items:center;font-size:45px">🧲</div>';
+
+return `
+<article class="card torrent-card">
+${image}
+<div class="cardtop">
+<div>
+<h3>${safeText(t.name)}</h3>
+<span class="tag">${safeText(t.category||'Игры')}</span>
+</div>
+</div>
+<p class="desc">${safeText(t.description||'Описание отсутствует.')}</p>
+<div class="torrent-meta">
+<span>${safeText(t.platform||'PS4')}</span>
+${t.version?`<span>${safeText(t.version)}</span>`:''}
+${t.size?`<span>${safeText(t.size)}</span>`:''}
+</div>
+<div class="cardactions">
+<button class="source" onclick="openTorrent(${Number(t.id)})">Открыть раздачу ↗</button>
+</div>
+</article>`;
+}
+
+async function loadTorrents(){
+const grid=$('torrentGrid');
+if(!grid)return;
+
+grid.innerHTML='<div class="empty">Загрузка...</div>';
+
+try{
+const d=await api('/api/torrents');
+torrentItems=d.torrents||[];
+renderTorrents();
+}catch(e){
+grid.innerHTML='<div class="empty">Не удалось загрузить торренты. Проверь backend.</div>';
+$('torrentCount').textContent='Ошибка загрузки';
+console.error('Torrent loading:',e);
+}
+}
+
+function renderTorrents(){
+const q=($('torrentSearch').value||'').toLowerCase().trim();
+
+const list=torrentItems.filter(t=>
+[t.name,t.description,t.category,t.platform,t.version]
+.join(' ').toLowerCase().includes(q)
+);
+
+$('torrentGrid').innerHTML=list.length
+?list.map(torrentCard).join('')
+:'<div class="empty">Раздачи не найдены.</div>';
+
+$('torrentCount').textContent='Показано: '+list.length;
+}
+
+window.openTorrent=function(id){
+const t=torrentItems.find(x=>Number(x.id)===Number(id));
+if(!t)return;
+
+if(!currentUser){
+showView('accountView');
+$('accountMessage').textContent='Для открытия раздач сначала войди в аккаунт.';
+return;
+}
+
+const url=String(t.download_url||'');
+if(!torrentLinkValid(url)){
+alert('Ссылка недействительна.');
+return;
+}
+
+if(url.toLowerCase().startsWith('magnet:?')){
+window.location.href=url;
+}else{
+window.open(url,'_blank','noopener,noreferrer');
+}
+};
+
+/* Форма администратора */
+function torrentFormData(){
+return {
+name:$('torrentName').value.trim(),
+category:$('torrentCategory').value.trim()||'Игры',
+version:$('torrentVersion').value.trim(),
+size:$('torrentSize').value.trim(),
+platform:$('torrentPlatform').value.trim()||'PS4',
+cover_url:$('torrentCover').value.trim(),
+download_url:$('torrentUrl').value.trim(),
+description:$('torrentDescription').value.trim(),
+rights_confirmed:$('torrentRights').checked
+};
+}
+
+function clearTorrentForm(){
+editingTorrentId=null;
+
+[
+'torrentName','torrentCategory','torrentVersion',
+'torrentSize','torrentCover','torrentUrl','torrentDescription'
+].forEach(id=>$(id).value='');
+
+$('torrentPlatform').value='PS4';
+$('torrentRights').checked=false;
+$('torrentAddBtn').textContent='Добавить раздачу';
+$('torrentCancelEdit').hidden=true;
+}
+
+async function saveTorrent(){
+const data=torrentFormData();
+
+if(!data.name||!data.download_url){
+$('torrentAdminMessage').textContent='Заполни название и ссылку.';
+return;
+}
+
+if(!torrentLinkValid(data.download_url)){
+$('torrentAdminMessage').textContent='Нужна корректная magnet-ссылка или HTTPS-ссылка.';
+return;
+}
+
+if(data.cover_url&&!torrentCover(data.cover_url)){
+$('torrentAdminMessage').textContent='Обложка должна иметь HTTPS-ссылку.';
+return;
+}
+
+if(!data.rights_confirmed){
+$('torrentAdminMessage').textContent='Подтверди право на распространение файла.';
+return;
+}
+
+const btn=$('torrentAddBtn');
+btn.disabled=true;
+
+try{
+if(editingTorrentId){
+await api('/api/admin/torrents/'+editingTorrentId,{
+method:'PATCH',
+body:JSON.stringify(data)
+});
+$('torrentAdminMessage').textContent='Раздача обновлена.';
+}else{
+await api('/api/admin/torrents',{
+method:'POST',
+body:JSON.stringify(data)
+});
+$('torrentAdminMessage').textContent='Раздача добавлена.';
+}
+
+clearTorrentForm();
+await loadTorrents();
+await loadTorrentAdmin();
+}catch(e){
+$('torrentAdminMessage').textContent=e.message;
+}finally{
+btn.disabled=false;
+}
+}
+
+async function loadTorrentAdmin(){
+if(!currentUser||!['owner','admin'].includes(currentUser.role))return;
+
+try{
+const d=await api('/api/admin/torrents');
+const items=d.torrents||[];
+
+$('torrentAdminBody').innerHTML=items.length
+?items.map(t=>`
+<tr>
+<td>${Number(t.id)}</td>
+<td>${safeText(t.name)}</td>
+<td>${safeText(t.category)}</td>
+<td>
+<div class="torrent-admin-actions">
+<button class="btn ghost" onclick="editTorrent(${Number(t.id)})">Изменить</button>
+<button class="btn danger" onclick="deleteTorrent(${Number(t.id)})">Удалить</button>
+</div>
+</td>
+</tr>
+`).join('')
+:'<tr><td colspan="4">Раздач пока нет.</td></tr>';
+
+}catch(e){
+$('torrentAdminBody').innerHTML=
+`<tr><td colspan="4">${safeText(e.message)}</td></tr>`;
+}
+}
+
+window.editTorrent=function(id){
+const t=torrentItems.find(x=>Number(x.id)===Number(id));
+if(!t){
+alert('Сначала обнови список торрентов.');
+return;
+}
+
+editingTorrentId=Number(id);
+
+$('torrentName').value=t.name||'';
+$('torrentCategory').value=t.category||'';
+$('torrentVersion').value=t.version||'';
+$('torrentSize').value=t.size||'';
+$('torrentPlatform').value=t.platform||'PS4';
+$('torrentCover').value=t.cover_url||'';
+$('torrentUrl').value=t.download_url||'';
+$('torrentDescription').value=t.description||'';
+$('torrentRights').checked=true;
+
+$('torrentAddBtn').textContent='Сохранить изменения';
+$('torrentCancelEdit').hidden=false;
+
+adminPanel.scrollIntoView({behavior:'smooth'});
+};
+
+window.deleteTorrent=async function(id){
+if(!confirm('Удалить эту раздачу?'))return;
+
+try{
+await api('/api/admin/torrents/'+id,{
+method:'DELETE',
+body:'{}'
+});
+await loadTorrents();
+await loadTorrentAdmin();
+}catch(e){
+alert(e.message);
+}
+};
+
+/* Обработчики */
+$('torrentAddBtn').onclick=saveTorrent;
+$('torrentCancelEdit').onclick=clearTorrentForm;
+$('torrentSearch').addEventListener('input',renderTorrents);
+
+/* Интеграция с существующей админкой */
+const originalLoadAdmin=loadAdmin;
+loadAdmin=async function(){
+await originalLoadAdmin();
+await loadTorrentAdmin();
+};
+
+/* Загрузка при открытии страницы */
+const originalShowView=showView;
+showView=function(id){
+originalShowView(id);
+if(id==='torrentsView')loadTorrents();
+};
+
+})();
 /* Запуск */
 (async()=>{
 apps=fallback();
