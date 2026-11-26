@@ -1,11 +1,11 @@
-6
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080808">
-<title>PS4 ULTIMATE STORE 1.0.0</title>
+<title>PS4 ULTIMATE STORE 1.0.2</title>
 
 <style>
 :root{
@@ -142,6 +142,22 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 .modalbox{width:min(600px,100%);background:#111;border:1px solid #444;border-radius:18px;padding:22px;position:relative}
 .close{float:right;background:transparent;border:0;color:#aaa;cursor:pointer}
 [hidden]{display:none!important}
+
+.torrent-cover{
+width:100%;height:150px;object-fit:cover;border-radius:12px;
+background:#241316;border:1px solid #333;margin-bottom:12px
+}
+.torrent-meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+.torrent-meta span{
+font-size:12px;color:#ff9ca2;background:#351317;
+border:1px solid #61252c;border-radius:20px;padding:4px 9px
+}
+.torrent-admin-actions{display:flex;gap:7px;flex-wrap:wrap}
+.torrent-admin-actions button{flex:1}
+.torrent-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.torrent-form textarea{grid-column:1/-1}
+.torrent-card .desc{white-space:pre-wrap}
+
 @media(max-width:720px){
 .nav{align-items:flex-start;padding:12px 0;flex-direction:column}
 .navlinks{width:100%;overflow:auto;flex-wrap:nowrap}
@@ -160,6 +176,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 <div class="navlinks">
 <button class="active" data-view="homeView" onclick="showView('homeView')">Главная</button>
 <button data-view="storeView" onclick="showView('storeView')">Магазин</button>
+<button data-view="torrentsView" onclick="showView('torrentsView')">Торренты</button>
 <button data-view="supportView" onclick="showView('supportView')">Поддержка</button>
 <button data-view="updatesView" onclick="showView('updatesView')">Обновления</button>
 <button data-view="notificationsView" onclick="showView('notificationsView')">Уведомления <span id="notificationCount" class="tag">0</span></button>
@@ -183,12 +200,13 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 <div class="stats">
 <div class="stat"><b id="count">0</b><span class="muted">приложений в каталоге</span></div>
 <div class="stat"><b>3</b><span class="muted">основные платформы</span></div>
-<div class="stat"><b>1.0.0</b><span class="muted">текущий релиз</span></div>
+<div class="stat"><b>1.0.2</b><span class="muted">текущий релиз</span></div>
 </div>
 <p id="homeStatus" class="muted">Войди или создай аккаунт</p>
 <div class="tiles">
 <div class="tile" onclick="showView('storeView')"><div class="emoji">🛒</div><h3>Магазин</h3><span class="muted">Каталог приложений</span></div>
 <div class="tile" onclick="showView('favoritesView')"><div class="emoji">⭐</div><h3>Избранное</h3><span class="muted">Твои сохранённые приложения</span></div>
+<div class="tile" onclick="showView('torrentsView')"><div class="emoji">🧲</div><h3>Торренты</h3><span class="muted">Разрешённые к распространению файлы</span></div>
 <div class="tile" onclick="showView('accountView')"><div class="emoji">👤</div><h3>Аккаунт</h3><span class="muted">Профиль и авторизация</span></div>
 <div class="tile" onclick="showView('updatesView')"><div class="emoji">🧩</div><h3>Обновления</h3><span class="muted">История релизов</span></div>
 <div class="tile" onclick="showView('supportView')"><div class="emoji">🎧</div><h3>ArticSupport</h3><span class="muted">Обращения в поддержку</span></div>
@@ -197,7 +215,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 </section>
 
 <section class="view" id="storeView">
-<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">STORE / 1.0.0</span></div>
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">STORE / 1.0.2</span></div>
 <div class="heading"><h1>Магазин<span class="accent">.</span></h1><p class="lead">Выбирай приложения для своей платформы.</p></div>
 <div class="toolbar"><input id="search" placeholder="Поиск по каталогу..."><span class="muted" id="shown">Показано: 0</span></div>
 <div class="tabs">
@@ -215,6 +233,27 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 <button class="filter" data-filter="Игры">Игры</button>
 </div>
 <div id="grid" class="grid"></div>
+</section>
+
+<section class="view" id="torrentsView">
+<div class="view-top">
+<button class="back" onclick="showView('homeView')">← Главная</button>
+<span class="muted">TORRENTS / 1.0.2</span>
+</div>
+<div class="heading">
+<h1>Торренты<span class="accent">.</span></h1>
+<p class="lead">Раздачи файлов, разрешённых к распространению их владельцами.</p>
+</div>
+<div class="toolbar">
+<input id="torrentSearch" placeholder="Поиск раздач...">
+<span class="muted" id="torrentCount">Загрузка...</span>
+</div>
+<div id="torrentGrid" class="grid">
+<div class="empty">Загрузка раздач...</div>
+</div>
+<div class="notice">
+Публикуй только файлы, которые ты имеешь право распространять.
+</div>
 </section>
 
 <section class="view" id="favoritesView">
@@ -317,6 +356,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button></div>
 <h1>История обновлений<span class="accent">.</span></h1>
 <div class="panel">
+<div class="release"><b>1.0.2 — Обновление системы раздач</b><p class="muted">Поддержка прямых ссылок, magnet и HTTPS .torrent.</p></div>
 <div class="release"><b>1.0.0 — Первый стабильный релиз</b><p class="muted">Обновлён интерфейс, каталог и система обращений ArticSupport.</p></div>
 <div class="release"><b>0.9.9</b><p class="muted">Авторизация перед скачиванием, серверные аккаунты и поддержка.</p></div>
 <div class="release"><b>0.9.8</b><p class="muted">Серверная система обращений ArticSupport.</p></div>
@@ -380,7 +420,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:#999}
 
 <footer>
 <div class="wrap footerrow">
-<b>PS4 <span class="accent">ULTIMATE STORE</span> · 1.0.0</b>
+<b>PS4 <span class="accent">ULTIMATE STORE</span> · 1.0.2</b>
 <span>Независимый каталог сообщества</span>
 <a href="#" onclick="showView('supportView');return false">Поддержка</a>
 </div>
@@ -410,7 +450,6 @@ let selectedSupportCategory='';
 let activeSupportTicket=null;
 let supportCategories=[];
 
-/* Диагностика запросов */
 let lastDiagnostic={
 stage:'Ожидание запроса',
 id:'',
@@ -445,6 +484,7 @@ if(id==='favoritesView')renderFavorites();
 if(id==='adminView')loadAdmin();
 if(id==='notificationsView')renderNotifications();
 if(id==='supportView')renderLastSupportTicket();
+if(id==='torrentsView'&&typeof loadTorrents==='function')loadTorrents();
 }
 
 function readFav(){
@@ -470,7 +510,6 @@ return ['https:','http:'].includes(u.protocol)?u.href:null;
 }catch{return null;}
 }
 
-/* CSRF с диагностикой */
 async function getCsrf(){
 lastDiagnostic.stage='Запрос CSRF';
 lastDiagnostic.id='';
@@ -511,7 +550,6 @@ lastDiagnostic.stage='CSRF получен';
 return csrfToken;
 }
 
-/* API */
 async function api(path,options={}){
 const method=(options.method||'GET').toUpperCase();
 const needsCsrf=!['GET','HEAD','OPTIONS'].includes(method);
@@ -577,7 +615,6 @@ lastDiagnostic.stage='Запрос выполнен успешно';
 return d;
 }
 
-/* Локальный каталог */
 function fallback(){
 return [
 {name:'PS Remote Play',icon:'📱',category:'Утилиты',platforms:['Телефоны','ПК'],desc:'Официальное приложение удалённой игры PlayStation.',version:'Актуальная',compat:'Android / iOS / Windows / macOS',source:'PlayStation',url:'https://remoteplay.dl.playstation.net/remoteplay/'},
@@ -592,7 +629,6 @@ return [
 ];
 }
 
-/* Магазин */
 function openDownload(i){
 let a=apps[i];
 if(!a)return;
@@ -657,7 +693,6 @@ $('modal').classList.add('open');
 
 function closeModal(){$('modal').classList.remove('open');}
 
-/* Аккаунт */
 function updateAccount(){
 let yes=!!currentUser;
 $('authForms').hidden=yes;
@@ -707,7 +742,6 @@ showDiagnosticError(e.message);
 }finally{b.disabled=false;}
 }
 
-/* Регистрация с подробной диагностикой */
 async function register(){
 let username=$('authUsername').value.trim();
 let password=$('authPassword').value;
@@ -771,7 +805,6 @@ updateAccount();
 }catch(e){$('accountMessage').textContent=e.message;}
 }
 
-/* Каталог */
 async function loadCatalog(){
 try{
 let d=await api('/api/catalog');
@@ -792,7 +825,6 @@ if(/windows|linux|macos|пк|pc/.test(s))return ['ПК'];
 return ['PS4'];
 }
 
-/* Админ-панель */
 async function loadAdmin(){
 if(!currentUser||!['owner','admin'].includes(currentUser.role)){showView('accountView');return;}
 $('adminRole').textContent=currentUser.role.toUpperCase();
@@ -869,10 +901,9 @@ try{await api('/api/admin/catalog/'+id,{method:'DELETE',body:'{}'});await loadCa
 catch(e){alert(e.message);}
 }
 
-/* Уведомления */
 const notices=[
-{id:'100',title:'Вышла версия 1.0.0',body:'Первый стабильный релиз PS4 ULTIMATE STORE.',date:'26.11.2026'},
-{id:'099',title:'Вышла версия 0.9.9',body:'Авторизация перед скачиванием и обновлённая поддержка.',date:'26.11.2026'}
+{id:'100',title:'Вышла версия 1.0.2',body:'Обновлена система раздач: прямые HTTPS-ссылки, magnet и .torrent.',date:'26.11.2026'},
+{id:'099',title:'Вышла версия 1.0.0',body:'Первый стабильный релиз PS4 ULTIMATE STORE.',date:'26.11.2026'}
 ];
 
 function renderNotifications(){
@@ -892,7 +923,6 @@ catch(e){console.error(e);}
 renderNotifications();
 }
 
-/* Поддержка */
 function supportStatus(s){
 return s==='closed'?'<span class="support-status closed">Закрыто</span>':'<span class="support-status open">Открыто</span>';
 }
@@ -1011,161 +1041,34 @@ $('supportUserArea').hidden=true;
 }
 }
 
-/* Обработчики интерфейса */
-document.querySelectorAll('.filter').forEach(b=>{
-b.addEventListener('click',()=>{
-document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
-b.classList.add('active');activeCategory=b.dataset.filter;render();
-});
-});
-
-document.querySelectorAll('.tab').forEach(b=>{
-b.addEventListener('click',()=>{
-document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-b.classList.add('active');activePlatform=b.dataset.platform;render();
-});
-});
-
-document.querySelectorAll('.avatar-choice[data-avatar]').forEach(b=>{
-b.onclick=()=>{
-selectedAvatar=b.dataset.avatar;
-document.querySelectorAll('.avatar-choice[data-avatar]').forEach(x=>x.classList.toggle('selected',x===b));
-};
-});
-
-document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
-b.onclick=()=>{
-if(!currentUser)return;
-try{localStorage.setItem('ps4_avatar_'+currentUser.username,b.dataset.profileAvatar);}
-catch(e){console.error(e);}
-updateAccount();
-};
-});
-
-$('search').addEventListener('input',render);
-$('loginBtn').onclick=login;
-$('registerBtn').onclick=register;
-$('logoutBtn').onclick=logout;
-$('addCatalogBtn').onclick=addCatalog;
-$('createSupportBtn').onclick=createSupportTicket;
-$('supportReplyBtn').onclick=sendSupportReply;
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 /* ==========================================
-   TORRENTS SYSTEM — PS4 ULTIMATE STORE
+   TORRENTS SYSTEM — VERSION 1.0.2
 ========================================== */
-
-(function initTorrentSystem(){
-
-const style=document.createElement('style');
-style.textContent=`
-.torrent-cover{
-width:100%;height:150px;object-fit:cover;border-radius:12px;
-background:#241316;border:1px solid #333;margin-bottom:12px
-}
-.torrent-meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
-.torrent-meta span{
-font-size:12px;color:#ff9ca2;background:#351317;
-border:1px solid #61252c;border-radius:20px;padding:4px 9px
-}
-.torrent-admin-actions{display:flex;gap:7px;flex-wrap:wrap}
-.torrent-admin-actions button{flex:1}
-.torrent-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.torrent-form textarea{grid-column:1/-1}
-.torrent-card .desc{white-space:pre-wrap}
-`;
-document.head.appendChild(style);
-
-/* Кнопка навигации */
-const nav=document.querySelector('.navlinks');
-if(nav&&!document.querySelector('[data-view="torrentsView"]')){
-const btn=document.createElement('button');
-btn.dataset.view='torrentsView';
-btn.textContent='Торренты';
-btn.onclick=()=>showView('torrentsView');
-nav.insertBefore(btn,nav.querySelector('[data-view="supportView"]'));
-}
-
-/* Страница торрентов */
-const main=document.querySelector('main');
-const section=document.createElement('section');
-section.className='view';
-section.id='torrentsView';
-section.innerHTML=`
-<div class="view-top">
-<button class="back" onclick="showView('homeView')">← Главная</button>
-<span class="muted">TORRENTS / 1.0.0</span>
-</div>
-
-<div class="heading">
-<h1>Торренты<span class="accent">.</span></h1>
-<p class="lead">Раздачи разрешённых к распространению игр, homebrew и других файлов.</p>
-</div>
-
-<div class="toolbar">
-<input id="torrentSearch" placeholder="Поиск раздач...">
-<span class="muted" id="torrentCount">Загрузка...</span>
-</div>
-
-<div id="torrentGrid" class="grid">
-<div class="empty">Загрузка раздач...</div>
-</div>
-
-<div class="notice">
-Добавляйте только файлы, которые разрешено распространять.
-Коммерческие игры и материалы без разрешения правообладателя не допускаются.
-</div>
-`;
-main.appendChild(section);
-
-/* Панель администратора */
-const admin=document.getElementById('adminView');
-const adminPanel=document.createElement('div');
-adminPanel.className='panel';
-adminPanel.style.marginTop='15px';
-adminPanel.id='torrentAdminPanel';
-adminPanel.innerHTML=`
-<h2>Управление торрентами</h2>
-<p class="muted">Добавление и удаление разрешённых к распространению раздач.</p>
-
-<div class="torrent-form" id="torrentForm">
-<input id="torrentName" maxlength="100" placeholder="Название">
-<input id="torrentCategory" maxlength="60" placeholder="Категория">
-<input id="torrentVersion" maxlength="50" placeholder="Версия">
-<input id="torrentSize" maxlength="50" placeholder="Размер">
-<input id="torrentPlatform" maxlength="50" value="PS4" placeholder="Платформа">
-<input id="torrentCover" placeholder="Ссылка на обложку HTTPS">
-<input id="torrentUrl" placeholder="Magnet-ссылка или HTTPS .torrent">
-<textarea id="torrentDescription" maxlength="3000" placeholder="Описание"></textarea>
-<label style="display:flex;gap:9px;align-items:center;grid-column:1/-1">
-<input type="checkbox" id="torrentRights" style="width:auto">
-Я подтверждаю, что имею право распространять этот файл.
-</label>
-</div>
-
-<div class="actions">
-<button class="btn primary" id="torrentAddBtn">Добавить раздачу</button>
-<button class="btn" id="torrentCancelEdit" hidden>Отмена редактирования</button>
-</div>
-
-<div class="message" id="torrentAdminMessage"></div>
-
-<h3>Список раздач</h3>
-<div class="tablewrap">
-<table>
-<thead>
-<tr><th>ID</th><th>Название</th><th>Категория</th><th>Действия</th></tr>
-</thead>
-<tbody id="torrentAdminBody">
-<tr><td colspan="4">Загрузка...</td></tr>
-</tbody>
-</table>
-</div>
-`;
-admin.appendChild(adminPanel);
 
 let torrentItems=[];
 let editingTorrentId=null;
+
+function normalizeTorrent(t){
+const name=t.name||t.title||'Без названия';
+const description=t.description||t.desc||'';
+const downloadUrl=t.download_url||t.url||'';
+const magnetUrl=t.magnet_url||t.magnet||'';
+
+return {
+...t,
+name,
+title:name,
+description,
+desc:description,
+download_url:downloadUrl||magnetUrl,
+magnet_url:magnetUrl,
+category:t.category||'Игры',
+platform:t.platform||'PS4',
+version:t.version||'',
+size:t.size||'',
+cover_url:t.cover_url||''
+};
+}
 
 function torrentLinkValid(value){
 value=String(value||'').trim();
@@ -1173,8 +1076,10 @@ value=String(value||'').trim();
 if(value.toLowerCase().startsWith('magnet:?')){
 try{
 const u=new URL(value);
-return u.searchParams.getAll('xt').some(x=>
-/^urn:(btih|btmh):/i.test(x)
+return u.protocol==='magnet:'&&
+u.searchParams.getAll('xt').some(x=>
+/^urn:btih:[a-f0-9]{40}$/i.test(x)||
+/^urn:btih:[a-z2-7]{32}$/i.test(x)
 );
 }catch{return false;}
 }
@@ -1187,16 +1092,24 @@ return u.protocol==='https:'&&!u.username&&!u.password;
 
 function torrentCover(value){
 try{
-const u=new URL(value);
-return u.protocol==='https:'?u.href:'';
+const u=new URL(String(value||''));
+return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';
 }catch{return '';}
 }
 
 function torrentCard(t){
+t=normalizeTorrent(t);
 const cover=torrentCover(t.cover_url);
 const image=cover
-?`<img class="torrent-cover" src="${safeText(cover)}" alt="Обложка" loading="lazy">`
-:'<div class="torrent-cover" style="display:grid;place-items:center;font-size:45px">🧲</div>';
+?`<img class="torrent-cover" src="${safeText(cover)}" alt="Обложка" loading="lazy" referrerpolicy="no-referrer">`
+:'<div class="torrent-cover" style="display:grid;place-items:center;font-size:45px">📦</div>';
+
+const link=t.download_url||t.magnet_url;
+const type=String(link).toLowerCase().startsWith('magnet:')
+?'MAGNET'
+:link.toLowerCase().includes('.torrent')
+?'TORRENT'
+:'HTTPS';
 
 return `
 <article class="card torrent-card">
@@ -1204,14 +1117,15 @@ ${image}
 <div class="cardtop">
 <div>
 <h3>${safeText(t.name)}</h3>
-<span class="tag">${safeText(t.category||'Игры')}</span>
+<span class="tag">${safeText(t.category)}</span>
 </div>
 </div>
 <p class="desc">${safeText(t.description||'Описание отсутствует.')}</p>
 <div class="torrent-meta">
-<span>${safeText(t.platform||'PS4')}</span>
+<span>${safeText(t.platform)}</span>
 ${t.version?`<span>${safeText(t.version)}</span>`:''}
 ${t.size?`<span>${safeText(t.size)}</span>`:''}
+<span>${type}</span>
 </div>
 <div class="cardactions">
 <button class="source" onclick="openTorrent(${Number(t.id)})">Открыть раздачу ↗</button>
@@ -1227,22 +1141,24 @@ grid.innerHTML='<div class="empty">Загрузка...</div>';
 
 try{
 const d=await api('/api/torrents');
-torrentItems=d.torrents||[];
+torrentItems=(d.torrents||[]).map(normalizeTorrent);
 renderTorrents();
 }catch(e){
-grid.innerHTML='<div class="empty">Не удалось загрузить торренты. Проверь backend.</div>';
+grid.innerHTML='<div class="empty">Не удалось загрузить раздачи. Проверь backend.</div>';
 $('torrentCount').textContent='Ошибка загрузки';
 console.error('Torrent loading:',e);
 }
 }
 
 function renderTorrents(){
-const q=($('torrentSearch').value||'').toLowerCase().trim();
+const q=($('torrentSearch')?.value||'').toLowerCase().trim();
 
-const list=torrentItems.filter(t=>
-[t.name,t.description,t.category,t.platform,t.version]
-.join(' ').toLowerCase().includes(q)
-);
+const list=torrentItems.filter(raw=>{
+const t=normalizeTorrent(raw);
+return [
+t.name,t.description,t.category,t.platform,t.version
+].join(' ').toLowerCase().includes(q);
+});
 
 $('torrentGrid').innerHTML=list.length
 ?list.map(torrentCard).join('')
@@ -1252,8 +1168,10 @@ $('torrentCount').textContent='Показано: '+list.length;
 }
 
 window.openTorrent=function(id){
-const t=torrentItems.find(x=>Number(x.id)===Number(id));
-if(!t)return;
+const raw=torrentItems.find(x=>Number(x.id)===Number(id));
+if(!raw)return;
+
+const t=normalizeTorrent(raw);
 
 if(!currentUser){
 showView('accountView');
@@ -1261,29 +1179,34 @@ $('accountMessage').textContent='Для открытия раздач снача
 return;
 }
 
-const url=String(t.download_url||'');
+const url=String(t.download_url||t.magnet_url||'').trim();
+
 if(!torrentLinkValid(url)){
-alert('Ссылка недействительна.');
+alert('Ссылка недействительна или не поддерживается.');
 return;
 }
 
-if(url.toLowerCase().startsWith('magnet:?')){
+if(url.toLowerCase().startsWith('magnet:')){
 window.location.href=url;
 }else{
 window.open(url,'_blank','noopener,noreferrer');
 }
 };
 
-/* Форма администратора */
 function torrentFormData(){
+const rawUrl=$('torrentUrl').value.trim();
+const isMagnet=rawUrl.toLowerCase().startsWith('magnet:');
+
 return {
 name:$('torrentName').value.trim(),
+title:$('torrentName').value.trim(),
 category:$('torrentCategory').value.trim()||'Игры',
 version:$('torrentVersion').value.trim(),
 size:$('torrentSize').value.trim(),
 platform:$('torrentPlatform').value.trim()||'PS4',
 cover_url:$('torrentCover').value.trim(),
-download_url:$('torrentUrl').value.trim(),
+download_url:rawUrl,
+magnet_url:isMagnet?rawUrl:'',
 description:$('torrentDescription').value.trim(),
 rights_confirmed:$('torrentRights').checked
 };
@@ -1312,7 +1235,7 @@ return;
 }
 
 if(!torrentLinkValid(data.download_url)){
-$('torrentAdminMessage').textContent='Нужна корректная magnet-ссылка или HTTPS-ссылка.';
+$('torrentAdminMessage').textContent='Укажи корректную magnet-ссылку или HTTPS-ссылку.';
 return;
 }
 
@@ -1359,7 +1282,10 @@ if(!currentUser||!['owner','admin'].includes(currentUser.role))return;
 
 try{
 const d=await api('/api/admin/torrents');
-const items=d.torrents||[];
+const items=(d.torrents||[]).map(normalizeTorrent);
+
+/* Админский список также обновляет локальный список */
+torrentItems=items;
 
 $('torrentAdminBody').innerHTML=items.length
 ?items.map(t=>`
@@ -1384,12 +1310,13 @@ $('torrentAdminBody').innerHTML=
 }
 
 window.editTorrent=function(id){
-const t=torrentItems.find(x=>Number(x.id)===Number(id));
-if(!t){
+const raw=torrentItems.find(x=>Number(x.id)===Number(id));
+if(!raw){
 alert('Сначала обнови список торрентов.');
 return;
 }
 
+const t=normalizeTorrent(raw);
 editingTorrentId=Number(id);
 
 $('torrentName').value=t.name||'';
@@ -1398,14 +1325,14 @@ $('torrentVersion').value=t.version||'';
 $('torrentSize').value=t.size||'';
 $('torrentPlatform').value=t.platform||'PS4';
 $('torrentCover').value=t.cover_url||'';
-$('torrentUrl').value=t.download_url||'';
+$('torrentUrl').value=t.download_url||t.magnet_url||'';
 $('torrentDescription').value=t.description||'';
 $('torrentRights').checked=true;
 
 $('torrentAddBtn').textContent='Сохранить изменения';
 $('torrentCancelEdit').hidden=false;
 
-adminPanel.scrollIntoView({behavior:'smooth'});
+$('torrentAdminPanel').scrollIntoView({behavior:'smooth'});
 };
 
 window.deleteTorrent=async function(id){
@@ -1423,27 +1350,112 @@ alert(e.message);
 }
 };
 
-/* Обработчики */
+/* Обработчики интерфейса */
+document.querySelectorAll('.filter').forEach(b=>{
+b.addEventListener('click',()=>{
+document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');activeCategory=b.dataset.filter;render();
+});
+});
+
+document.querySelectorAll('.tab').forEach(b=>{
+b.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+b.classList.add('active');activePlatform=b.dataset.platform;render();
+});
+});
+
+document.querySelectorAll('.avatar-choice[data-avatar]').forEach(b=>{
+b.onclick=()=>{
+selectedAvatar=b.dataset.avatar;
+document.querySelectorAll('.avatar-choice[data-avatar]').forEach(x=>x.classList.toggle('selected',x===b));
+};
+});
+
+document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
+b.onclick=()=>{
+if(!currentUser)return;
+try{localStorage.setItem('ps4_avatar_'+currentUser.username,b.dataset.profileAvatar);}
+catch(e){console.error(e);}
+updateAccount();
+};
+});
+
+$('search').addEventListener('input',render);
+$('loginBtn').onclick=login;
+$('registerBtn').onclick=register;
+$('logoutBtn').onclick=logout;
+$('addCatalogBtn').onclick=addCatalog;
+$('createSupportBtn').onclick=createSupportTicket;
+$('supportReplyBtn').onclick=sendSupportReply;
+
+/* ==========================================
+   TORRENTS ADMIN PANEL
+========================================== */
+
+(function initTorrentAdminPanel(){
+
+const admin=$('adminView');
+const adminPanel=document.createElement('div');
+
+adminPanel.className='panel';
+adminPanel.style.marginTop='15px';
+adminPanel.id='torrentAdminPanel';
+
+adminPanel.innerHTML=`
+<h2>Управление раздачами</h2>
+<p class="muted">Добавление и управление файлами, которые разрешено распространять.</p>
+
+<div class="torrent-form" id="torrentForm">
+<input id="torrentName" maxlength="120" placeholder="Название">
+<input id="torrentCategory" maxlength="60" placeholder="Категория">
+<input id="torrentVersion" maxlength="50" placeholder="Версия">
+<input id="torrentSize" maxlength="50" placeholder="Размер">
+<input id="torrentPlatform" maxlength="50" value="PS4" placeholder="Платформа">
+<input id="torrentCover" placeholder="Ссылка на обложку HTTPS">
+
+<input id="torrentUrl" placeholder="Прямая HTTPS-ссылка, magnet или .torrent">
+
+<textarea id="torrentDescription" maxlength="3000" placeholder="Описание"></textarea>
+
+<label style="display:flex;gap:9px;align-items:center;grid-column:1/-1">
+<input type="checkbox" id="torrentRights" style="width:auto">
+Я подтверждаю, что имею право распространять этот файл.
+</label>
+</div>
+
+<div class="actions">
+<button class="btn primary" id="torrentAddBtn">Добавить раздачу</button>
+<button class="btn" id="torrentCancelEdit" hidden>Отмена редактирования</button>
+</div>
+
+<div class="message" id="torrentAdminMessage"></div>
+
+<h3>Список раздач</h3>
+<div class="tablewrap">
+<table>
+<thead>
+<tr><th>ID</th><th>Название</th><th>Категория</th><th>Действия</th></tr>
+</thead>
+<tbody id="torrentAdminBody">
+<tr><td colspan="4">Загрузка...</td></tr>
+</tbody>
+</table>
+</div>
+`;
+
+admin.appendChild(adminPanel);
+
 $('torrentAddBtn').onclick=saveTorrent;
 $('torrentCancelEdit').onclick=clearTorrentForm;
 $('torrentSearch').addEventListener('input',renderTorrents);
 
-/* Интеграция с существующей админкой */
-const originalLoadAdmin=loadAdmin;
-loadAdmin=async function(){
-await originalLoadAdmin();
-await loadTorrentAdmin();
-};
-
-/* Загрузка при открытии страницы */
-const originalShowView=showView;
-showView=function(id){
-originalShowView(id);
-if(id==='torrentsView')loadTorrents();
-};
-
 })();
-/* Запуск */
+
+/* ==========================================
+   ЗАГРУЗКА ПРИ ОТКРЫТИИ
+========================================== */
+
 (async()=>{
 apps=fallback();
 render();
