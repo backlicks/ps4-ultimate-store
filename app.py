@@ -1,3 +1,4 @@
+
 import os
 import re
 import json
@@ -7,6 +8,7 @@ import sqlite3
 import urllib.request
 import urllib.parse
 
+from datetime import timedelta
 from pathlib import Path
 from functools import wraps
 from flask import Flask, request, jsonify, session, g
@@ -15,8 +17,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # ==========================================
-# PS4 ULTIMATE STORE 0.9.8
+# PS4 ULTIMATE STORE 0.9.9
 # BACKEND + ARTICSUPPORT
+# PERMANENT LOGIN
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -41,10 +44,18 @@ if len(secret) < 32:
 
 app.config.update(
     SECRET_KEY=secret,
+
+    SESSION_COOKIE_NAME="ps4_ultimate_store_session",
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=os.getenv("COOKIE_SECURE", "1") == "1",
     SESSION_COOKIE_SAMESITE="None",
-    PERMANENT_SESSION_LIFETIME=60 * 60 * 24 * 7,
+
+    # Практически постоянная авторизация: 100 лет.
+    # Браузер всё равно может удалить cookie самостоятельно.
+    PERMANENT_SESSION_LIFETIME=timedelta(days=36500),
+
+    # Не продлеваем срок cookie при каждом запросе.
+    SESSION_REFRESH_EACH_REQUEST=False,
 )
 
 allowed_origins = [
@@ -523,7 +534,7 @@ def support_api_key_required(fn):
 def index():
     return jsonify(
         service="PS4 ULTIMATE STORE API",
-        version="0.9.8",
+        version="0.9.9",
         status="ok"
     )
 
@@ -533,7 +544,7 @@ def health():
     return jsonify(
         status="ok",
         service="ps4-ultimate-store-api",
-        version="0.9.8"
+        version="0.9.9"
     )
 
 
@@ -545,6 +556,7 @@ def csrf():
         token = secrets.token_urlsafe(32)
         session["csrf_token"] = token
 
+    # Постоянная cookie для сохранения входа.
     session.permanent = True
 
     return jsonify(csrf_token=token)
