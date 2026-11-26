@@ -6,12 +6,12 @@ import hmac
 import secrets
 import sqlite3
 import urllib.request
-import urllib.parse
 import logging
 
 from pathlib import Path
 from datetime import timedelta
 from functools import wraps
+from urllib.parse import urlparse
 
 from flask import Flask, request, jsonify, session, g
 from flask_cors import CORS
@@ -19,8 +19,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # ==========================================
-# PS4 ULTIMATE STORE 1.0.1
-# BACKEND + ARTICSUPPORT NOTIFICATIONS
+# PS4 ULTIMATE STORE 1.0.2
+# BACKEND + TORRENTS + ARTICSUPPORT
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -59,6 +59,10 @@ logging.basicConfig(
 diag_logger = logging.getLogger("registration_diagnostics")
 
 
+# ==========================================
+# FLASK
+# ==========================================
+
 app = Flask(__name__)
 
 app.config.update(
@@ -88,22 +92,17 @@ CORS(
         "DELETE",
         "OPTIONS"
     ],
-    expose_headers=[
-        "X-Diagnostic-ID"
-    ]
+    expose_headers=["X-Diagnostic-ID"]
 )
 
 
 # ==========================================
-# REGISTRATION DIAGNOSTICS
+# REQUEST DIAGNOSTICS
 # ==========================================
 
 @app.before_request
 def diagnostic_request_start():
-    if request.path in (
-        "/api/register",
-        "/api/csrf"
-    ):
+    if request.path in ("/api/register", "/api/csrf"):
         g.diag_id = secrets.token_hex(4)
 
         diag_logger.info(
@@ -223,6 +222,52 @@ def init_db():
         ON support_messages(ticket_id);
         """)
 
+        # Таблица раздач.
+        connection.execute("""
+        CREATE TABLE IF NOT EXISTS torrents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            description TEXT DEFAULT '',
+            category TEXT DEFAULT '',
+            version TEXT DEFAULT '',
+            size TEXT DEFAULT '',
+            platform TEXT DEFAULT '',
+            cover_url TEXT DEFAULT '',
+            download_url TEXT DEFAULT '',
+            magnet_url TEXT DEFAULT '',
+            rights_confirmed INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        # Миграция старой таблицы torrents.
+        columns = {
+            row[1]
+            for row in connection.execute(
+                "PRAGMA table_info(torrents)"
+            ).fetchall()
+        }
+
+        migrations = {
+            "title": "TEXT DEFAULT ''",
+            "description": "TEXT DEFAULT ''",
+            "category": "TEXT DEFAULT ''",
+            "version": "TEXT DEFAULT ''",
+            "size": "TEXT DEFAULT ''",
+            "platform": "TEXT DEFAULT ''",
+            "cover_url": "TEXT DEFAULT ''",
+            "download_url": "TEXT DEFAULT ''",
+            "magnet_url": "TEXT DEFAULT ''",
+            "rights_confirmed": "INTEGER NOT NULL DEFAULT 0",
+            "created_at": "TEXT DEFAULT CURRENT_TIMESTAMP"
+        }
+
+        for column, definition in migrations.items():
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE torrents ADD COLUMN {column} {definition}"
+                )
+
         connection.commit()
 
     finally:
@@ -249,7 +294,7 @@ INITIAL_CATALOG = [
         "name": "PS Remote Play",
         "category": "Утилиты",
         "description": "Играй на своей PS4 через смартфон, планшет или компьютер.",
-        "version": "Актуальная версия на сайте",
+        "version": "Актуальная версия",
         "compatibility": "PS4 и совместимое устройство",
         "source": "PlayStation Remote Play",
         "url": "https://remoteplay.dl.playstation.net/remoteplay/",
@@ -270,7 +315,7 @@ INITIAL_CATALOG = [
     {
         "name": "Spotify",
         "category": "Медиа",
-        "description": "Музыка и плейлисты во время игры и на других устройствах.",
+        "description": "Музыка и плейлисты во время игры.",
         "version": "Актуальная версия",
         "compatibility": "Зависит от региона и устройства",
         "source": "Spotify",
@@ -281,35 +326,13 @@ INITIAL_CATALOG = [
     {
         "name": "PlayStation App",
         "category": "Утилиты",
-        "description": "Официальное приложение-компаньон PlayStation для смартфонов.",
+        "description": "Официальное приложение-компаньон PlayStation.",
         "version": "Актуальная версия",
         "compatibility": "Android / iOS",
         "source": "PlayStation",
         "url": "https://www.playstation.com/en-us/playstation-app/",
         "icon": "🎮",
         "platforms": ["Телефоны"]
-    },
-    {
-        "name": "GnmScale",
-        "category": "Homebrew",
-        "description": "Homebrew-приложение GnmScale.",
-        "version": "PKG",
-        "compatibility": "Требования не подтверждены",
-        "source": "MediaFire",
-        "url": "https://www.mediafire.com/file/lnrwap92lqeli6y/IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg/file",
-        "icon": "✨",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Jobee'sLair",
-        "category": "Homebrew",
-        "description": "Homebrew-инструмент для PS4.",
-        "version": "1.1.4",
-        "compatibility": "Проверь требования разработчика",
-        "source": "GitHub",
-        "url": "https://github.com/JVK3R/JobeesLair-PS4/releases",
-        "icon": "🧰",
-        "platforms": ["PS4"]
     },
     {
         "name": "Apollo Save Tool",
@@ -345,17 +368,6 @@ INITIAL_CATALOG = [
         "platforms": ["PS4"]
     },
     {
-        "name": "PS MTP Explorer",
-        "category": "Утилиты",
-        "description": "Обмен файлами между PS4 и совместимыми устройствами.",
-        "version": "Последняя версия",
-        "compatibility": "PS4 homebrew; ПК",
-        "source": "GitHub",
-        "url": "https://github.com/nueex/ps-mtp-explorer",
-        "icon": "🔌",
-        "platforms": ["PS4", "ПК"]
-    },
-    {
         "name": "Homebrew Store",
         "category": "Homebrew",
         "description": "Каталог homebrew-приложений сообщества.",
@@ -364,17 +376,6 @@ INITIAL_CATALOG = [
         "source": "ConsoleMods",
         "url": "https://consolemods.org/wiki/PS4:Recommended_Setup",
         "icon": "🏪",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "NULL Store",
-        "category": "Homebrew",
-        "description": "Сторонний каталог приложений для PS4.",
-        "version": "1.0.0",
-        "compatibility": "Совместимость не подтверждена",
-        "source": "GitHub Releases",
-        "url": "https://github.com/lastrowcritic/null-store-ps4/releases/download/v1.0.0/NULL_store-PS4-1.0.pkg",
-        "icon": "⬇️",
         "platforms": ["PS4"]
     },
     {
@@ -400,174 +401,20 @@ INITIAL_CATALOG = [
         "platforms": ["PS4"]
     },
     {
-        "name": "JoPlay",
-        "category": "Медиа",
-        "description": "Медиаплеер для PS4.",
-        "version": "Последняя версия",
-        "compatibility": "Проверь требования проекта",
-        "source": "GitHub",
-        "url": "https://github.com/JVK3R/JoPlay/releases",
-        "icon": "🎞️",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "PS4 Ambilight",
-        "category": "Утилиты",
-        "description": "Проект подсветки телевизора с совместимым оборудованием.",
-        "version": "Последняя версия",
-        "compatibility": "Нужно совместимое оборудование",
-        "source": "GitHub",
-        "url": "https://github.com/mitchshimy/PS4-Ambilight/releases",
-        "icon": "💡",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "orbisRPC",
-        "category": "Утилиты",
-        "description": "Discord Rich Presence для PS4.",
-        "version": "Последняя версия",
-        "compatibility": "Проверь требования проекта",
-        "source": "GitHub",
-        "url": "https://github.com/SirHumza/orbisRPC",
-        "icon": "🟣",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "RemotePad NG",
-        "category": "Утилиты",
-        "description": "Управление PS4 с совместимых устройств.",
-        "version": "Последняя версия",
-        "compatibility": "Требуется совместимая среда",
-        "source": "GitHub",
-        "url": "https://github.com/MoHadiShibli/remotePad-ng",
-        "icon": "🎮",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "EmuSuNi",
-        "category": "Эмуляторы",
-        "description": "Лончер ретро-консолей и аркадных систем.",
-        "version": "Последняя версия",
-        "compatibility": "PS4 homebrew",
-        "source": "GitHub",
-        "url": "https://github.com/arturofuentes1988/EmuSuNi/releases",
-        "icon": "🕹️",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Iconit (PS4)",
-        "category": "Утилиты",
-        "description": "Windows-программа для настройки иконок и аватаров PS4.",
-        "version": "Последняя версия",
-        "compatibility": "Windows",
-        "source": "GitHub",
-        "url": "https://github.com/OfficialAhmed/Iconit-PS4",
-        "icon": "🖼️",
-        "platforms": ["ПК"]
-    },
-    {
-        "name": "Remote PKG Installer",
-        "category": "Утилиты",
-        "description": "Инструмент сетевой передачи установочных файлов.",
-        "version": "Последняя версия",
-        "compatibility": "Проверь требования проекта",
-        "source": "GitHub",
-        "url": "https://github.com/AldySan/ps4_remote_pkg_installer_nextgen/releases",
-        "icon": "📡",
-        "platforms": ["PS4", "ПК"]
-    },
-    {
         "name": "RetroArch (PS4)",
         "category": "Эмуляторы",
-        "description": "Мультисистемная оболочка с ядрами NES, SNES, Genesis, GBA и других платформ.",
+        "description": "Мультисистемная оболочка для ретро-эмуляции.",
         "version": "Зависит от сборки",
         "compatibility": "Неофициальный порт PS4",
-        "source": "RArch PS4",
+        "source": "GitHub",
         "url": "https://github.com/gen04177/rarch-ps4",
         "icon": "🕹️",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "PCSX ReARMed",
-        "category": "Эмуляторы",
-        "description": "Эмуляционное ядро PlayStation 1 для RetroArch.",
-        "version": "Зависит от сборки",
-        "compatibility": "Зависит от сборки RetroArch",
-        "source": "RArch PS4",
-        "url": "https://github.com/gen04177/rarch-ps4",
-        "icon": "🎮",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "PPSSPP (PS4)",
-        "category": "Эмуляторы",
-        "description": "Эмулятор портативной консоли PSP.",
-        "version": "Зависит от сборки",
-        "compatibility": "Совместимость требует проверки",
-        "source": "PS4 RetroBox",
-        "url": "https://github.com/danyboy666/ps4-retrobox/releases",
-        "icon": "🎯",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Mupen64Plus",
-        "category": "Эмуляторы",
-        "description": "Эмуляционное ядро Nintendo 64.",
-        "version": "Зависит от сборки",
-        "compatibility": "Совместимость требует проверки",
-        "source": "PS4 RetroBox",
-        "url": "https://github.com/danyboy666/ps4-retrobox/releases",
-        "icon": "🟢",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Flycast",
-        "category": "Эмуляторы",
-        "description": "Эмулятор Sega Dreamcast.",
-        "version": "Не подтверждена",
-        "compatibility": "Наличие рабочего порта PS4 не подтверждено",
-        "source": "Поиск GitHub",
-        "url": "https://github.com/search?q=Flycast+PS4&type=repositories",
-        "icon": "💿",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "FinalBurn Neo",
-        "category": "Эмуляторы",
-        "description": "Ядро для эмуляции аркадных автоматов.",
-        "version": "Зависит от сборки",
-        "compatibility": "Зависит от RetroArch-сборки",
-        "source": "PS4 RetroBox",
-        "url": "https://github.com/danyboy666/ps4-retrobox/releases",
-        "icon": "👾",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "Snes9x",
-        "category": "Эмуляторы",
-        "description": "Эмуляционное ядро Super Nintendo.",
-        "version": "Зависит от сборки",
-        "compatibility": "Зависит от RetroArch-сборки",
-        "source": "PS4 RetroBox",
-        "url": "https://github.com/danyboy666/ps4-retrobox/releases",
-        "icon": "🟣",
-        "platforms": ["PS4"]
-    },
-    {
-        "name": "DobieStation",
-        "category": "Эмуляторы",
-        "description": "Экспериментальный эмулятор PlayStation 2.",
-        "version": "Не подтверждена",
-        "compatibility": "Отдельный порт PS4 не подтверждён",
-        "source": "Поиск GitHub",
-        "url": "https://github.com/search?q=DobieStation+PS4&type=repositories",
-        "icon": "⚙️",
         "platforms": ["PS4"]
     },
     {
         "name": "ZArchiver",
         "category": "Утилиты",
-        "description": "Архиватор для Android: работа с ZIP и другими архивами.",
+        "description": "Архиватор для Android.",
         "version": "Google Play",
         "compatibility": "Android",
         "source": "Google Play",
@@ -578,10 +425,10 @@ INITIAL_CATALOG = [
     {
         "name": "VLC",
         "category": "Медиа",
-        "description": "Универсальный медиаплеер для видео и музыки.",
+        "description": "Универсальный медиаплеер.",
         "version": "Последняя версия",
         "compatibility": "Android, iOS, Windows, macOS, Linux",
-        "source": "Официальный сайт VLC",
+        "source": "VideoLAN",
         "url": "https://www.videolan.org/vlc/",
         "icon": "🎬",
         "platforms": ["Телефоны", "ПК"]
@@ -592,7 +439,7 @@ INITIAL_CATALOG = [
         "description": "Общение, голосовые каналы и сообщества.",
         "version": "Последняя версия",
         "compatibility": "Android, iOS, Windows, macOS",
-        "source": "Официальный сайт Discord",
+        "source": "Discord",
         "url": "https://discord.com/download",
         "icon": "💬",
         "platforms": ["Телефоны", "ПК"]
@@ -603,7 +450,7 @@ INITIAL_CATALOG = [
         "description": "Мессенджер для общения и передачи файлов.",
         "version": "Последняя версия",
         "compatibility": "Android, iOS, Windows, macOS, Linux",
-        "source": "Официальный сайт Telegram",
+        "source": "Telegram",
         "url": "https://telegram.org/apps",
         "icon": "✈️",
         "platforms": ["Телефоны", "ПК"]
@@ -701,7 +548,7 @@ def seed_catalog():
 
 
 # ==========================================
-# OWNER / ADMIN BOOTSTRAP
+# BOOTSTRAP USERS
 # ==========================================
 
 def create_bootstrap_user(username_env, password_env, role):
@@ -848,11 +695,6 @@ def require_csrf(fn):
                 403
             )
 
-        diag_logger.info(
-            "CSRF_OK id=%s",
-            diag_id
-        )
-
         return fn(*args, **kwargs)
 
     return wrapper
@@ -871,9 +713,16 @@ def valid_url(url):
     if not url:
         return True
 
-    return bool(
-        re.match(r"^https?://", url, re.I)
-    )
+    try:
+        parsed = urlparse(url)
+        return (
+            parsed.scheme in ("http", "https")
+            and bool(parsed.netloc)
+            and not parsed.username
+            and not parsed.password
+        )
+    except Exception:
+        return False
 
 
 def catalog_item(row, hide_url=False):
@@ -923,8 +772,6 @@ def notify_owner(message, ticket_id=None):
         "text": message
     }
 
-    # Если уведомление связано с тикетом,
-    # добавляем кнопку открытия этого тикета в ArticSupport.
     if ticket_id is not None:
         payload["reply_markup"] = {
             "inline_keyboard": [[
@@ -958,14 +805,9 @@ def notify_owner(message, ticket_id=None):
             )
 
             if not result.get("ok"):
-                print(
-                    "Telegram notification failed:",
-                    result
-                )
+                print("Telegram notification failed:", result)
             else:
-                print(
-                    "Telegram notification sent successfully"
-                )
+                print("Telegram notification sent successfully")
 
     except Exception as error:
         print("Telegram notification error:", error)
@@ -1042,11 +884,6 @@ def register():
         data = request.get_json(silent=True)
 
         if not isinstance(data, dict):
-            diag_logger.warning(
-                "REGISTER_BAD_JSON id=%s",
-                diag_id
-            )
-
             return response_error(
                 "Некорректные данные регистрации",
                 400
@@ -1056,29 +893,12 @@ def register():
         password = str(data.get("password", ""))
         avatar = str(data.get("avatar", "🎮"))[:10]
 
-        diag_logger.info(
-            "REGISTER_DATA_OK id=%s username_length=%s password_length=%s",
-            diag_id,
-            len(username),
-            len(password)
-        )
-
         if not validate_username(username):
-            diag_logger.warning(
-                "REGISTER_INVALID_USERNAME id=%s",
-                diag_id
-            )
-
             return response_error(
                 "Ник должен содержать 3–20 символов: латиница, цифры, _ . -"
             )
 
         if len(password) < 10 or len(password) > 128:
-            diag_logger.warning(
-                "REGISTER_INVALID_PASSWORD_LENGTH id=%s",
-                diag_id
-            )
-
             return response_error(
                 "Пароль должен содержать от 10 до 128 символов"
             )
@@ -1089,20 +909,10 @@ def register():
         ).fetchone()
 
         if exists:
-            diag_logger.warning(
-                "REGISTER_USERNAME_TAKEN id=%s",
-                diag_id
-            )
-
             return response_error(
                 "Этот ник уже занят",
                 409
             )
-
-        diag_logger.info(
-            "REGISTER_VALIDATION_OK id=%s",
-            diag_id
-        )
 
         cursor = db().execute("""
             INSERT INTO users (
@@ -1119,22 +929,12 @@ def register():
 
         db().commit()
 
-        diag_logger.info(
-            "REGISTER_DATABASE_INSERT_OK id=%s",
-            diag_id
-        )
-
         user = db().execute(
             "SELECT * FROM users WHERE id = ?",
             (cursor.lastrowid,)
         ).fetchone()
 
         if not user:
-            diag_logger.error(
-                "REGISTER_USER_NOT_FOUND_AFTER_INSERT id=%s",
-                diag_id
-            )
-
             return response_error(
                 "Не удалось получить созданный аккаунт",
                 500
@@ -1145,20 +945,8 @@ def register():
         session["user_id"] = user["id"]
         session["csrf_token"] = secrets.token_urlsafe(32)
 
-        diag_logger.info(
-            "REGISTER_SESSION_CREATED id=%s",
-            diag_id
-        )
-
-        # Обычное уведомление о регистрации.
-        # Кнопка тикета здесь не нужна.
         notify_owner(
             f"Новый пользователь PS4 ULTIMATE STORE: {username}"
-        )
-
-        diag_logger.info(
-            "REGISTER_SUCCESS id=%s",
-            diag_id
         )
 
         return jsonify({
@@ -1261,132 +1049,6 @@ def get_catalog():
     })
 
 
-# ==========================================
-# ADMIN USERS
-# ==========================================
-
-@app.route("/api/admin/users", methods=["GET"])
-@require_roles("owner", "admin")
-def admin_users():
-    rows = db().execute("""
-        SELECT * FROM users
-        ORDER BY id DESC
-    """).fetchall()
-
-    return jsonify({
-        "users": [
-            public_user(row)
-            for row in rows
-        ]
-    })
-
-
-@app.route("/api/admin/users/<int:user_id>", methods=["PATCH"])
-@require_csrf
-@require_roles("owner", "admin")
-def update_user(user_id):
-    data = request.get_json(silent=True) or {}
-
-    target = db().execute(
-        "SELECT * FROM users WHERE id = ?",
-        (user_id,)
-    ).fetchone()
-
-    if not target:
-        return response_error("Пользователь не найден", 404)
-
-    actor = g.current_user
-
-    if target["role"] == "owner":
-        return response_error(
-            "Нельзя изменять владельца",
-            403
-        )
-
-    if actor["role"] == "admin" and target["role"] == "admin":
-        return response_error(
-            "Администратор не может изменять другого администратора",
-            403
-        )
-
-    if "is_banned" in data:
-        is_banned = bool(data["is_banned"])
-
-        db().execute(
-            "UPDATE users SET is_banned = ? WHERE id = ?",
-            (int(is_banned), user_id)
-        )
-
-    if "role" in data:
-        new_role = data["role"]
-
-        if actor["role"] != "owner":
-            return response_error(
-                "Только владелец может менять роли",
-                403
-            )
-
-        if new_role not in ("user", "admin"):
-            return response_error(
-                "Недопустимая роль"
-            )
-
-        db().execute(
-            "UPDATE users SET role = ? WHERE id = ?",
-            (new_role, user_id)
-        )
-
-    db().commit()
-
-    return jsonify({"success": True})
-
-
-@app.route("/api/admin/users/<int:user_id>", methods=["DELETE"])
-@require_csrf
-@require_roles("owner", "admin")
-def remove_user(user_id):
-    target = db().execute(
-        "SELECT * FROM users WHERE id = ?",
-        (user_id,)
-    ).fetchone()
-
-    if not target:
-        return response_error("Пользователь не найден", 404)
-
-    if target["role"] == "owner":
-        return response_error(
-            "Нельзя удалить владельца",
-            403
-        )
-
-    if (
-        g.current_user["role"] == "admin"
-        and target["role"] == "admin"
-    ):
-        return response_error(
-            "Администратор не может удалить другого администратора",
-            403
-        )
-
-    db().execute(
-        "DELETE FROM support_tickets WHERE user_id = ?",
-        (user_id,)
-    )
-
-    db().execute(
-        "DELETE FROM users WHERE id = ?",
-        (user_id,)
-    )
-
-    db().commit()
-
-    return jsonify({"success": True})
-
-
-# ==========================================
-# ADMIN CATALOG
-# ==========================================
-
 def catalog_payload(data):
     name = str(data.get("name", "")).strip()
     category = str(data.get("category", "")).strip()
@@ -1400,7 +1062,7 @@ def catalog_payload(data):
 
     if not valid_url(url):
         raise ValueError(
-            "Ссылка должна начинаться с http:// или https://"
+            "Ссылка должна быть корректной HTTP или HTTPS ссылкой"
         )
 
     platforms = data.get("platforms", [])
@@ -1509,6 +1171,405 @@ def delete_catalog(item_id):
 
 
 # ==========================================
+# ADMIN USERS
+# ==========================================
+
+@app.route("/api/admin/users", methods=["GET"])
+@require_roles("owner", "admin")
+def admin_users():
+    rows = db().execute("""
+        SELECT * FROM users
+        ORDER BY id DESC
+    """).fetchall()
+
+    return jsonify({
+        "users": [
+            public_user(row)
+            for row in rows
+        ]
+    })
+
+
+@app.route("/api/admin/users/<int:user_id>", methods=["PATCH"])
+@require_csrf
+@require_roles("owner", "admin")
+def update_user(user_id):
+    data = request.get_json(silent=True) or {}
+
+    target = db().execute(
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,)
+    ).fetchone()
+
+    if not target:
+        return response_error("Пользователь не найден", 404)
+
+    actor = g.current_user
+
+    if target["role"] == "owner":
+        return response_error(
+            "Нельзя изменять владельца",
+            403
+        )
+
+    if actor["role"] == "admin" and target["role"] == "admin":
+        return response_error(
+            "Администратор не может изменять другого администратора",
+            403
+        )
+
+    if "is_banned" in data:
+        db().execute(
+            "UPDATE users SET is_banned = ? WHERE id = ?",
+            (int(bool(data["is_banned"])), user_id)
+        )
+
+    if "role" in data:
+        new_role = data["role"]
+
+        if actor["role"] != "owner":
+            return response_error(
+                "Только владелец может менять роли",
+                403
+            )
+
+        if new_role not in ("user", "admin"):
+            return response_error("Недопустимая роль")
+
+        db().execute(
+            "UPDATE users SET role = ? WHERE id = ?",
+            (new_role, user_id)
+        )
+
+    db().commit()
+
+    return jsonify({"success": True})
+
+
+@app.route("/api/admin/users/<int:user_id>", methods=["DELETE"])
+@require_csrf
+@require_roles("owner", "admin")
+def remove_user(user_id):
+    target = db().execute(
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,)
+    ).fetchone()
+
+    if not target:
+        return response_error("Пользователь не найден", 404)
+
+    if target["role"] == "owner":
+        return response_error(
+            "Нельзя удалить владельца",
+            403
+        )
+
+    if (
+        g.current_user["role"] == "admin"
+        and target["role"] == "admin"
+    ):
+        return response_error(
+            "Администратор не может удалить другого администратора",
+            403
+        )
+
+    db().execute(
+        "DELETE FROM support_tickets WHERE user_id = ?",
+        (user_id,)
+    )
+
+    db().execute(
+        "DELETE FROM users WHERE id = ?",
+        (user_id,)
+    )
+
+    db().commit()
+
+    return jsonify({"success": True})
+
+
+# ==========================================
+# TORRENTS / DOWNLOADS
+# ==========================================
+
+def validate_torrent_link(value):
+    value = str(value or "").strip()
+
+    if not value:
+        return "empty", ""
+
+    if len(value) > 2048:
+        raise ValueError("Ссылка слишком длинная")
+
+    if value.lower().startswith("magnet:?"):
+        if not re.search(r"(?i)(?:^|&)xt=urn:btih:", value[8:]):
+            raise ValueError("Некорректная magnet-ссылка")
+
+        return "magnet", value
+
+    parsed = urlparse(value)
+
+    if (
+        parsed.scheme != "https"
+        or not parsed.netloc
+        or parsed.username
+        or parsed.password
+    ):
+        raise ValueError(
+            "Обычная ссылка должна начинаться с HTTPS"
+        )
+
+    if parsed.scheme != "https":
+        raise ValueError("Разрешены только HTTPS-ссылки")
+
+    if parsed.path.lower().endswith(".torrent"):
+        return "torrent", value
+
+    return "direct", value
+
+
+def torrent_payload(data):
+    title = str(
+        data.get("title", data.get("name", ""))
+    ).strip()
+
+    description = str(
+        data.get("description", data.get("desc", ""))
+    ).strip()
+
+    category = str(data.get("category", "")).strip()
+    version = str(data.get("version", "")).strip()
+    size = str(data.get("size", "")).strip()
+    platform = str(data.get("platform", "")).strip()
+    cover_url = str(data.get("cover_url", "")).strip()
+
+    link = str(
+        data.get(
+            "download_url",
+            data.get("url", data.get("magnet_url", ""))
+        )
+    ).strip()
+
+    if not title:
+        raise ValueError("Название обязательно")
+
+    if len(title) > 120:
+        raise ValueError("Название слишком длинное")
+
+    if len(description) > 3000:
+        raise ValueError("Описание слишком длинное")
+
+    if len(category) > 60:
+        raise ValueError("Категория слишком длинная")
+
+    if len(version) > 50 or len(size) > 50:
+        raise ValueError("Версия или размер слишком длинные")
+
+    if len(platform) > 100:
+        raise ValueError("Платформа слишком длинная")
+
+    if cover_url and not valid_url(cover_url):
+        raise ValueError("Некорректная ссылка на обложку")
+
+    if not link:
+        raise ValueError("Добавь ссылку для скачивания")
+
+    link_type, normalized_link = validate_torrent_link(link)
+
+    if link_type == "magnet":
+        download_url = ""
+        magnet_url = normalized_link
+    else:
+        download_url = normalized_link
+        magnet_url = ""
+
+    rights_confirmed = bool(
+        data.get("rights_confirmed", data.get("rights", False))
+    )
+
+    if not rights_confirmed:
+        raise ValueError(
+            "Подтверди, что имеешь право распространять этот материал"
+        )
+
+    return (
+        title,
+        description,
+        category,
+        version,
+        size,
+        platform,
+        cover_url,
+        download_url,
+        magnet_url,
+        1
+    )
+
+
+def torrent_item(row):
+    download_url = row["download_url"] or ""
+    magnet_url = row["magnet_url"] or ""
+
+    return {
+        "id": row["id"],
+        "title": row["title"],
+        "name": row["title"],
+        "description": row["description"] or "",
+        "desc": row["description"] or "",
+        "category": row["category"] or "",
+        "version": row["version"] or "",
+        "size": row["size"] or "",
+        "platform": row["platform"] or "",
+        "cover_url": row["cover_url"] or "",
+        "download_url": download_url,
+        "url": download_url or magnet_url,
+        "magnet_url": magnet_url,
+        "magnet": magnet_url,
+        "link_type": (
+            "magnet" if magnet_url
+            else "torrent" if download_url.lower().split("?")[0].endswith(".torrent")
+            else "direct"
+        ),
+        "created_at": row["created_at"]
+    }
+
+
+@app.route("/api/torrents", methods=["GET"])
+def get_torrents():
+    rows = db().execute("""
+        SELECT * FROM torrents
+        ORDER BY id DESC
+    """).fetchall()
+
+    return jsonify({
+        "torrents": [
+            torrent_item(row)
+            for row in rows
+        ]
+    })
+
+
+@app.route("/api/admin/torrents", methods=["GET"])
+@require_roles("owner", "admin")
+def admin_torrents():
+    rows = db().execute("""
+        SELECT * FROM torrents
+        ORDER BY id DESC
+    """).fetchall()
+
+    return jsonify({
+        "torrents": [
+            torrent_item(row)
+            for row in rows
+        ]
+    })
+
+
+@app.route("/api/admin/torrents", methods=["POST"])
+@require_csrf
+@require_roles("owner", "admin")
+def add_torrent():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        values = torrent_payload(data)
+    except ValueError as error:
+        return response_error(str(error))
+
+    cursor = db().execute("""
+        INSERT INTO torrents (
+            title,
+            description,
+            category,
+            version,
+            size,
+            platform,
+            cover_url,
+            download_url,
+            magnet_url,
+            rights_confirmed
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, values)
+
+    db().commit()
+
+    row = db().execute(
+        "SELECT * FROM torrents WHERE id = ?",
+        (cursor.lastrowid,)
+    ).fetchone()
+
+    return jsonify({
+        "success": True,
+        "torrent": torrent_item(row)
+    }), 201
+
+
+@app.route("/api/admin/torrents/<int:torrent_id>", methods=["PATCH"])
+@require_csrf
+@require_roles("owner", "admin")
+def update_torrent(torrent_id):
+    exists = db().execute(
+        "SELECT id FROM torrents WHERE id = ?",
+        (torrent_id,)
+    ).fetchone()
+
+    if not exists:
+        return response_error("Раздача не найдена", 404)
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        values = torrent_payload(data)
+    except ValueError as error:
+        return response_error(str(error))
+
+    db().execute("""
+        UPDATE torrents SET
+            title = ?,
+            description = ?,
+            category = ?,
+            version = ?,
+            size = ?,
+            platform = ?,
+            cover_url = ?,
+            download_url = ?,
+            magnet_url = ?,
+            rights_confirmed = ?
+        WHERE id = ?
+    """, values + (torrent_id,))
+
+    db().commit()
+
+    row = db().execute(
+        "SELECT * FROM torrents WHERE id = ?",
+        (torrent_id,)
+    ).fetchone()
+
+    return jsonify({
+        "success": True,
+        "torrent": torrent_item(row)
+    })
+
+
+@app.route("/api/admin/torrents/<int:torrent_id>", methods=["DELETE"])
+@require_csrf
+@require_roles("owner", "admin")
+def delete_torrent(torrent_id):
+    cursor = db().execute(
+        "DELETE FROM torrents WHERE id = ?",
+        (torrent_id,)
+    )
+
+    db().commit()
+
+    if cursor.rowcount == 0:
+        return response_error("Раздача не найдена", 404)
+
+    return jsonify({"success": True})
+
+
+# ==========================================
 # SUPPORT CATEGORIES
 # ==========================================
 
@@ -1611,8 +1672,6 @@ def create_ticket():
 
     db().commit()
 
-    # Уведомление о новом обращении с полным описанием
-    # и кнопкой открытия тикета в Telegram.
     notify_owner(
         "🔔 НОВОЕ ОБРАЩЕНИЕ ARTICSUPPORT!\n\n"
         f"👤 Пользователь: {g.current_user['username']}\n"
@@ -1730,7 +1789,6 @@ def send_ticket_message(ticket_id):
 
     db().commit()
 
-    # Уведомление о новом сообщении с кнопкой открытия тикета.
     notify_owner(
         "💬 НОВОЕ СООБЩЕНИЕ ARTICSUPPORT!\n\n"
         f"👤 Пользователь: {g.current_user['username']}\n"
@@ -1785,7 +1843,6 @@ def bot_tickets():
             ORDER BY t.updated_at DESC
             LIMIT 100
         """).fetchall()
-
     else:
         rows = db().execute("""
             SELECT t.*, u.username
@@ -1813,7 +1870,10 @@ def bot_tickets():
     })
 
 
-@app.route("/api/support/bot/tickets/<int:ticket_id>", methods=["GET"])
+@app.route(
+    "/api/support/bot/tickets/<int:ticket_id>",
+    methods=["GET"]
+)
 @require_support_key
 def bot_get_ticket(ticket_id):
     ticket = db().execute("""
@@ -1928,217 +1988,7 @@ def bot_update_ticket(ticket_id):
 
     return jsonify({"success": True})
 
-# ==========================================
-# TORRENTS API — PS4 ULTIMATE STORE
-# ==========================================
 
-def init_torrents_db():
-    connection = sqlite3.connect(DB_PATH)
-    try:
-        connection.execute("""
-            CREATE TABLE IF NOT EXISTS torrents (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                description TEXT DEFAULT '',
-                category TEXT DEFAULT 'Homebrew',
-                version TEXT DEFAULT '',
-                size TEXT DEFAULT '',
-                download_url TEXT DEFAULT '',
-                magnet_url TEXT DEFAULT '',
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        connection.commit()
-    finally:
-        connection.close()
-
-
-def torrent_payload(data):
-    title = str(data.get("title", data.get("name", ""))).strip()
-    description = str(data.get("description", data.get("desc", ""))).strip()
-    category = str(data.get("category", "Homebrew")).strip()
-    version = str(data.get("version", "")).strip()
-    size = str(data.get("size", "")).strip()
-
-    download_url = str(
-        data.get("download_url", data.get("url", ""))
-    ).strip()
-
-    magnet_url = str(
-        data.get("magnet_url", data.get("magnet", ""))
-    ).strip()
-
-    if not title or len(title) > 120:
-        raise ValueError("Название обязательно и не должно превышать 120 символов")
-
-    if len(description) > 3000:
-        raise ValueError("Описание слишком длинное")
-
-    if len(category) > 60 or len(version) > 50 or len(size) > 50:
-        raise ValueError("Одно из полей слишком длинное")
-
-    if download_url and not re.match(
-        r"^https?://.+\.torrent(?:\?.*)?$",
-        download_url,
-        re.I
-    ):
-        raise ValueError("Ссылка должна вести на файл .torrent по HTTP или HTTPS")
-
-    if magnet_url and not magnet_url.lower().startswith("magnet:?"):
-        raise ValueError("Некорректная magnet-ссылка")
-
-    if not download_url and not magnet_url:
-        raise ValueError("Добавь .torrent-ссылку или magnet-ссылку")
-
-    return (
-        title,
-        description,
-        category or "Homebrew",
-        version,
-        size,
-        download_url,
-        magnet_url
-    )
-
-
-def torrent_item(row):
-    return {
-        "id": row["id"],
-        "title": row["title"],
-        "name": row["title"],
-        "description": row["description"],
-        "desc": row["description"],
-        "category": row["category"],
-        "version": row["version"],
-        "size": row["size"],
-        "download_url": row["download_url"],
-        "url": row["download_url"],
-        "magnet_url": row["magnet_url"],
-        "magnet": row["magnet_url"],
-        "created_at": row["created_at"]
-    }
-
-
-@app.route("/api/torrents", methods=["GET"])
-def get_torrents():
-    rows = db().execute("""
-        SELECT * FROM torrents
-        ORDER BY id DESC
-    """).fetchall()
-
-    return jsonify({
-        "torrents": [torrent_item(row) for row in rows]
-    })
-
-
-@app.route("/api/admin/torrents", methods=["GET"])
-@require_roles("owner", "admin")
-def admin_get_torrents():
-    rows = db().execute("""
-        SELECT * FROM torrents
-        ORDER BY id DESC
-    """).fetchall()
-
-    return jsonify({
-        "torrents": [torrent_item(row) for row in rows]
-    })
-
-
-@app.route("/api/admin/torrents", methods=["POST"])
-@require_csrf
-@require_roles("owner", "admin")
-def admin_add_torrent():
-    data = request.get_json(silent=True) or {}
-
-    try:
-        values = torrent_payload(data)
-    except ValueError as error:
-        return response_error(str(error))
-
-    cursor = db().execute("""
-        INSERT INTO torrents (
-            title, description, category,
-            version, size, download_url, magnet_url
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, values)
-
-    db().commit()
-
-    row = db().execute(
-        "SELECT * FROM torrents WHERE id = ?",
-        (cursor.lastrowid,)
-    ).fetchone()
-
-    return jsonify({
-        "success": True,
-        "torrent": torrent_item(row)
-    }), 201
-
-
-@app.route("/api/admin/torrents/<int:torrent_id>", methods=["PATCH"])
-@require_csrf
-@require_roles("owner", "admin")
-def admin_update_torrent(torrent_id):
-    existing = db().execute(
-        "SELECT id FROM torrents WHERE id = ?",
-        (torrent_id,)
-    ).fetchone()
-
-    if not existing:
-        return response_error("Раздача не найдена", 404)
-
-    data = request.get_json(silent=True) or {}
-
-    try:
-        values = torrent_payload(data)
-    except ValueError as error:
-        return response_error(str(error))
-
-    db().execute("""
-        UPDATE torrents SET
-            title = ?,
-            description = ?,
-            category = ?,
-            version = ?,
-            size = ?,
-            download_url = ?,
-            magnet_url = ?
-        WHERE id = ?
-    """, values + (torrent_id,))
-
-    db().commit()
-
-    row = db().execute(
-        "SELECT * FROM torrents WHERE id = ?",
-        (torrent_id,)
-    ).fetchone()
-
-    return jsonify({
-        "success": True,
-        "torrent": torrent_item(row)
-    })
-
-
-@app.route("/api/admin/torrents/<int:torrent_id>", methods=["DELETE"])
-@require_csrf
-@require_roles("owner", "admin")
-def admin_delete_torrent(torrent_id):
-    cursor = db().execute(
-        "DELETE FROM torrents WHERE id = ?",
-        (torrent_id,)
-    )
-
-    db().commit()
-
-    if cursor.rowcount == 0:
-        return response_error("Раздача не найдена", 404)
-
-    return jsonify({"success": True})
-
-
-# Создаём таблицу при запуске приложения
-init_torrents_db()
 # ==========================================
 # HEALTH CHECK
 # ==========================================
@@ -2147,7 +1997,7 @@ init_torrents_db()
 def index():
     return jsonify({
         "name": "PS4 ULTIMATE STORE",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "status": "online"
     })
 
