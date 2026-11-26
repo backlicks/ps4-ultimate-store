@@ -37,45 +37,47 @@ DB_PATH = Path(
 
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-FRONTEND_ORIGIN = os.getenv(
-    "FRONTEND_ORIGIN",
-    "https://backlicks.github.io"
-).rstrip("/")
+FRONTEND_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv(
+        "FRONTEND_ORIGINS",
+        os.getenv("FRONTEND_ORIGIN", "https://backlicks.github.io")
+    ).split(",")
+    if origin.strip()
+]
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 if not SECRET_KEY:
-    SECRET_KEY = secrets.token_hex(32)
-    print("WARNING: SECRET_KEY is temporary. Set it in Render.")
+    raise RuntimeError(
+        "SECRET_KEY is missing. Set it in Render Environment."
+    )
 
 app = Flask(__name__)
 
 app.config.update(
-    SECRET_KEY=SECRET_KEY,
-    SESSION_COOKIE_NAME="ps4_ultimate_store_session",
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=True,
-    SESSION_COOKIE_SAMESITE="None",
-    PERMANENT_SESSION_LIFETIME=timedelta(days=30),
-    MAX_CONTENT_LENGTH=2 * 1024 * 1024
+    SECRET_KEY=SECRET_KEY,
+    SESSION_COOKIE_NAME="ps4_ultimate_store_session",
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="None",
+    PERMANENT_SESSION_LIFETIME=timedelta(days=30),
+    MAX_CONTENT_LENGTH=2 * 1024 * 1024
 )
 
 CORS(
-    app,
-    origins=[FRONTEND_ORIGIN],
-    supports_credentials=True,
-    allow_headers=[
-        "Content-Type",
-        "X-CSRF-Token",
-        "X-Support-Key"
-    ],
-    methods=[
-        "GET",
-        "POST",
-        "PATCH",
-        "DELETE",
-        "OPTIONS"
-    ]
+    app,
+    origins=FRONTEND_ORIGINS,
+    supports_credentials=True,
+    allow_headers=[
+        "Content-Type",
+        "X-CSRF-Token",
+        "X-Support-Key"
+    ],
+    methods=[
+        "GET", "POST", "PATCH",
+        "DELETE", "OPTIONS"
+    ]
 )
 
 
