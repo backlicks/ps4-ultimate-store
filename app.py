@@ -2184,7 +2184,7 @@ def bot_update_ticket(ticket_id):
 def index():
     return jsonify({
         "name": "PS4 ULTIMATE STORE",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "status": "online"
     })
 
