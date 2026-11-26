@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080808">
-<title>PS4 ULTIMATE STORE 0.9.7</title>
+<title>PS4 ULTIMATE STORE 0.9.8</title>
 <style>
 :root{--bg:#080808;--surface:#111;--surface2:#191919;--red:#ed1421;--red2:#ff3845;--text:#f5f5f5;--muted:#999;--line:#303030}
 *{box-sizing:border-box}
@@ -31,6 +32,7 @@ h1{font-size:clamp(38px,7vw,76px);line-height:1;letter-spacing:-2px;margin:18px 
 .hero-actions,.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:10px;border:1px solid transparent;font-weight:850;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s}
 .btn:hover{transform:translateY(-2px);filter:brightness(1.15)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .primary{color:white;background:linear-gradient(110deg,#f01420,#a9000b)}
 .ghost{background:#151515;border-color:#383838;color:#eee}
 .danger{background:#351014;border-color:#79252c;color:#ff9ba1}
@@ -111,12 +113,21 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 .support-category.selected{border-color:#ed1421;background:#321013;box-shadow:0 0 0 1px #ed1421}
 .support-form{display:grid;gap:12px}
 .support-form textarea{min-height:130px;resize:vertical;width:100%;padding:13px;color:white;background:#101010;border:1px solid #393939;border-radius:10px;font:inherit}
-.support-ticket{padding:16px;border:1px solid #51252a;border-radius:12px;background:#1c1011;margin-top:15px}
+.support-ticket{padding:15px;border:1px solid #51252a;border-radius:12px;background:#1c1011;margin:12px 0}
 .support-ticket b{color:#ff737b}
+.support-status{display:inline-block;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:900;background:#242424;color:#ccc}
+.support-status.open{background:#18301e;color:#8cffaa}
+.support-status.closed{background:#321416;color:#ff9ba1}
+.support-message{padding:12px;margin:10px 0;border:1px solid #353535;border-radius:10px;background:#151515;overflow-wrap:anywhere}
+.support-message.admin{border-color:#713036;background:#211113}
+.support-message small{display:block;color:#888;font-size:10px;margin-bottom:5px}
+.support-message p{margin:0;white-space:pre-wrap}
+.support-categories button{min-height:55px}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.account-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.wrap{width:calc(100% - 28px)}.nav{min-height:66px}.brand{font-size:13px}.nav-link{display:none}.version{display:none}.grid,.home-panels,.info-grid{grid-template-columns:1fr}.hero{padding:48px 0 35px}.stats{gap:15px}.grid{gap:11px}.support-categories{grid-template-columns:1fr}}
 </style>
-</head><body>
+</head>
+<body>
 <header>
 <div class="wrap nav">
 <button class="brand" onclick="showView('homeView')"><span class="brand-mark">P</span><span>PS4 <i>ULTIMATE STORE</i></span></button>
@@ -127,13 +138,12 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <a class="nav-link" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Telegram ↗</a>
 <button class="account-nav" onclick="showView('notificationsView')">🔔 <span id="notificationCount" class="notification-dot">2</span></button>
 <button class="account-nav" onclick="showView('accountView')"><span id="navAvatar">👤</span> <span id="navName">Аккаунт</span></button>
-<span class="version">0.9.7 · BLACK RED</span>
+<span class="version">0.9.8 · BLACK RED</span>
 </div>
 </div>
 </header>
 
 <main class="wrap">
-
 <section class="view active" id="homeView">
 <section class="hero">
 <div class="eyebrow">PS4 ULTIMATE STORE · DIGITAL HUB</div>
@@ -147,15 +157,14 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="stats">
 <span><b id="count">41</b>приложение</span>
 <span><b>03</b>платформы</span>
-<span><b>0.9.7</b>версия</span>
+<span><b>0.9.8</b>версия</span>
 </div>
 </section>
-
 <div class="home-panels">
 <button class="tile" onclick="showView('storeView')"><span>БИБЛИОТЕКА</span><strong>Магазин</strong>Каталог приложений</button>
 <button class="tile" onclick="showView('favoritesView')"><span>ТВОЯ БИБЛИОТЕКА</span><strong>Избранное</strong>Сохранённые приложения</button>
 <button class="tile" onclick="showView('accountView')"><span>ЛИЧНЫЙ КАБИНЕТ</span><strong>Мой аккаунт</strong><div id="homeStatus">Войди или создай аккаунт</div></button>
-<button class="tile" onclick="showView('updatesView')"><span>CHANGELOG</span><strong>Обновления</strong>Версия 0.9.7</button>
+<button class="tile" onclick="showView('updatesView')"><span>CHANGELOG</span><strong>Обновления</strong>Версия 0.9.8</button>
 <button class="tile" onclick="showView('newsView')"><span>ЛЕНТА ПРОЕКТА</span><strong>Новости</strong>Объявления и планы</button>
 <button class="tile" onclick="showView('supportView')"><span>ARTICSUPPORT</span><strong>Поддержка 🎧</strong>Помощь и обращения</button>
 <button class="tile" onclick="showView('aboutView')"><span>ИНФОРМАЦИЯ</span><strong>О проекте</strong>Подробнее о магазине</button>
@@ -296,6 +305,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">CHANGELOG</span></div>
 <div class="heading"><div class="eyebrow">CHANGELOG</div><h1>История релизов<span class="accent">.</span></h1><p class="lead">Основные изменения PS4 ULTIMATE STORE.</p></div>
 <div class="panel">
+<div class="release-item"><div class="release-version">0.9.8</div><div><h3>ArticSupport Integration</h3><p>Серверные обращения, история тикетов, переписка с поддержкой и авторизация для создания обращений.</p></div></div>
 <div class="release-item"><div class="release-version">0.9.7</div><div><h3>ArticSupport & Redesign</h3><p>Новая страница поддержки, обновлённый интерфейс, улучшенные карточки и навигация.</p></div></div>
 <div class="release-item"><div class="release-version">0.9.6</div><div><h3>Notifications & Profile</h3><p>Центр уведомлений, отметка прочитанного, выбор локального аватара и история релизов.</p></div></div>
 <div class="release-item"><div class="release-version">0.9.5</div><div><h3>Admin Control</h3><p>Редактирование и удаление приложений, управление пользователями, блокировка и назначение ADMIN.</p></div></div>
@@ -307,7 +317,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <section class="view" id="newsView">
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">NEWS</span></div>
 <div class="heading"><h1>Новости<span class="accent">.</span></h1><p class="lead">Следующий этап проекта — расширение панели управления и профилей.</p></div>
-<div class="panel"><h2>PS4 ULTIMATE STORE 0.9.7</h2><p class="muted">Обновлён дизайн и добавлена страница ArticSupport.</p></div>
+<div class="panel"><h2>PS4 ULTIMATE STORE 0.9.8</h2><p class="muted">Поддержка подключена к серверу. Теперь обращения сохраняются в аккаунте.</p></div>
 </section>
 
 <section class="view" id="supportView">
@@ -315,38 +325,58 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="heading">
 <div class="eyebrow">ARTICSUPPORT · SUPPORT</div>
 <h1>Служба <span class="accent">поддержки.</span></h1>
-<p class="lead">Чем мы можем помочь? Выбери категорию и опиши проблему.</p>
+<p class="lead">Создавай обращения, следи за статусом и общайся с поддержкой прямо на сайте.</p>
 </div>
 <div class="support-hero">
 <h2>🎧 ArticSupport</h2>
-<p class="muted">Поддержка пользователей PS4 ULTIMATE STORE. Сообщи о проблеме, неработающей ссылке или предложи улучшение.</p>
+<p class="muted">Официальная система обращений PS4 ULTIMATE STORE.</p>
 </div>
+
+<div id="supportGuest" class="panel" hidden>
+<h2>🔒 Требуется авторизация</h2>
+<p class="muted">Чтобы пользоваться поддержкой, войди в аккаунт или зарегистрируйся.</p>
+<button class="btn primary" onclick="showView('accountView')">Перейти к аккаунту</button>
+</div>
+
+<div id="supportUserArea" hidden>
 <div class="panel">
 <h2>Создать обращение</h2>
-<div class="support-categories" id="supportCategories">
-<button class="support-category selected" data-category="PS4">🎮 Проблема с PS4</button>
-<button class="support-category" data-category="Телефон">📱 Проблема с телефоном</button>
-<button class="support-category" data-category="ПК">💻 Проблема с ПК</button>
-<button class="support-category" data-category="Ссылка/скачивание">🔗 Не работает ссылка</button>
-<button class="support-category" data-category="Предложение">💡 Предложение</button>
-<button class="support-category" data-category="Другая проблема">❔ Другая проблема</button>
-</div>
+<p class="muted">Выбери категорию и подробно опиши проблему.</p>
+<div class="support-categories" id="supportCategories"></div>
 <div class="support-form">
-<label for="supportDescription">Опиши проблему</label>
+<label for="supportDescription">Описание проблемы</label>
 <textarea id="supportDescription" maxlength="2000" placeholder="Напиши, что произошло и что ты хотел сделать..."></textarea>
-<button class="btn primary" onclick="createSupportTicket()">Отправить обращение ↗</button>
+<button class="btn primary" id="createSupportBtn" onclick="createSupportTicket()">Отправить обращение ↗</button>
 <div class="message" id="supportMessage" role="status"></div>
 </div>
-<div class="notice">Не отправляй пароли, токены и другие секретные данные. После создания обращения можно перейти в Telegram.</div>
+<div class="notice">Не отправляй пароли, токены и другие секретные данные.</div>
 </div>
+
+<div class="panel" style="margin-top:15px">
+<h2>Мои обращения</h2>
+<p class="muted">Здесь отображаются все твои обращения с сервера.</p>
+<div id="supportTicketsList" class="muted">Загрузка...</div>
+<button class="btn ghost" onclick="loadSupportData()">↻ Обновить</button>
+</div>
+
+<div class="panel" id="supportChatPanel" style="margin-top:15px" hidden>
+<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+<h2 id="supportChatTitle">Обращение</h2>
+<button class="btn ghost" onclick="closeSupportChat()">Закрыть</button>
+</div>
+<div id="supportChatMessages"></div>
+<div id="supportReplyArea" class="support-form" style="margin-top:15px">
+<textarea id="supportReply" maxlength="2000" placeholder="Напиши ответ..."></textarea>
+<button class="btn primary" id="supportReplyBtn" onclick="sendSupportReply()">Отправить сообщение</button>
+</div>
+<div class="message" id="supportChatMessage"></div>
+</div>
+</div>
+
 <div class="panel" style="margin-top:15px">
 <h2>Другие способы связи</h2>
 <p class="muted">Telegram проекта:</p>
 <a class="btn ghost" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Открыть Telegram ↗</a>
-</div>
-<div class="panel" style="margin-top:15px">
-<h2>Моё последнее обращение</h2>
-<div id="lastSupportTicket" class="muted">Пока обращений нет на этом устройстве.</div>
 </div>
 </section>
 
@@ -358,12 +388,11 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 </div>
 <div class="panel"><h2>Наши разделы</h2><p class="muted">Магазин, избранное, профиль, новости, обновления и ArticSupport.</p><button class="btn primary" onclick="showView('supportView')">Связаться с поддержкой</button></div>
 </section>
-
 </main>
 
 <footer>
 <div class="wrap footerrow">
-<b>PS4 <span style="color:#e50914">ULTIMATE STORE</span> · 0.9.7</b>
+<b>PS4 <span style="color:#e50914">ULTIMATE STORE</span> · 0.9.8</b>
 <span>Независимый каталог сообщества</span>
 <a href="#" onclick="showView('supportView');return false">Поддержка</a>
 </div>
@@ -427,9 +456,11 @@ let apps=[...fallbackApps];
 let activeCategory='Все';
 let activePlatform='PS4';
 let selectedAvatar='🎮';
-let selectedSupportCategory='PS4';
+let selectedSupportCategory='';
 let csrfToken='';
 let currentUser=null;
+let activeSupportTicket=null;
+let supportCategories=[];
 
 const $=id=>document.getElementById(id);
 
@@ -453,9 +484,7 @@ function readFavorites(){
  try{return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]')}
  catch(e){return []}
 }
-
 function isFav(name){return readFavorites().includes(name)}
-
 function toggleFav(name){
  let f=readFavorites();
  f=f.includes(name)?f.filter(x=>x!==name):[...f,name];
@@ -510,7 +539,6 @@ function details(i){
  <a style="color:#ff737b" href="${safeText(a.url)}" target="_blank" rel="noopener">Открыть источник ↗</a>`;
  $('modal').classList.add('open');
 }
-
 function closeModal(){$('modal').classList.remove('open')}
 
 async function api(path,options={}){
@@ -534,23 +562,18 @@ async function getCsrf(){
  return csrfToken;
 }
 
-function avatarStorageKey(username){
- return AVATAR_PREFIX+String(username||'guest').toLowerCase();
-}
-
+function avatarStorageKey(username){return AVATAR_PREFIX+String(username||'guest').toLowerCase()}
 function getProfileAvatar(user){
  if(!user)return '👤';
  try{return localStorage.getItem(avatarStorageKey(user.username))||user.avatar||'👤'}
  catch(e){return user.avatar||'👤'}
 }
-
 function renderProfileAvatarChoices(){
  const chosen=currentUser?getProfileAvatar(currentUser):'';
  document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
   b.classList.toggle('selected',b.dataset.profileAvatar===chosen);
  });
 }
-
 function setProfileAvatar(avatar){
  if(!currentUser)return;
  try{localStorage.setItem(avatarStorageKey(currentUser.username),avatar)}catch(e){}
@@ -687,14 +710,12 @@ async function toggleBan(id,banned){
   await loadAdmin();
  }catch(e){alert(e.message)}
 }
-
 async function changeRole(id,role){
  try{
   await api('/api/admin/users/'+id,{method:'PATCH',body:JSON.stringify({role})});
   await loadAdmin();
  }catch(e){alert(e.message)}
 }
-
 async function deleteUser(id){
  if(!confirm('Удалить этого пользователя?'))return;
  try{
@@ -756,6 +777,7 @@ async function addCatalog(){
 /* УВЕДОМЛЕНИЯ */
 
 const releaseNotifications=[
+ {id:'release-098',title:'Вышла версия 0.9.8',body:'Подключена серверная система обращений ArticSupport.',date:'26.11.2026'},
  {id:'release-097',title:'Вышла версия 0.9.7',body:'Добавлена страница ArticSupport и обновлён дизайн магазина.',date:'26.11.2026'},
  {id:'release-096',title:'Вышла версия 0.9.6',body:'Центр уведомлений, локальная смена аватара и история релизов.',date:'26.11.2026'},
  {id:'release-095',title:'Обновление панели управления',body:'В версии 0.9.5 появились редактирование и удаление приложений, а также управление пользователями.',date:'26.11.2026'}
@@ -765,7 +787,6 @@ function getReadNotifications(){
  try{return JSON.parse(localStorage.getItem(NOTICE_READ_KEY)||'[]')}
  catch(e){return []}
 }
-
 function renderNotifications(){
  const read=getReadNotifications();
  const items=releaseNotifications.map(n=>({...n,read:read.includes(n.id)}));
@@ -779,90 +800,247 @@ function renderNotifications(){
  $('notificationCount').textContent=unread;
  $('notificationCount').style.display=unread?'inline-grid':'none';
 }
-
 function markAllNotificationsRead(){
  localStorage.setItem(NOTICE_READ_KEY,JSON.stringify(releaseNotifications.map(n=>n.id)));
  renderNotifications();
 }
 
-/* ARTICSUPPORT */
+/* ARTICSUPPORT 0.9.8 */
 
-function createSupportTicket(){
- const description=$('supportDescription').value.trim();
+function supportStatus(status){
+ if(status==='closed')return '<span class="support-status closed">Закрыто</span>';
+ return '<span class="support-status open">Открыто</span>';
+}
+
+function supportDate(value){
+ if(!value)return '';
+ const date=new Date(value);
+ if(Number.isNaN(date.getTime()))return '';
+ return date.toLocaleString('ru-RU');
+}
+
+async function loadSupportCategories(){
+ const container=$('supportCategories');
+ if(!container)return;
+
+ try{
+  const data=await api('/api/support/categories');
+  const categories=Array.isArray(data.categories)?data.categories:[];
+  supportCategories=categories.map(item=>{
+   if(typeof item==='string')return {value:item,label:item};
+   return {
+    value:item.value||item.category||item.name||item.label,
+    label:item.label||item.name||item.category||item.value
+   };
+  }).filter(item=>item.value&&item.label);
+ }catch(error){
+  console.warn('Не удалось загрузить категории:',error.message);
+  supportCategories=[
+   {value:'PS4',label:'🎮 Проблема с PS4'},
+   {value:'Телефон',label:'📱 Проблема с телефоном'},
+   {value:'ПК',label:'💻 Проблема с ПК'},
+   {value:'Ссылка/скачивание',label:'🔗 Не работает ссылка'},
+   {value:'Предложение',label:'💡 Предложение'},
+   {value:'Другая проблема',label:'❔ Другая проблема'}
+  ];
+ }
+
+ if(!supportCategories.length){
+  container.innerHTML='<p class="muted">Категории пока недоступны.</p>';
+  return;
+ }
+
+ if(!supportCategories.some(c=>c.value===selectedSupportCategory)){
+  selectedSupportCategory=supportCategories[0].value;
+ }
+
+ container.innerHTML=supportCategories.map(category=>`
+  <button type="button" class="support-category ${category.value===selectedSupportCategory?'selected':''}" data-category="${safeText(category.value)}">${safeText(category.label)}</button>
+ `).join('');
+
+ container.querySelectorAll('.support-category').forEach(button=>{
+  button.addEventListener('click',()=>{
+   selectedSupportCategory=button.dataset.category;
+   container.querySelectorAll('.support-category').forEach(item=>{
+    item.classList.toggle('selected',item===button);
+   });
+  });
+ });
+}
+
+async function createSupportTicket(){
  const output=$('supportMessage');
+ const description=$('supportDescription').value.trim();
+ const button=$('createSupportBtn');
 
- if(!description){
-  output.textContent='Опиши проблему перед отправкой.';
+ if(!currentUser){
+  output.textContent='Сначала войди в аккаунт.';
+  return;
+ }
+ if(!selectedSupportCategory){
+  output.textContent='Выбери категорию обращения.';
   return;
  }
  if(description.length<10){
-  output.textContent='Описание слишком короткое. Добавь немного подробностей.';
+  output.textContent='Описание должно содержать минимум 10 символов.';
+  return;
+ }
+ if(description.length>2000){
+  output.textContent='Описание слишком длинное.';
   return;
  }
 
- const ticketId='PS4-'+Date.now().toString().slice(-8);
- const username=currentUser?currentUser.username:'Гость';
-
- const ticket={
-  id:ticketId,
-  category:selectedSupportCategory,
-  description:description,
-  username:username,
-  date:new Date().toISOString()
- };
+ button.disabled=true;
+ button.textContent='Отправка...';
+ output.textContent='Создаём обращение...';
 
  try{
-  localStorage.setItem('ps4_support_last_ticket',JSON.stringify(ticket));
- }catch(e){
-  output.textContent='Не удалось сохранить обращение на устройстве.';
+  const data=await api('/api/support/tickets',{
+   method:'POST',
+   body:JSON.stringify({category:selectedSupportCategory,description})
+  });
+  $('supportDescription').value='';
+  const ticket=data.ticket||data;
+  output.textContent='Обращение успешно создано! Номер: '+(ticket.id??'создан');
+  await loadSupportData();
+ }catch(error){
+  output.textContent='Ошибка: '+error.message;
+ }finally{
+  button.disabled=false;
+  button.textContent='Отправить обращение ↗';
+ }
+}
+
+async function loadSupportData(){
+ const list=$('supportTicketsList');
+ if(!list)return;
+
+ if(!currentUser){
+  $('supportGuest').hidden=false;
+  $('supportUserArea').hidden=true;
   return;
  }
 
- const telegramText=
-  '🎧 ARTICSUPPORT PS4 ULTIMATE STORE\n\n'+
-  'Номер обращения: '+ticketId+'\n'+
-  'Пользователь: '+username+'\n'+
-  'Категория: '+selectedSupportCategory+'\n\n'+
-  'Описание:\n'+description;
-
- $('supportDescription').value='';
-
- output.innerHTML=
-  'Обращение подготовлено. Номер: <b>'+safeText(ticketId)+'</b>. '+
-  'Открой Telegram проекта и отправь подготовленный текст.';
+ $('supportGuest').hidden=true;
+ $('supportUserArea').hidden=false;
+ list.textContent='Загрузка обращений...';
 
  try{
-  if(navigator.clipboard&&window.isSecureContext){
-   navigator.clipboard.writeText(telegramText).then(()=>{
-    output.innerHTML='Обращение <b>'+safeText(ticketId)+'</b> подготовлено, текст скопирован. <a style="color:#ff737b" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Перейти в Telegram ↗</a>';
-   }).catch(()=>{});
+  const data=await api('/api/support/tickets');
+  const tickets=Array.isArray(data.tickets)?data.tickets:[];
+
+  if(!tickets.length){
+   list.innerHTML='<div class="empty">У тебя пока нет обращений.</div>';
+   return;
   }
- }catch(e){}
 
- renderLastSupportTicket();
+  list.innerHTML=tickets.map(ticket=>`
+   <div class="support-ticket">
+    <b>Обращение #${safeText(ticket.id)}</b>
+    <p>${safeText(ticket.category||'Без категории')}</p>
+    <p class="muted">${safeText((ticket.description||'').slice(0,180))}</p>
+    <p>${supportStatus(ticket.status)}</p>
+    <p class="muted">${safeText(supportDate(ticket.created_at||ticket.date))}</p>
+    <button class="btn ghost" onclick="openSupportTicket(${Number(ticket.id)})">Открыть переписку →</button>
+   </div>
+  `).join('');
+ }catch(error){
+  list.innerHTML='<div class="notice">Не удалось загрузить обращения: '+safeText(error.message)+'</div>';
+ }
+}
+
+async function openSupportTicket(id){
+ const panel=$('supportChatPanel');
+ activeSupportTicket=id;
+ panel.hidden=false;
+ $('supportChatTitle').textContent='Обращение #'+id;
+ $('supportChatMessages').innerHTML='<p class="muted">Загрузка переписки...</p>';
+ $('supportChatMessage').textContent='';
+ panel.scrollIntoView({behavior:'smooth',block:'start'});
+
+ try{
+  const data=await api('/api/support/tickets/'+id);
+  const ticket=data.ticket||data;
+  const messages=Array.isArray(ticket.messages)?ticket.messages:[];
+
+  $('supportChatTitle').textContent='Обращение #'+ticket.id+' · '+(ticket.category||'');
+
+  if(!messages.length){
+   $('supportChatMessages').innerHTML='<p class="muted">Сообщений пока нет.</p>';
+  }else{
+   $('supportChatMessages').innerHTML=messages.map(message=>{
+    const sender=message.sender_type||message.role||'user';
+    const isAdmin=sender==='admin'||sender==='owner'||sender==='support';
+    return `
+     <div class="support-message ${isAdmin?'admin':''}">
+      <small>${safeText(message.username||(isAdmin?'ArticSupport':'Ты'))} · ${safeText(supportDate(message.created_at||message.date))}</small>
+      <p>${safeText(message.message||message.text||'')}</p>
+     </div>`;
+   }).join('');
+  }
+
+  const closed=ticket.status==='closed';
+  $('supportReplyArea').hidden=closed;
+  if(closed)$('supportChatMessage').textContent='Это обращение закрыто. Ответить на него нельзя.';
+ }catch(error){
+  $('supportChatMessages').innerHTML='<div class="notice">Не удалось открыть обращение: '+safeText(error.message)+'</div>';
+ }
+}
+
+async function sendSupportReply(){
+ if(!currentUser){
+  $('supportChatMessage').textContent='Войди в аккаунт.';
+  return;
+ }
+ if(!activeSupportTicket)return;
+
+ const input=$('supportReply');
+ const messageText=input.value.trim();
+ if(messageText.length<1){
+  $('supportChatMessage').textContent='Напиши сообщение.';
+  return;
+ }
+ if(messageText.length>2000){
+  $('supportChatMessage').textContent='Сообщение слишком длинное.';
+  return;
+ }
+
+ const button=$('supportReplyBtn');
+ button.disabled=true;
+ button.textContent='Отправка...';
+
+ try{
+  await api('/api/support/tickets/'+activeSupportTicket+'/messages',{
+   method:'POST',
+   body:JSON.stringify({message:messageText})
+  });
+  input.value='';
+  $('supportChatMessage').textContent='Сообщение отправлено.';
+  await openSupportTicket(activeSupportTicket);
+  await loadSupportData();
+ }catch(error){
+  $('supportChatMessage').textContent='Ошибка: '+error.message;
+ }finally{
+  button.disabled=false;
+  button.textContent='Отправить сообщение';
+ }
+}
+
+function closeSupportChat(){
+ activeSupportTicket=null;
+ $('supportChatPanel').hidden=true;
+ $('supportChatMessages').innerHTML='';
 }
 
 function renderLastSupportTicket(){
- const el=$('lastSupportTicket');
- if(!el)return;
- try{
-  const ticket=JSON.parse(localStorage.getItem('ps4_support_last_ticket')||'null');
-  if(!ticket){
-   el.textContent='Пока обращений нет на этом устройстве.';
-   return;
-  }
-  const date=new Date(ticket.date).toLocaleString('ru-RU');
-  el.innerHTML=
-   '<div class="support-ticket">'+
-   '<b>'+safeText(ticket.id)+'</b>'+
-   '<p>Категория: '+safeText(ticket.category)+'</p>'+
-   '<p>Пользователь: '+safeText(ticket.username)+'</p>'+
-   '<p>'+safeText(ticket.description)+'</p>'+
-   '<span class="muted">'+safeText(date)+'</span>'+
-   '<p class="muted">Статус: сохранено локально, не отправлено на сервер.</p>'+
-   '</div>';
- }catch(e){
-  el.textContent='Не удалось прочитать последнее обращение.';
+ if(currentUser){
+  $('supportGuest').hidden=true;
+  $('supportUserArea').hidden=false;
+  loadSupportCategories();
+  loadSupportData();
+ }else{
+  $('supportGuest').hidden=false;
+  $('supportUserArea').hidden=true;
  }
 }
 
@@ -890,14 +1068,6 @@ document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
  b.addEventListener('click',()=>setProfileAvatar(b.dataset.profileAvatar));
 });
 
-document.querySelectorAll('.support-category').forEach(button=>{
- button.addEventListener('click',()=>{
-  document.querySelectorAll('.support-category').forEach(item=>item.classList.remove('selected'));
-  button.classList.add('selected');
-  selectedSupportCategory=button.dataset.category;
- });
-});
-
 $('search').addEventListener('input',render);
 $('loginBtn').addEventListener('click',login);
 $('registerBtn').addEventListener('click',register);
@@ -919,7 +1089,6 @@ document.addEventListener('keydown',e=>{
  render();
  renderFavorites();
  renderNotifications();
- renderLastSupportTicket();
  await refreshMe();
  await loadCatalog();
 })();
