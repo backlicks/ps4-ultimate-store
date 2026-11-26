@@ -1,78 +1,384 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808">
-<title>PS4 ULTIMATE STORE 0.9.5</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080808">
+<title>PS4 ULTIMATE STORE 0.9.7</title>
 <style>
-:root{--bg:#080808;--surface:#111;--surface2:#191919;--red:#e50914;--red2:#ff2633;--text:#f5f5f5;--muted:#999;--line:#303030}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--text);background:radial-gradient(ellipse at 50% -15%,rgba(229,9,20,.23),transparent 42%),#080808;font:15px/1.55 Inter,system-ui,Arial,sans-serif}
-button,input{font:inherit}a{color:inherit}.wrap{width:min(1180px,calc(100% - 40px));margin:auto}
+:root{--bg:#080808;--surface:#111;--surface2:#191919;--red:#ed1421;--red2:#ff3845;--text:#f5f5f5;--muted:#999;--line:#303030}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);background:radial-gradient(ellipse at 10% 0%,#3b090d55,transparent 35%),radial-gradient(ellipse at 90% 20%,#25080b44,transparent 35%),#080808;font:15px/1.55 Inter,system-ui,Arial,sans-serif}
+button,input,textarea,select{font:inherit}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 40px));margin:auto}
 header{position:sticky;top:0;z-index:20;background:rgba(8,8,8,.92);border-bottom:1px solid #292929;backdrop-filter:blur(18px)}
-.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:11px;font-weight:950;letter-spacing:.5px;font-size:18px;border:0;background:none;color:white;cursor:pointer}.brand i{font-style:normal;color:var(--red2)}
-.brand-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#ff2935,#9e0009);box-shadow:0 0 24px #e5091452}
-.nav-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.nav-link{border:0;background:none;color:#ddd;cursor:pointer;padding:9px 12px;border-radius:9px;font-weight:750;font-size:13px}.nav-link:hover{background:#211113}
+.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:950;letter-spacing:.5px;font-size:18px;border:0;background:none;color:white;cursor:pointer}
+.brand i{font-style:normal;color:var(--red2)}
+.brand-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#ff2935,#9e0009);box-shadow:0 0 25px #e5091466}
+.nav-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.nav-link{border:0;background:none;color:#ddd;cursor:pointer;padding:9px 12px;border-radius:9px;font-weight:750;font-size:13px}
+.nav-link:hover{background:#211113}
 .version,.role{border:1px solid #542126;background:#1b0d0e;color:#ff9ba1;border-radius:30px;padding:5px 10px;font-size:10px;font-weight:850}
 .account-nav{border:1px solid #512126;border-radius:24px;background:#1b1011;color:white;padding:7px 11px;cursor:pointer;font-weight:800}
-.hero{padding:72px 0 48px}.eyebrow{color:#ff626b;text-transform:uppercase;letter-spacing:3px;font-size:11px;font-weight:900}
-h1{font-size:clamp(38px,7vw,76px);line-height:1;letter-spacing:-2px;margin:18px 0}.accent{color:var(--red2);text-shadow:0 0 34px #e509143d}
-.hero p,.lead{max-width:680px;color:#aaa}.hero-actions,.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:10px;border:1px solid transparent;font-weight:850;font-size:13px;cursor:pointer;text-decoration:none}
-.primary{color:white;background:linear-gradient(110deg,#f01420,#a9000b)}.ghost{background:#151515;border-color:#383838;color:#eee}.danger{background:#351014;border-color:#79252c;color:#ff9ba1}
-.stats{display:flex;gap:28px;margin-top:30px;padding-top:20px;border-top:1px solid #292929;color:#888;font-size:12px}.stats b{display:block;color:white;font-size:19px}
-.view{display:none;min-height:68vh;animation:fade .25s ease}.view.active{display:block}@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-.view-top{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid #292929}.back{background:#151515;color:#ddd;border:1px solid #383838;padding:9px 13px;border-radius:9px;cursor:pointer}
-.heading{padding:32px 0 18px}.heading h1{font-size:clamp(38px,6vw,62px)}.toolbar{display:grid;gap:12px;margin:15px 0}.tabs,.filters{display:flex;gap:8px;flex-wrap:wrap}
-.tab,.filter{background:#141414;border:1px solid #303030;color:#aaa;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800;font-size:12px}.tab.active,.filter.active{color:white;border-color:#e50914;background:linear-gradient(120deg,#a9000b,#e50914)}
-.search{width:100%;background:#111;border:1px solid #303030;border-radius:11px;padding:13px;color:white;outline:none}.search:focus{border-color:#b3232b}
-.catalog-line{display:flex;justify-content:space-between;align-items:center;margin:23px 0 14px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;padding-bottom:60px}
-.card,.panel{position:relative;padding:19px;border:1px solid #303030;border-radius:16px;background:linear-gradient(145deg,#191919,#101010);min-width:0}.card{display:flex;flex-direction:column;min-height:250px;transition:.2s}.card:hover{transform:translateY(-3px);border-color:#76252a}
-.cardtop{display:flex;align-items:center;gap:12px}.appicon,.avatar{width:52px;height:52px;display:grid;place-items:center;border:1px solid #542126;border-radius:13px;background:#291114;font-size:24px;flex-shrink:0}
-.card h3{margin:0;font-size:16px;overflow-wrap:anywhere}.tag{display:inline-block;margin-top:5px;padding:3px 8px;border-radius:5px;color:#ff9da3;background:#2b1113;border:1px solid #552126;font-size:9px;font-weight:850}
-.muted{color:#888;font-size:11px}.desc{color:#999;font-size:12px;margin:15px 0;flex:1}.cardactions{display:flex;gap:8px}.cardactions>*{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:11px;font-weight:800;text-decoration:none;cursor:pointer}
-.details{background:#1b1b1b;color:#ddd;border:1px solid #3a3a3a}.source{background:#c10a14;color:white;border:1px solid #ed101d}.fav{position:absolute;right:14px;top:13px;border:1px solid #493033;background:#211416;color:#ffcc4d;border-radius:50%;width:32px;height:32px;cursor:pointer}
+.hero{padding:72px 0 48px}
+.eyebrow{color:#ff626b;text-transform:uppercase;letter-spacing:3px;font-size:11px;font-weight:900}
+h1{font-size:clamp(38px,7vw,76px);line-height:1;letter-spacing:-2px;margin:18px 0}
+.accent{color:var(--red2);text-shadow:0 0 34px #e509143d}
+.hero p,.lead{max-width:680px;color:#aaa}
+.hero-actions,.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:10px;border:1px solid transparent;font-weight:850;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.15)}
+.primary{color:white;background:linear-gradient(110deg,#f01420,#a9000b)}
+.ghost{background:#151515;border-color:#383838;color:#eee}
+.danger{background:#351014;border-color:#79252c;color:#ff9ba1}
+.stats{display:flex;gap:28px;margin-top:30px;padding-top:20px;border-top:1px solid #292929;color:#888;font-size:12px}
+.stats b{display:block;color:white;font-size:19px}
+.view{display:none;min-height:68vh;animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.view-top{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid #292929}
+.back{background:#151515;color:#ddd;border:1px solid #383838;padding:9px 13px;border-radius:9px;cursor:pointer}
+.heading{padding:32px 0 18px}
+.heading h1{font-size:clamp(38px,6vw,62px)}
+.toolbar{display:grid;gap:12px;margin:15px 0}
+.tabs,.filters{display:flex;gap:8px;flex-wrap:wrap}
+.tab,.filter{background:#141414;border:1px solid #303030;color:#aaa;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:800;font-size:12px}
+.tab.active,.filter.active{color:white;border-color:#e50914;background:linear-gradient(120deg,#a9000b,#e50914)}
+.search{width:100%;background:#111;border:1px solid #303030;border-radius:11px;padding:13px;color:white;outline:none}
+.search:focus{border-color:#b3232b}
+.catalog-line{display:flex;justify-content:space-between;align-items:center;margin:23px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;padding-bottom:60px}
+.card,.panel{position:relative;padding:19px;border:1px solid #303030;border-radius:16px;background:linear-gradient(145deg,#191919,#101010);min-width:0;transition:.22s}
+.card{display:flex;flex-direction:column;min-height:250px}
+.card:hover,.panel:hover{transform:translateY(-3px);border-color:#a52a33;box-shadow:0 12px 35px #e5091415}
+.cardtop{display:flex;align-items:center;gap:12px}
+.appicon,.avatar{width:52px;height:52px;display:grid;place-items:center;border:1px solid #542126;border-radius:13px;background:#291114;font-size:24px;flex-shrink:0}
+.card h3{margin:0;font-size:16px;overflow-wrap:anywhere}
+.tag{display:inline-block;margin-top:5px;padding:3px 8px;border-radius:5px;color:#ff9da3;background:#2b1113;border:1px solid #552126;font-size:9px;font-weight:850}
+.muted{color:#888;font-size:11px}
+.desc{color:#999;font-size:12px;margin:15px 0;flex:1}
+.cardactions{display:flex;gap:8px}
+.cardactions>*{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:11px;font-weight:800;text-decoration:none;cursor:pointer}
+.details{background:#1b1b1b;color:#ddd;border:1px solid #3a3a3a}
+.source{background:#c10a14;color:white;border:1px solid #ed101d}
+.fav{position:absolute;right:14px;top:13px;border:1px solid #493033;background:#211416;color:#ffcc4d;border-radius:50%;width:32px;height:32px;cursor:pointer}
 .empty{grid-column:1/-1;text-align:center;padding:40px;color:#888;border:1px dashed #393939;border-radius:15px}
-.home-panels,.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 40px}.tile{padding:22px;min-height:155px;text-align:left;background:linear-gradient(145deg,#1a1a1a,#101010);border:1px solid #343434;border-radius:15px;color:white;cursor:pointer}.tile strong{display:block;font-size:23px;margin:8px 0}.tile span{color:#ff737b;font-size:11px;font-weight:900}
-.account-layout{display:grid;grid-template-columns:minmax(0,760px) minmax(260px,1fr);gap:16px;margin:20px 0 60px}.panel h2{margin:0 0 12px}.form{display:grid;gap:9px}.form label{font-size:12px;font-weight:800;color:#ddd}.form input,.form select,.form textarea{width:100%;padding:12px;background:#101010;border:1px solid #393939;border-radius:9px;color:white;outline:none}.form input:focus,.form textarea:focus{border-color:#b3232b}.message{min-height:20px;color:#ff8c93;font-size:12px}.avatarrow{display:flex;gap:7px;flex-wrap:wrap}.avatar-choice{width:42px;height:42px;border:1px solid #393939;border-radius:10px;background:#171717;color:white;font-size:21px;cursor:pointer}.avatar-choice.selected{border-color:#e50914;background:#321013}
-.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:10px;border-bottom:1px solid #303030;white-space:nowrap}th{color:#ff8a91}
+.home-panels,.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 40px}
+.tile{padding:22px;min-height:155px;text-align:left;background:linear-gradient(145deg,#1a1a1a,#101010);border:1px solid #343434;border-radius:15px;color:white;cursor:pointer;transition:.22s}
+.tile:hover{transform:translateY(-3px);border-color:#a52a33;box-shadow:0 12px 35px #e5091415}
+.tile strong{display:block;font-size:23px;margin:8px 0}
+.tile span{color:#ff737b;font-size:11px;font-weight:900}
+.account-layout{display:grid;grid-template-columns:minmax(0,760px) minmax(260px,1fr);gap:16px;margin:20px 0 60px}
+.panel h2{margin:0 0 12px}
+.form{display:grid;gap:9px}
+.form label{font-size:12px;font-weight:800;color:#ddd}
+.form input,.form select,.form textarea{width:100%;padding:12px;background:#101010;border:1px solid #393939;border-radius:9px;color:white;outline:none}
+.form input:focus,.form textarea:focus{border-color:#b3232b}
+.message{min-height:20px;color:#ff8c93;font-size:12px}
+.avatarrow{display:flex;gap:7px;flex-wrap:wrap}
+.avatar-choice{width:42px;height:42px;border:1px solid #393939;border-radius:10px;background:#171717;color:white;font-size:21px;cursor:pointer}
+.avatar-choice.selected{border-color:#e50914;background:#321013}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #303030;white-space:nowrap}
+th{color:#ff8a91}
 .notice{padding:14px;border:1px solid #492328;border-left:3px solid var(--red);border-radius:10px;color:#aaa;background:#160e0f;font-size:12px;margin:15px 0}
-footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11px}.footerrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:#000d;backdrop-filter:blur(6px)}.modal.open{display:flex}.modalbox{width:min(560px,100%);max-height:88vh;overflow:auto;background:#171717;border:1px solid #713036;border-radius:16px;padding:22px}.close{float:right;background:#242424;color:white;border:1px solid #414141;border-radius:8px;padding:7px 10px;cursor:pointer}
+footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11px}
+.footerrow{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:#000d;backdrop-filter:blur(6px)}
+.modal.open{display:flex}
+.modalbox{width:min(560px,100%);max-height:88vh;overflow:auto;background:#171717;border:1px solid #713036;border-radius:16px;padding:22px}
+.close{float:right;background:#242424;color:white;border:1px solid #414141;border-radius:8px;padding:7px 10px;cursor:pointer}
+.notification-dot{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:4px;border-radius:20px;background:#e50914;color:#fff;font-size:10px;font-weight:900}
+.notice-item{padding:15px;border:1px solid #343434;border-radius:12px;background:#141414;margin:10px 0}
+.notice-item.unread{border-color:#8a3037;background:#1d1012}
+.notice-item h3{font-size:15px;margin:0 0 5px}
+.notice-item p{font-size:12px;color:#aaa;margin:0}
+.notice-meta{display:flex;justify-content:space-between;gap:10px;color:#777;font-size:10px;margin-top:9px}
+.avatar-picker{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.avatar-picker button{width:43px;height:43px;border:1px solid #393939;border-radius:11px;background:#171717;color:white;font-size:21px;cursor:pointer}
+.avatar-picker button.selected{border-color:#e50914;background:#321013;box-shadow:0 0 0 1px #e50914}
+.release-item{display:grid;grid-template-columns:90px 1fr;gap:14px;padding:17px 0;border-bottom:1px solid #303030}
+.release-version{font-weight:950;color:#ff737b;font-size:18px}
+.release-item h3{margin:0 0 5px;font-size:15px}
+.release-item p{margin:0;color:#999;font-size:12px}
+.support-hero{padding:25px;border:1px solid #67252b;border-radius:17px;background:radial-gradient(circle at 90% 10%,#e5091428,transparent 40%),linear-gradient(145deg,#211012,#111);margin:20px 0}
+.support-categories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:15px 0}
+.support-category{padding:15px;text-align:left;border:1px solid #383838;border-radius:12px;background:#151515;color:white;cursor:pointer;font-weight:800}
+.support-category.selected{border-color:#ed1421;background:#321013;box-shadow:0 0 0 1px #ed1421}
+.support-form{display:grid;gap:12px}
+.support-form textarea{min-height:130px;resize:vertical;width:100%;padding:13px;color:white;background:#101010;border:1px solid #393939;border-radius:10px;font:inherit}
+.support-ticket{padding:16px;border:1px solid #51252a;border-radius:12px;background:#1c1011;margin-top:15px}
+.support-ticket b{color:#ff737b}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.account-layout{grid-template-columns:1fr}}
-@media(max-width:600px){.wrap{width:calc(100% - 28px)}.nav{min-height:66px}.brand{font-size:13px}.nav-link{display:none}.version{display:none}.grid,.home-panels,.info-grid{grid-template-columns:1fr}.hero{padding:48px 0 35px}.stats{gap:15px}.grid{gap:11px}}
+@media(max-width:600px){.wrap{width:calc(100% - 28px)}.nav{min-height:66px}.brand{font-size:13px}.nav-link{display:none}.version{display:none}.grid,.home-panels,.info-grid{grid-template-columns:1fr}.hero{padding:48px 0 35px}.stats{gap:15px}.grid{gap:11px}.support-categories{grid-template-columns:1fr}}
 </style>
-</head>
-<body>
-<header><div class="wrap nav">
+</head><body>
+<header>
+<div class="wrap nav">
 <button class="brand" onclick="showView('homeView')"><span class="brand-mark">P</span><span>PS4 <i>ULTIMATE STORE</i></span></button>
-<div class="nav-right"><button class="nav-link" onclick="showView('homeView')">Главная</button><button class="nav-link" onclick="showView('storeView')">Магазин</button><a class="nav-link" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Telegram ↗</a><button class="account-nav" onclick="showView('accountView')"><span id="navAvatar">👤</span> <span id="navName">Аккаунт</span></button><span class="version">0.9.5 · BLACK RED</span></div>
-</div></header>
+<div class="nav-right">
+<button class="nav-link" onclick="showView('homeView')">Главная</button>
+<button class="nav-link" onclick="showView('storeView')">Магазин</button>
+<button class="nav-link" onclick="showView('supportView')">Поддержка</button>
+<a class="nav-link" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Telegram ↗</a>
+<button class="account-nav" onclick="showView('notificationsView')">🔔 <span id="notificationCount" class="notification-dot">2</span></button>
+<button class="account-nav" onclick="showView('accountView')"><span id="navAvatar">👤</span> <span id="navName">Аккаунт</span></button>
+<span class="version">0.9.7 · BLACK RED</span>
+</div>
+</div>
+</header>
+
 <main class="wrap">
-<section class="view active" id="homeView"><section class="hero"><div class="eyebrow">PS4 ULTIMATE STORE · DIGITAL HUB</div><h1>Твой игровой<br><span class="accent">центр.</span></h1><p>Приложения, инструменты и полезные программы для твоих устройств — собраны в одном месте.</p><div class="hero-actions"><button class="btn primary" onclick="showView('storeView')">Открыть магазин ↗</button><button class="btn ghost" onclick="showView('aboutView')">О проекте</button></div><div class="stats"><span><b id="count">41</b>приложение</span><span><b>03</b>платформы</span><span><b>0.9.5</b>версия</span></div></section>
-<div class="home-panels"><button class="tile" onclick="showView('storeView')"><span>БИБЛИОТЕКА</span><strong>Магазин</strong>Каталог приложений</button><button class="tile" onclick="showView('favoritesView')"><span>ТВОЯ БИБЛИОТЕКА</span><strong>Избранное</strong>Сохранённые приложения</button><button class="tile" onclick="showView('accountView')"><span>ПЕРСОНАЛЬНОЕ ПРОСТРАНСТВО</span><strong>Мой аккаунт</strong><div id="homeStatus">Войди или создай аккаунт</div></button><button class="tile" onclick="showView('updatesView')"><span>CHANGELOG</span><strong>Обновления</strong>Версия 0.9.3</button><button class="tile" onclick="showView('newsView')"><span>ЛЕНТА ПРОЕКТА</span><strong>Новости</strong>Объявления и планы</button><button class="tile" onclick="showView('aboutView')"><span>ИНФОРМАЦИЯ</span><strong>О проекте</strong>Подробнее о магазине</button></div></section>
-<section class="view" id="storeView"><div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">STORE / КАТАЛОГ</span></div><div class="heading"><div class="eyebrow">БИБЛИОТЕКА ПРИЛОЖЕНИЙ</div><h1>Магазин<span class="accent">.</span></h1><p class="lead">Каталог загружается с сервера. Если серверный каталог пуст или недоступен, используется встроенный список.</p></div>
-<div class="toolbar"><div class="tabs" id="platformTabs"><button class="tab active" data-platform="PS4">🎮 PS4</button><button class="tab" data-platform="Телефоны">📱 Телефоны</button><button class="tab" data-platform="ПК">💻 ПК</button><button class="tab" data-platform="Все">🌐 Все</button></div><input class="search" id="search" placeholder="Найти приложение..." autocomplete="off"></div>
-<div class="filters" id="filters"><button class="filter active" data-filter="Все">Все категории</button><button class="filter" data-filter="Homebrew">Homebrew</button><button class="filter" data-filter="Эмуляторы">Эмуляторы</button><button class="filter" data-filter="Медиа">Медиа</button><button class="filter" data-filter="Утилиты">Утилиты</button><button class="filter" data-filter="Игры">Игры</button></div><div class="catalog-line"><b>Все приложения</b><span class="muted" id="shown">Показано: 0</span></div><div class="grid" id="grid"></div></section>
-<section class="view" id="favoritesView"><div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">SAVED / ИЗБРАННОЕ</span></div><div class="heading"><h1>Избранное<span class="accent">.</span></h1><p class="lead">Список хранится в браузере на этом устройстве.</p></div><div class="grid" id="favoriteGrid"></div></section>
-<section class="view" id="accountView"><div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">ACCOUNT / ЛИЧНЫЙ КАБИНЕТ</span></div><div class="heading"><div class="eyebrow">ТВОЁ ПРОСТРАНСТВО</div><h1>Мой аккаунт<span class="accent">.</span></h1><p class="lead">Регистрация и вход используют серверную сессию. Не используй один и тот же пароль на других сайтах.</p></div>
-<div class="account-layout"><div class="panel"><div style="display:flex;align-items:center;gap:13px;margin-bottom:20px"><div class="avatar" id="profileAvatar">👤</div><div><b id="profileName">Гость</b><div class="muted" id="profileRole">Не авторизован</div></div></div>
-<div id="authForms"><div class="form"><label>Ник</label><input id="authUsername" maxlength="20" autocomplete="username" placeholder="Player_01"><label>Пароль</label><input id="authPassword" type="password" maxlength="128" autocomplete="current-password" placeholder="От 10 символов"><div class="avatarrow" id="avatarChoices"><button class="avatar-choice selected" type="button" data-avatar="🎮">🎮</button><button class="avatar-choice" type="button" data-avatar="👾">👾</button><button class="avatar-choice" type="button" data-avatar="🦊">🦊</button><button class="avatar-choice" type="button" data-avatar="🐺">🐺</button><button class="avatar-choice" type="button" data-avatar="🤖">🤖</button><button class="avatar-choice" type="button" data-avatar="👑">👑</button><button class="avatar-choice" type="button" data-avatar="⚡">⚡</button><button class="avatar-choice" type="button" data-avatar="🔥">🔥</button></div><div class="actions"><button class="btn primary" id="loginBtn">Войти</button><button class="btn ghost" id="registerBtn">Создать аккаунт</button></div></div></div>
-<div id="signedIn" hidden><p class="muted">Ты вошёл в аккаунт. Сессия хранится в защищённой cookie браузера.</p><button class="btn danger" id="logoutBtn">Выйти из аккаунта</button></div><div class="message" id="accountMessage" role="status"></div></div>
-<div class="panel"><h2>Информация</h2><p class="muted">Ник: 3–20 символов, латиница, цифры, точка, дефис или подчёркивание. Пароль: 10–128 символов.</p><div class="notice">Если вход не работает, проверь доступность API и настройки cookie в браузере. Некоторые браузеры ограничивают сторонние cookies для GitHub Pages и Render.</div></div></div></section>
-<section class="view" id="adminView"><div class="view-top"><button class="back" onclick="showView('accountView')">← Аккаунт</button><span class="role" id="adminRole">ADMIN</span></div><div class="heading"><div class="eyebrow">CONTROL CENTER</div><h1>Панель управления<span class="accent">.</span></h1></div>
-<div class="panel"><h2>Пользователи</h2><div class="tablewrap"><table><thead><tr><th>ID</th><th>Ник</th><th>Роль</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="usersBody"><tr><td colspan="5">Загрузка…</td></tr></tbody></table></div></div>
-<div class="panel" style="margin-top:15px"><h2>Каталог — добавить приложение</h2><div class="form" id="catalogForm"><label>Название</label><input id="newName" maxlength="100"><label>Категория</label><input id="newCategory" value="Утилиты"><label>Описание</label><textarea id="newDesc" rows="2"></textarea><label>Версия</label><input id="newVersion"><label>Совместимость</label><input id="newCompat"><label>Источник</label><input id="newSource"><label>Ссылка</label><input id="newUrl" type="url"><label>Иконка</label><input id="newIcon" value="📦" maxlength="16"><button class="btn primary" id="addCatalogBtn">Добавить в каталог</button></div><div class="message" id="catalogMessage"></div></div>
-<div class="panel" style="margin-top:15px"><h2>Управление каталогом</h2><p class="muted">Редактируй или удаляй записи, сохранённые на сервере.</p><div class="tablewrap"><table><thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Действия</th></tr></thead><tbody id="catalogBody"><tr><td colspan="4">Загрузка…</td></tr></tbody></table></div></div>
-<div class="panel" id="ownerPanel" style="margin-top:15px" hidden><h2>OWNER CONTROL</h2><p class="muted">Уровень владельца проекта: управление назначением ADMIN, контроль пользователей и каталога. Не передавай доступ владельца другим людям.</p><div class="notice">Роль OWNER нельзя назначить через эту панель. Изменение роли доступно только между USER и ADMIN.</div></div>
+
+<section class="view active" id="homeView">
+<section class="hero">
+<div class="eyebrow">PS4 ULTIMATE STORE · DIGITAL HUB</div>
+<h1>Твой игровой<br><span class="accent">центр.</span></h1>
+<p>Приложения, инструменты и полезные программы для твоих устройств — собраны в одном месте.</p>
+<div class="hero-actions">
+<button class="btn primary" onclick="showView('storeView')">Открыть магазин ↗</button>
+<button class="btn ghost" onclick="showView('aboutView')">О проекте</button>
+<button class="btn ghost" onclick="showView('supportView')">Поддержка 🎧</button>
+</div>
+<div class="stats">
+<span><b id="count">41</b>приложение</span>
+<span><b>03</b>платформы</span>
+<span><b>0.9.7</b>версия</span>
+</div>
 </section>
-<section class="view" id="updatesView"><div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">CHANGELOG</span></div><div class="heading"><h1>Что нового<span class="accent">?</span></h1><p class="lead">PS4 ULTIMATE STORE 0.9.5 — серверные аккаунты, роли и подключение каталога.</p></div><div class="panel"><h2>0.9.5</h2><p class="muted">Добавлены серверные аккаунты и сессии, CSRF-защита, управление пользователями, назначение ADMIN владельцем, добавление, редактирование и удаление приложений. Избранное по-прежнему хранится локально.</p></div></section>
-<section class="view" id="newsView"><div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">NEWS</span></div><div class="heading"><h1>Новости<span class="accent">.</span></h1><p class="lead">Следующий этап проекта — расширение панели управления и профилей.</p></div><div class="panel"><h2>PS4 ULTIMATE STORE 0.9.5</h2><p class="muted">Добавлены управление каталогом, редактирование и удаление приложений, расширенные возможности OWNER и ADMIN.</p></div></section>
-<section class="view" id="aboutView"><div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">ABOUT</span></div><div class="heading"><h1>О проекте<span class="accent">.</span></h1><p class="lead">PS4 ULTIMATE STORE — независимый каталог полезных приложений и инструментов для PlayStation 4, телефонов и компьютеров. Проект не связан с Sony Interactive Entertainment.</p></div></section>
+
+<div class="home-panels">
+<button class="tile" onclick="showView('storeView')"><span>БИБЛИОТЕКА</span><strong>Магазин</strong>Каталог приложений</button>
+<button class="tile" onclick="showView('favoritesView')"><span>ТВОЯ БИБЛИОТЕКА</span><strong>Избранное</strong>Сохранённые приложения</button>
+<button class="tile" onclick="showView('accountView')"><span>ЛИЧНЫЙ КАБИНЕТ</span><strong>Мой аккаунт</strong><div id="homeStatus">Войди или создай аккаунт</div></button>
+<button class="tile" onclick="showView('updatesView')"><span>CHANGELOG</span><strong>Обновления</strong>Версия 0.9.7</button>
+<button class="tile" onclick="showView('newsView')"><span>ЛЕНТА ПРОЕКТА</span><strong>Новости</strong>Объявления и планы</button>
+<button class="tile" onclick="showView('supportView')"><span>ARTICSUPPORT</span><strong>Поддержка 🎧</strong>Помощь и обращения</button>
+<button class="tile" onclick="showView('aboutView')"><span>ИНФОРМАЦИЯ</span><strong>О проекте</strong>Подробнее о магазине</button>
+</div>
+</section>
+
+<section class="view" id="storeView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">STORE / КАТАЛОГ</span></div>
+<div class="heading"><div class="eyebrow">БИБЛИОТЕКА ПРИЛОЖЕНИЙ</div><h1>Магазин<span class="accent">.</span></h1><p class="lead">Каталог загружается с сервера. Если серверный каталог пуст или недоступен, используется встроенный список.</p></div>
+<div class="toolbar">
+<div class="tabs" id="platformTabs">
+<button class="tab active" data-platform="PS4">🎮 PS4</button>
+<button class="tab" data-platform="Телефоны">📱 Телефоны</button>
+<button class="tab" data-platform="ПК">💻 ПК</button>
+<button class="tab" data-platform="Все">🌐 Все</button>
+</div>
+<input class="search" id="search" placeholder="Найти приложение..." autocomplete="off">
+</div>
+<div class="filters" id="filters">
+<button class="filter active" data-filter="Все">Все категории</button>
+<button class="filter" data-filter="Homebrew">Homebrew</button>
+<button class="filter" data-filter="Эмуляторы">Эмуляторы</button>
+<button class="filter" data-filter="Медиа">Медиа</button>
+<button class="filter" data-filter="Утилиты">Утилиты</button>
+<button class="filter" data-filter="Игры">Игры</button>
+</div>
+<div class="catalog-line"><b>Все приложения</b><span class="muted" id="shown">Показано: 0</span></div>
+<div class="grid" id="grid"></div>
+</section>
+
+<section class="view" id="favoritesView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">SAVED / ИЗБРАННОЕ</span></div>
+<div class="heading"><h1>Избранное<span class="accent">.</span></h1><p class="lead">Список хранится в браузере на этом устройстве.</p></div>
+<div class="grid" id="favoriteGrid"></div>
+</section>
+
+<section class="view" id="accountView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">ACCOUNT / ЛИЧНЫЙ КАБИНЕТ</span></div>
+<div class="heading"><div class="eyebrow">ТВОЁ ПРОСТРАНСТВО</div><h1>Мой аккаунт<span class="accent">.</span></h1><p class="lead">Регистрация и вход используют серверную сессию. Не используй один и тот же пароль на других сайтах.</p></div>
+<div class="account-layout">
+<div class="panel">
+<div style="display:flex;align-items:center;gap:13px;margin-bottom:20px">
+<div class="avatar" id="profileAvatar">👤</div>
+<div><b id="profileName">Гость</b><div class="muted" id="profileRole">Не авторизован</div></div>
+</div>
+<div id="authForms">
+<div class="form">
+<label>Ник</label>
+<input id="authUsername" maxlength="20" autocomplete="username" placeholder="Player_01">
+<label>Пароль</label>
+<input id="authPassword" type="password" maxlength="128" autocomplete="current-password" placeholder="От 10 символов">
+<div class="avatarrow" id="avatarChoices">
+<button class="avatar-choice selected" type="button" data-avatar="🎮">🎮</button>
+<button class="avatar-choice" type="button" data-avatar="👾">👾</button>
+<button class="avatar-choice" type="button" data-avatar="🦊">🦊</button>
+<button class="avatar-choice" type="button" data-avatar="🐺">🐺</button>
+<button class="avatar-choice" type="button" data-avatar="🤖">🤖</button>
+<button class="avatar-choice" type="button" data-avatar="👑">👑</button>
+<button class="avatar-choice" type="button" data-avatar="⚡">⚡</button>
+<button class="avatar-choice" type="button" data-avatar="🔥">🔥</button>
+</div>
+<div class="actions">
+<button class="btn primary" id="loginBtn">Войти</button>
+<button class="btn ghost" id="registerBtn">Создать аккаунт</button>
+</div>
+</div>
+</div>
+<div id="signedIn" hidden>
+<p class="muted">Ты вошёл в аккаунт. Сессия хранится в защищённой cookie браузера.</p>
+<label style="display:block;margin-top:16px;font-size:12px;font-weight:850">Аватар профиля</label>
+<div class="avatar-picker" id="profileAvatarChoices">
+<button type="button" data-profile-avatar="🎮">🎮</button>
+<button type="button" data-profile-avatar="👾">👾</button>
+<button type="button" data-profile-avatar="🦊">🦊</button>
+<button type="button" data-profile-avatar="🐺">🐺</button>
+<button type="button" data-profile-avatar="🤖">🤖</button>
+<button type="button" data-profile-avatar="👑">👑</button>
+<button type="button" data-profile-avatar="⚡">⚡</button>
+<button type="button" data-profile-avatar="🔥">🔥</button>
+<button type="button" data-profile-avatar="🐱">🐱</button>
+<button type="button" data-profile-avatar="🚀">🚀</button>
+</div>
+<p class="muted">Аватар сохраняется в этом браузере.</p>
+<button class="btn danger" id="logoutBtn">Выйти из аккаунта</button>
+</div>
+<div class="message" id="accountMessage" role="status"></div>
+</div>
+<div class="panel">
+<h2>Информация</h2>
+<p class="muted">Ник: 3–20 символов, латиница, цифры, точка, дефис или подчёркивание. Пароль: 10–128 символов.</p>
+<div class="notice">Если вход не работает, проверь доступность API и настройки cookie в браузере. Некоторые браузеры ограничивают сторонние cookies для GitHub Pages и Render.</div>
+</div>
+</div>
+</section>
+
+<section class="view" id="adminView">
+<div class="view-top"><button class="back" onclick="showView('accountView')">← Аккаунт</button><span class="role" id="adminRole">ADMIN</span></div>
+<div class="heading"><div class="eyebrow">CONTROL CENTER</div><h1>Панель управления<span class="accent">.</span></h1></div>
+<div class="panel">
+<h2>Пользователи</h2>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Ник</th><th>Роль</th><th>Статус</th><th>Действия</th></tr></thead><tbody id="usersBody"><tr><td colspan="5">Загрузка…</td></tr></tbody></table></div>
+</div>
+<div class="panel" style="margin-top:15px">
+<h2>Каталог — добавить приложение</h2>
+<div class="form" id="catalogForm">
+<label>Название</label><input id="newName" maxlength="100">
+<label>Категория</label><input id="newCategory" value="Утилиты">
+<label>Описание</label><textarea id="newDesc" rows="2"></textarea>
+<label>Версия</label><input id="newVersion">
+<label>Совместимость</label><input id="newCompat">
+<label>Источник</label><input id="newSource">
+<label>Ссылка</label><input id="newUrl" type="url">
+<label>Иконка</label><input id="newIcon" value="📦" maxlength="16">
+<button class="btn primary" id="addCatalogBtn">Добавить в каталог</button>
+</div>
+<div class="message" id="catalogMessage"></div>
+</div>
+<div class="panel" style="margin-top:15px">
+<h2>Управление каталогом</h2>
+<p class="muted">Редактируй или удаляй записи, сохранённые на сервере.</p>
+<div class="tablewrap"><table><thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Действия</th></tr></thead><tbody id="catalogBody"><tr><td colspan="4">Загрузка…</td></tr></tbody></table></div>
+</div>
+<div class="panel" id="ownerPanel" style="margin-top:15px" hidden>
+<h2>OWNER CONTROL</h2>
+<p class="muted">Уровень владельца проекта: управление назначением ADMIN, контроль пользователей и каталога.</p>
+<div class="notice">Роль OWNER нельзя назначить через эту панель. Изменение роли доступно только между USER и ADMIN.</div>
+</div>
+</section>
+
+<section class="view" id="notificationsView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">NOTIFICATIONS</span></div>
+<div class="heading"><div class="eyebrow">ТВОЯ ЛЕНТА</div><h1>Уведомления<span class="accent">.</span></h1><p class="lead">Новости проекта и важные объявления.</p></div>
+<div class="actions"><button class="btn ghost" onclick="markAllNotificationsRead()">Отметить все прочитанными</button></div>
+<div id="notificationsList"></div>
+</section>
+
+<section class="view" id="updatesView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">CHANGELOG</span></div>
+<div class="heading"><div class="eyebrow">CHANGELOG</div><h1>История релизов<span class="accent">.</span></h1><p class="lead">Основные изменения PS4 ULTIMATE STORE.</p></div>
+<div class="panel">
+<div class="release-item"><div class="release-version">0.9.7</div><div><h3>ArticSupport & Redesign</h3><p>Новая страница поддержки, обновлённый интерфейс, улучшенные карточки и навигация.</p></div></div>
+<div class="release-item"><div class="release-version">0.9.6</div><div><h3>Notifications & Profile</h3><p>Центр уведомлений, отметка прочитанного, выбор локального аватара и история релизов.</p></div></div>
+<div class="release-item"><div class="release-version">0.9.5</div><div><h3>Admin Control</h3><p>Редактирование и удаление приложений, управление пользователями, блокировка и назначение ADMIN.</p></div></div>
+<div class="release-item"><div class="release-version">0.9.3</div><div><h3>Server Accounts</h3><p>Регистрация, вход, выход, серверные сессии, CSRF-защита и подключение каталога к API.</p></div></div>
+<div class="release-item"><div class="release-version">0.9.2</div><div><h3>Account & UI</h3><p>Обновление интерфейса, профиль, избранное, новости и мобильное меню.</p></div></div>
+</div>
+</section>
+
+<section class="view" id="newsView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">NEWS</span></div>
+<div class="heading"><h1>Новости<span class="accent">.</span></h1><p class="lead">Следующий этап проекта — расширение панели управления и профилей.</p></div>
+<div class="panel"><h2>PS4 ULTIMATE STORE 0.9.7</h2><p class="muted">Обновлён дизайн и добавлена страница ArticSupport.</p></div>
+</section>
+
+<section class="view" id="supportView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">ARTICSUPPORT / SUPPORT</span></div>
+<div class="heading">
+<div class="eyebrow">ARTICSUPPORT · SUPPORT</div>
+<h1>Служба <span class="accent">поддержки.</span></h1>
+<p class="lead">Чем мы можем помочь? Выбери категорию и опиши проблему.</p>
+</div>
+<div class="support-hero">
+<h2>🎧 ArticSupport</h2>
+<p class="muted">Поддержка пользователей PS4 ULTIMATE STORE. Сообщи о проблеме, неработающей ссылке или предложи улучшение.</p>
+</div>
+<div class="panel">
+<h2>Создать обращение</h2>
+<div class="support-categories" id="supportCategories">
+<button class="support-category selected" data-category="PS4">🎮 Проблема с PS4</button>
+<button class="support-category" data-category="Телефон">📱 Проблема с телефоном</button>
+<button class="support-category" data-category="ПК">💻 Проблема с ПК</button>
+<button class="support-category" data-category="Ссылка/скачивание">🔗 Не работает ссылка</button>
+<button class="support-category" data-category="Предложение">💡 Предложение</button>
+<button class="support-category" data-category="Другая проблема">❔ Другая проблема</button>
+</div>
+<div class="support-form">
+<label for="supportDescription">Опиши проблему</label>
+<textarea id="supportDescription" maxlength="2000" placeholder="Напиши, что произошло и что ты хотел сделать..."></textarea>
+<button class="btn primary" onclick="createSupportTicket()">Отправить обращение ↗</button>
+<div class="message" id="supportMessage" role="status"></div>
+</div>
+<div class="notice">Не отправляй пароли, токены и другие секретные данные. После создания обращения можно перейти в Telegram.</div>
+</div>
+<div class="panel" style="margin-top:15px">
+<h2>Другие способы связи</h2>
+<p class="muted">Telegram проекта:</p>
+<a class="btn ghost" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Открыть Telegram ↗</a>
+</div>
+<div class="panel" style="margin-top:15px">
+<h2>Моё последнее обращение</h2>
+<div id="lastSupportTicket" class="muted">Пока обращений нет на этом устройстве.</div>
+</div>
+</section>
+
+<section class="view" id="aboutView">
+<div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">ABOUT</span></div>
+<div class="heading">
+<h1>О проекте<span class="accent">.</span></h1>
+<p class="lead">PS4 ULTIMATE STORE — независимый каталог полезных приложений и инструментов для PlayStation 4, телефонов и компьютеров. Проект не связан с Sony Interactive Entertainment.</p>
+</div>
+<div class="panel"><h2>Наши разделы</h2><p class="muted">Магазин, избранное, профиль, новости, обновления и ArticSupport.</p><button class="btn primary" onclick="showView('supportView')">Связаться с поддержкой</button></div>
+</section>
+
 </main>
-<footer><div class="wrap footerrow"><b>PS4 <span style="color:#e50914">ULTIMATE STORE</span> · 0.9.5</b><span>Независимый каталог сообщества</span></div></footer>
-<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox"><button class="close" onclick="closeModal()">Закрыть ✕</button><div id="modalContent"></div></div></div>
+
+<footer>
+<div class="wrap footerrow">
+<b>PS4 <span style="color:#e50914">ULTIMATE STORE</span> · 0.9.7</b>
+<span>Независимый каталог сообщества</span>
+<a href="#" onclick="showView('supportView');return false">Поддержка</a>
+</div>
+</footer>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+<div class="modalbox"><button class="close" onclick="closeModal()">Закрыть ✕</button><div id="modalContent"></div></div>
+</div>
+
 <script>
 const API='https://ps4-ultimate-store-db.onrender.com';
 const FAVORITES_KEY='ps4_ultimate_store_favorites_v1';
+const NOTICE_READ_KEY='ps4_ultimate_store_notice_read_v1';
+const AVATAR_PREFIX='ps4_ultimate_store_avatar_';
+
 const fallbackApps=[
 {name:"SHAREfactory",icon:"🎬",category:"Медиа",platforms:["PS4"],desc:"Редактирование игровых клипов и скриншотов прямо на PS4.",version:"PS Store",compat:"PlayStation 4",source:"PlayStation",url:"https://www.playstation.com/en-us/support/hardware/ps4/"},
 {name:"PS Remote Play",icon:"📱",category:"Утилиты",platforms:["Телефоны","ПК"],desc:"Играй на PS4 через смартфон, планшет или компьютер.",version:"Актуальная версия",compat:"PS4 и совместимое устройство",source:"PlayStation",url:"https://remoteplay.dl.playstation.net/remoteplay/"},
@@ -116,47 +422,287 @@ const fallbackApps=[
 {name:"Jellyfin",icon:"📺",category:"Медиа",platforms:["Телефоны","ПК"],desc:"Медиасистема для собственной библиотеки.",version:"Последняя версия",compat:"Нужен сервер Jellyfin",source:"Jellyfin",url:"https://jellyfin.org/downloads/"},
 {name:"OBS Studio",icon:"🎥",category:"Медиа",platforms:["ПК"],desc:"Программа для записи экрана и трансляций.",version:"Последняя версия",compat:"Windows, macOS, Linux",source:"OBS Studio",url:"https://obsproject.com/download"}
 ];
-let apps=[...fallbackApps],activeCategory='Все',activePlatform='PS4',selectedAvatar='🎮',csrfToken='',currentUser=null;
+
+let apps=[...fallbackApps];
+let activeCategory='Все';
+let activePlatform='PS4';
+let selectedAvatar='🎮';
+let selectedSupportCategory='PS4';
+let csrfToken='';
+let currentUser=null;
+
 const $=id=>document.getElementById(id);
-function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='storeView')render();if(id==='favoritesView')renderFavorites();if(id==='adminView')loadAdmin();}
-function message(text){$('accountMessage').textContent=text}
-function readFavorites(){try{return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]')}catch(e){return []}}
+
+function safeText(v){
+ return String(v??'').replace(/[&<>"']/g,c=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+ }[c]));
+}
+
+function showView(id){
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+ window.scrollTo({top:0,behavior:'smooth'});
+ if(id==='storeView')render();
+ if(id==='favoritesView')renderFavorites();
+ if(id==='adminView')loadAdmin();
+ if(id==='notificationsView')renderNotifications();
+ if(id==='supportView')renderLastSupportTicket();
+}
+
+function readFavorites(){
+ try{return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]')}
+ catch(e){return []}
+}
+
 function isFav(name){return readFavorites().includes(name)}
-function toggleFav(name){let f=readFavorites();f=f.includes(name)?f.filter(x=>x!==name):[...f,name];localStorage.setItem(FAVORITES_KEY,JSON.stringify(f));render();renderFavorites()}
-function safeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function cardHTML(a){const index=apps.indexOf(a);return `<article class="card"><button class="fav" onclick="toggleFav('${safeText(a.name).replace(/'/g,"&#39;")}')">${isFav(a.name)?'★':'☆'}</button><div class="cardtop"><div class="appicon">${safeText(a.icon||'📦')}</div><div><h3>${safeText(a.name)}</h3><span class="tag">${safeText(a.category)}</span><div class="muted">${safeText((a.platforms||[]).join(' · '))}</div></div></div><p class="desc">${safeText(a.desc||'')}</p><div class="cardactions"><button class="details" onclick="details(${index})">Подробнее</button><a class="source" href="${safeText(a.url||'#')}" target="_blank" rel="noopener noreferrer">Источник ↗</a></div></article>`}
-function render(){const q=$('search').value.toLowerCase().trim();const list=apps.filter(a=>(activePlatform==='Все'||(a.platforms||[]).includes(activePlatform))&&(activeCategory==='Все'||a.category===activeCategory)&&(a.name+' '+(a.desc||'')+' '+a.category+' '+(a.platforms||[]).join(' ')).toLowerCase().includes(q));$('grid').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty">Ничего не найдено.</div>';$('shown').textContent='Показано: '+list.length;$('count').textContent=apps.length}
-function renderFavorites(){const list=apps.filter(a=>readFavorites().includes(a.name));$('favoriteGrid').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty">Пока пусто. Добавь приложения в избранное.</div>'}
-function details(i){const a=apps[i];if(!a)return;$('modalContent').innerHTML=`<h2>${safeText(a.icon)} ${safeText(a.name)}</h2><span class="tag">${safeText(a.category)}</span><p>${safeText(a.desc)}</p><p class="muted">Платформы: ${safeText((a.platforms||[]).join(', '))}<br>Версия: ${safeText(a.version)}<br>Совместимость: ${safeText(a.compat)}<br>Источник: ${safeText(a.source)}</p><a style="color:#ff737b" href="${safeText(a.url)}" target="_blank" rel="noopener">Открыть источник ↗</a>`;$('modal').classList.add('open')}
+
+function toggleFav(name){
+ let f=readFavorites();
+ f=f.includes(name)?f.filter(x=>x!==name):[...f,name];
+ localStorage.setItem(FAVORITES_KEY,JSON.stringify(f));
+ render();
+ renderFavorites();
+}
+
+function cardHTML(a){
+ const index=apps.indexOf(a);
+ return `<article class="card">
+ <button class="fav" onclick="toggleFav('${safeText(a.name).replace(/'/g,"&#39;")}')">${isFav(a.name)?'★':'☆'}</button>
+ <div class="cardtop">
+ <div class="appicon">${safeText(a.icon||'📦')}</div>
+ <div><h3>${safeText(a.name)}</h3><span class="tag">${safeText(a.category)}</span>
+ <div class="muted">${safeText((a.platforms||[]).join(' · '))}</div></div>
+ </div>
+ <p class="desc">${safeText(a.desc||'')}</p>
+ <div class="cardactions">
+ <button class="details" onclick="details(${index})">Подробнее</button>
+ <a class="source" href="${safeText(a.url||'#')}" target="_blank" rel="noopener noreferrer">Источник ↗</a>
+ </div></article>`;
+}
+
+function render(){
+ const q=$('search').value.toLowerCase().trim();
+ const list=apps.filter(a=>
+  (activePlatform==='Все'||(a.platforms||[]).includes(activePlatform))&&
+  (activeCategory==='Все'||a.category===activeCategory)&&
+  (a.name+' '+(a.desc||'')+' '+a.category+' '+(a.platforms||[]).join(' ')).toLowerCase().includes(q)
+ );
+ $('grid').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty">Ничего не найдено.</div>';
+ $('shown').textContent='Показано: '+list.length;
+ $('count').textContent=apps.length;
+}
+
+function renderFavorites(){
+ const list=apps.filter(a=>readFavorites().includes(a.name));
+ $('favoriteGrid').innerHTML=list.length?list.map(cardHTML).join(''):'<div class="empty">Пока пусто. Добавь приложения в избранное.</div>';
+}
+
+function details(i){
+ const a=apps[i];
+ if(!a)return;
+ $('modalContent').innerHTML=`<h2>${safeText(a.icon)} ${safeText(a.name)}</h2>
+ <span class="tag">${safeText(a.category)}</span>
+ <p>${safeText(a.desc)}</p>
+ <p class="muted">Платформы: ${safeText((a.platforms||[]).join(', '))}<br>
+ Версия: ${safeText(a.version)}<br>
+ Совместимость: ${safeText(a.compat)}<br>
+ Источник: ${safeText(a.source)}</p>
+ <a style="color:#ff737b" href="${safeText(a.url)}" target="_blank" rel="noopener">Открыть источник ↗</a>`;
+ $('modal').classList.add('open');
+}
+
 function closeModal(){$('modal').classList.remove('open')}
-async function api(path,options={}){const headers={'Content-Type':'application/json',...(options.headers||{})};if(options.method&&options.method!=='GET'){if(!csrfToken)await getCsrf();headers['X-CSRF-Token']=csrfToken}const response=await fetch(API+path,{...options,headers,credentials:'include'});let data={};try{data=await response.json()}catch(e){}if(!response.ok)throw new Error(data.error||`Ошибка API (${response.status})`);return data}
-async function getCsrf(){const r=await fetch(API+'/api/csrf',{credentials:'include'});if(!r.ok)throw new Error('Не удалось получить CSRF-токен');const d=await r.json();csrfToken=d.csrf_token||'';return csrfToken}
-function updateAccount(){const signed=!!currentUser;$('authForms').hidden=signed;$('signedIn').hidden=!signed;$('profileName').textContent=signed?currentUser.username:'Гость';$('profileRole').textContent=signed?currentUser.role.toUpperCase():'Не авторизован';$('profileAvatar').textContent=signed?currentUser.avatar:'👤';$('navAvatar').textContent=signed?currentUser.avatar:'👤';$('navName').textContent=signed?currentUser.username:'Аккаунт';$('homeStatus').textContent=signed?'Добро пожаловать, '+currentUser.username+'!':'Войди или создай аккаунт';if(signed&&['owner','admin'].includes(currentUser.role))$('profileRole').innerHTML=`${currentUser.role.toUpperCase()} · <button class="btn ghost" style="padding:4px 8px" onclick="showView('adminView')">Панель управления</button>`}
-async function refreshMe(){try{await getCsrf();const d=await api('/api/me');currentUser=d.user||null}catch(e){currentUser=null;console.warn(e.message)}updateAccount()}
-async function login(){const username=$('authUsername').value.trim(),password=$('authPassword').value;try{await getCsrf();const d=await api('/api/login',{method:'POST',body:JSON.stringify({username,password})});csrfToken=d.csrf_token||csrfToken;currentUser=d.user;message('Вход выполнен.');updateAccount()}catch(e){message(e.message)}}
-async function register(){const username=$('authUsername').value.trim(),password=$('authPassword').value;try{await getCsrf();const d=await api('/api/register',{method:'POST',body:JSON.stringify({username,password,avatar:selectedAvatar})});csrfToken=d.csrf_token||csrfToken;currentUser=d.user;message('Аккаунт создан!');updateAccount()}catch(e){message(e.message)}}
-async function logout(){try{await api('/api/logout',{method:'POST',body:'{}'});currentUser=null;message('Ты вышел из аккаунта.');updateAccount()}catch(e){message(e.message)}}
-async function loadCatalog(){try{const d=await api('/api/catalog');if(Array.isArray(d.apps)&&d.apps.length){apps=d.apps.map(a=>({...a,platforms:inferPlatforms(a),desc:a.desc||a.description||'',version:a.version||'',compat:a.compat||'',source:a.source||'',url:a.url||'',icon:a.icon||'📦'}));}}catch(e){console.warn('Каталог API недоступен, используется встроенный список:',e.message)}render();renderFavorites()}
-function inferPlatforms(a){const s=((a.name||'')+' '+(a.category||'')+' '+(a.compat||a.compatibility||'')).toLowerCase();if(/android|телефон|ios|mobile/.test(s))return ['Телефоны'];if(/windows|linux|macos|пк|pc/.test(s))return ['ПК'];return ['PS4']}
+
+async function api(path,options={}){
+ const headers={'Content-Type':'application/json',...(options.headers||{})};
+ if(options.method&&options.method!=='GET'){
+  if(!csrfToken)await getCsrf();
+  headers['X-CSRF-Token']=csrfToken;
+ }
+ const response=await fetch(API+path,{...options,headers,credentials:'include'});
+ let data={};
+ try{data=await response.json()}catch(e){}
+ if(!response.ok)throw new Error(data.error||`Ошибка API (${response.status})`);
+ return data;
+}
+
+async function getCsrf(){
+ const r=await fetch(API+'/api/csrf',{credentials:'include'});
+ if(!r.ok)throw new Error('Не удалось получить CSRF-токен');
+ const d=await r.json();
+ csrfToken=d.csrf_token||'';
+ return csrfToken;
+}
+
+function avatarStorageKey(username){
+ return AVATAR_PREFIX+String(username||'guest').toLowerCase();
+}
+
+function getProfileAvatar(user){
+ if(!user)return '👤';
+ try{return localStorage.getItem(avatarStorageKey(user.username))||user.avatar||'👤'}
+ catch(e){return user.avatar||'👤'}
+}
+
+function renderProfileAvatarChoices(){
+ const chosen=currentUser?getProfileAvatar(currentUser):'';
+ document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
+  b.classList.toggle('selected',b.dataset.profileAvatar===chosen);
+ });
+}
+
+function setProfileAvatar(avatar){
+ if(!currentUser)return;
+ try{localStorage.setItem(avatarStorageKey(currentUser.username),avatar)}catch(e){}
+ updateAccount();
+}
+
+function updateAccount(){
+ const signed=!!currentUser;
+ $('authForms').hidden=signed;
+ $('signedIn').hidden=!signed;
+ $('profileName').textContent=signed?currentUser.username:'Гость';
+ $('profileRole').textContent=signed?currentUser.role.toUpperCase():'Не авторизован';
+ $('profileAvatar').textContent=signed?getProfileAvatar(currentUser):'👤';
+ $('navAvatar').textContent=signed?getProfileAvatar(currentUser):'👤';
+ $('navName').textContent=signed?currentUser.username:'Аккаунт';
+ $('homeStatus').textContent=signed?'Добро пожаловать, '+currentUser.username+'!':'Войди или создай аккаунт';
+ if(signed)renderProfileAvatarChoices();
+ if(signed&&['owner','admin'].includes(currentUser.role)){
+  $('profileRole').innerHTML=`${safeText(currentUser.role.toUpperCase())} · <button class="btn ghost" style="padding:4px 8px" onclick="showView('adminView')">Панель управления</button>`;
+ }
+}
+
+function message(text){$('accountMessage').textContent=text}
+
+async function refreshMe(){
+ try{
+  await getCsrf();
+  const d=await api('/api/me');
+  currentUser=d.user||null;
+ }catch(e){
+  currentUser=null;
+  console.warn(e.message);
+ }
+ updateAccount();
+}
+
+async function login(){
+ const username=$('authUsername').value.trim();
+ const password=$('authPassword').value;
+ try{
+  await getCsrf();
+  const d=await api('/api/login',{method:'POST',body:JSON.stringify({username,password})});
+  csrfToken=d.csrf_token||csrfToken;
+  currentUser=d.user;
+  message('Вход выполнен.');
+  updateAccount();
+ }catch(e){message(e.message)}
+}
+
+async function register(){
+ const username=$('authUsername').value.trim();
+ const password=$('authPassword').value;
+ try{
+  await getCsrf();
+  const d=await api('/api/register',{method:'POST',body:JSON.stringify({username,password,avatar:selectedAvatar})});
+  csrfToken=d.csrf_token||csrfToken;
+  currentUser=d.user;
+  message('Аккаунт создан!');
+  updateAccount();
+ }catch(e){message(e.message)}
+}
+
+async function logout(){
+ try{
+  await api('/api/logout',{method:'POST',body:'{}'});
+  currentUser=null;
+  message('Ты вышел из аккаунта.');
+  updateAccount();
+ }catch(e){message(e.message)}
+}
+
+function inferPlatforms(a){
+ const s=((a.name||'')+' '+(a.category||'')+' '+(a.compat||a.compatibility||'')).toLowerCase();
+ if(/android|телефон|ios|mobile/.test(s))return ['Телефоны'];
+ if(/windows|linux|macos|пк|pc/.test(s))return ['ПК'];
+ return ['PS4'];
+}
+
+async function loadCatalog(){
+ try{
+  const d=await api('/api/catalog');
+  if(Array.isArray(d.apps)&&d.apps.length){
+   apps=d.apps.map(a=>({...a,platforms:inferPlatforms(a),desc:a.desc||a.description||'',version:a.version||'',compat:a.compat||'',source:a.source||'',url:a.url||'',icon:a.icon||'📦'}));
+  }
+ }catch(e){
+  console.warn('Каталог API недоступен, используется встроенный список:',e.message);
+ }
+ render();
+ renderFavorites();
+}
+
 async function loadAdmin(){
- if(!currentUser||!['owner','admin'].includes(currentUser.role)){showView('accountView');message('Недостаточно прав.');return}
+ if(!currentUser||!['owner','admin'].includes(currentUser.role)){
+  showView('accountView');
+  message('Недостаточно прав.');
+  return;
+ }
  $('adminRole').textContent=currentUser.role.toUpperCase();
  $('ownerPanel').hidden=currentUser.role!=='owner';
  $('usersBody').innerHTML='<tr><td colspan="5">Загрузка…</td></tr>';
  $('catalogBody').innerHTML='<tr><td colspan="4">Загрузка…</td></tr>';
+
  try{
   const d=await api('/api/admin/users');
-  $('usersBody').innerHTML=(d.users||[]).map(u=>`<tr><td>${u.id}</td><td>${safeText(u.username)}</td><td>${safeText(u.role).toUpperCase()}</td><td>${u.is_banned?'Заблокирован':'Активен'}</td><td>${u.role!=='owner'&&(currentUser.role==='owner'||u.role==='user')?`<button class="btn ghost" style="padding:5px 8px" onclick="toggleBan(${u.id},${!u.is_banned})">${u.is_banned?'Разблок.':'Блок.'}</button> <button class="btn danger" style="padding:5px 8px" onclick="deleteUser(${u.id})">Удалить</button> ${currentUser.role==='owner'&&u.role!=='owner'?`<button class="btn ghost" style="padding:5px 8px" onclick="changeRole(${u.id},'${u.role==='admin'?'user':'admin'}')">${u.role==='admin'?'Снять ADMIN':'Назначить ADMIN'}</button>`:''}`:'—'}</td></tr>`).join('')||'<tr><td colspan="5">Пользователей нет</td></tr>';
- }catch(e){$('usersBody').innerHTML=`<tr><td colspan="5">${safeText(e.message)}</td></tr>`}
+  $('usersBody').innerHTML=(d.users||[]).map(u=>`
+  <tr>
+  <td>${safeText(u.id)}</td><td>${safeText(u.username)}</td>
+  <td>${safeText(u.role).toUpperCase()}</td>
+  <td>${u.is_banned?'Заблокирован':'Активен'}</td>
+  <td>${u.role!=='owner'&&(currentUser.role==='owner'||u.role==='user')?`
+  <button class="btn ghost" style="padding:5px 8px" onclick="toggleBan(${Number(u.id)},${!u.is_banned})">${u.is_banned?'Разблок.':'Блок.'}</button>
+  <button class="btn danger" style="padding:5px 8px" onclick="deleteUser(${Number(u.id)})">Удалить</button>
+  ${currentUser.role==='owner'&&u.role!=='owner'?`<button class="btn ghost" style="padding:5px 8px" onclick="changeRole(${Number(u.id)},'${u.role==='admin'?'user':'admin'}')">${u.role==='admin'?'Снять ADMIN':'Назначить ADMIN'}</button>`:''}
+  `:'—'}</td></tr>`).join('')||'<tr><td colspan="5">Пользователей нет</td></tr>';
+ }catch(e){
+  $('usersBody').innerHTML=`<tr><td colspan="5">${safeText(e.message)}</td></tr>`;
+ }
+
  try{
   const c=await api('/api/catalog');
   const rows=c.apps||[];
-  $('catalogBody').innerHTML=rows.map(a=>`<tr><td>${safeText(a.id)}</td><td>${safeText(a.name)}</td><td>${safeText(a.category||'')}</td><td><button class="btn ghost" style="padding:5px 8px" onclick="editCatalogItem(${Number(a.id)})">Изменить</button> <button class="btn danger" style="padding:5px 8px" onclick="deleteCatalogItem(${Number(a.id)})">Удалить</button></td></tr>`).join('')||'<tr><td colspan="4">Серверный каталог пока пуст</td></tr>';
- }catch(e){$('catalogBody').innerHTML=`<tr><td colspan="4">${safeText(e.message)}</td></tr>`}
+  $('catalogBody').innerHTML=rows.map(a=>`
+  <tr><td>${safeText(a.id)}</td><td>${safeText(a.name)}</td><td>${safeText(a.category||'')}</td>
+  <td><button class="btn ghost" style="padding:5px 8px" onclick="editCatalogItem(${Number(a.id)})">Изменить</button>
+  <button class="btn danger" style="padding:5px 8px" onclick="deleteCatalogItem(${Number(a.id)})">Удалить</button></td></tr>`).join('')||'<tr><td colspan="4">Серверный каталог пока пуст</td></tr>';
+ }catch(e){
+  $('catalogBody').innerHTML=`<tr><td colspan="4">${safeText(e.message)}</td></tr>`;
+ }
 }
-async function toggleBan(id,banned){try{await api('/api/admin/users/'+id,{method:'PATCH',body:JSON.stringify({is_banned:banned})});await loadAdmin()}catch(e){alert(e.message)}}
-async function changeRole(id,role){try{await api('/api/admin/users/'+id,{method:'PATCH',body:JSON.stringify({role})});await loadAdmin()}catch(e){alert(e.message)}}
-async function deleteUser(id){if(!confirm('Удалить этого пользователя?'))return;try{await api('/api/admin/users/'+id,{method:'DELETE',body:'{}'});await loadAdmin()}catch(e){alert(e.message)}}
+
+async function toggleBan(id,banned){
+ try{
+  await api('/api/admin/users/'+id,{method:'PATCH',body:JSON.stringify({is_banned:banned})});
+  await loadAdmin();
+ }catch(e){alert(e.message)}
+}
+
+async function changeRole(id,role){
+ try{
+  await api('/api/admin/users/'+id,{method:'PATCH',body:JSON.stringify({role})});
+  await loadAdmin();
+ }catch(e){alert(e.message)}
+}
+
+async function deleteUser(id){
+ if(!confirm('Удалить этого пользователя?'))return;
+ try{
+  await api('/api/admin/users/'+id,{method:'DELETE',body:'{}'});
+  await loadAdmin();
+ }catch(e){alert(e.message)}
+}
+
 async function editCatalogItem(id){
  try{
   const d=await api('/api/catalog');
@@ -172,20 +718,211 @@ async function editCatalogItem(id){
   const icon=prompt('Иконка:',item.icon||'📦');if(icon===null)return;
   await api('/api/admin/catalog/'+id,{method:'PATCH',body:JSON.stringify({name,category,desc,version,compat,source,url,icon})});
   $('catalogMessage').textContent='Изменения сохранены.';
-  await loadCatalog();await loadAdmin();
+  await loadCatalog();
+  await loadAdmin();
  }catch(e){alert('Не удалось изменить приложение: '+e.message)}
 }
+
 async function deleteCatalogItem(id){
  if(!confirm('Удалить приложение из серверного каталога?'))return;
- try{await api('/api/admin/catalog/'+id,{method:'DELETE',body:'{}'});$('catalogMessage').textContent='Приложение удалено.';await loadCatalog();await loadAdmin()}
- catch(e){alert('Не удалось удалить приложение: '+e.message)}
+ try{
+  await api('/api/admin/catalog/'+id,{method:'DELETE',body:'{}'});
+  $('catalogMessage').textContent='Приложение удалено.';
+  await loadCatalog();
+  await loadAdmin();
+ }catch(e){alert('Не удалось удалить приложение: '+e.message)}
 }
-async function addCatalog(){const data={name:$('newName').value.trim(),category:$('newCategory').value.trim(),desc:$('newDesc').value,version:$('newVersion').value,compat:$('newCompat').value,source:$('newSource').value,url:$('newUrl').value,icon:$('newIcon').value};try{await api('/api/admin/catalog',{method:'POST',body:JSON.stringify(data)});$('catalogMessage').textContent='Приложение добавлено.';$('catalogForm').reset();await loadCatalog()}catch(e){$('catalogMessage').textContent=e.message}}
-document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCategory=b.dataset.filter;render()}));
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');activePlatform=b.dataset.platform;render()}));
-$('search').addEventListener('input',render);$('loginBtn').addEventListener('click',login);$('registerBtn').addEventListener('click',register);$('logoutBtn').addEventListener('click',logout);$('addCatalogBtn').addEventListener('click',addCatalog);
-document.querySelectorAll('.avatar-choice').forEach(b=>b.addEventListener('click',()=>{selectedAvatar=b.dataset.avatar;document.querySelectorAll('.avatar-choice').forEach(x=>x.classList.toggle('selected',x===b))}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-(async()=>{render();renderFavorites();await refreshMe();await loadCatalog()})();
+
+async function addCatalog(){
+ const data={
+  name:$('newName').value.trim(),
+  category:$('newCategory').value.trim(),
+  desc:$('newDesc').value,
+  version:$('newVersion').value,
+  compat:$('newCompat').value,
+  source:$('newSource').value,
+  url:$('newUrl').value,
+  icon:$('newIcon').value
+ };
+ try{
+  await api('/api/admin/catalog',{method:'POST',body:JSON.stringify(data)});
+  $('catalogMessage').textContent='Приложение добавлено.';
+  $('catalogForm').reset();
+  await loadCatalog();
+  await loadAdmin();
+ }catch(e){$('catalogMessage').textContent=e.message}
+}
+
+/* УВЕДОМЛЕНИЯ */
+
+const releaseNotifications=[
+ {id:'release-097',title:'Вышла версия 0.9.7',body:'Добавлена страница ArticSupport и обновлён дизайн магазина.',date:'26.11.2026'},
+ {id:'release-096',title:'Вышла версия 0.9.6',body:'Центр уведомлений, локальная смена аватара и история релизов.',date:'26.11.2026'},
+ {id:'release-095',title:'Обновление панели управления',body:'В версии 0.9.5 появились редактирование и удаление приложений, а также управление пользователями.',date:'26.11.2026'}
+];
+
+function getReadNotifications(){
+ try{return JSON.parse(localStorage.getItem(NOTICE_READ_KEY)||'[]')}
+ catch(e){return []}
+}
+
+function renderNotifications(){
+ const read=getReadNotifications();
+ const items=releaseNotifications.map(n=>({...n,read:read.includes(n.id)}));
+ $('notificationsList').innerHTML=items.map(n=>`
+ <article class="notice-item ${n.read?'':'unread'}">
+ <h3>${safeText(n.title)}</h3>
+ <p>${safeText(n.body)}</p>
+ <div class="notice-meta"><span>${safeText(n.date)}</span><span>${n.read?'Прочитано':'Новое'}</span></div>
+ </article>`).join('');
+ const unread=items.filter(n=>!n.read).length;
+ $('notificationCount').textContent=unread;
+ $('notificationCount').style.display=unread?'inline-grid':'none';
+}
+
+function markAllNotificationsRead(){
+ localStorage.setItem(NOTICE_READ_KEY,JSON.stringify(releaseNotifications.map(n=>n.id)));
+ renderNotifications();
+}
+
+/* ARTICSUPPORT */
+
+function createSupportTicket(){
+ const description=$('supportDescription').value.trim();
+ const output=$('supportMessage');
+
+ if(!description){
+  output.textContent='Опиши проблему перед отправкой.';
+  return;
+ }
+ if(description.length<10){
+  output.textContent='Описание слишком короткое. Добавь немного подробностей.';
+  return;
+ }
+
+ const ticketId='PS4-'+Date.now().toString().slice(-8);
+ const username=currentUser?currentUser.username:'Гость';
+
+ const ticket={
+  id:ticketId,
+  category:selectedSupportCategory,
+  description:description,
+  username:username,
+  date:new Date().toISOString()
+ };
+
+ try{
+  localStorage.setItem('ps4_support_last_ticket',JSON.stringify(ticket));
+ }catch(e){
+  output.textContent='Не удалось сохранить обращение на устройстве.';
+  return;
+ }
+
+ const telegramText=
+  '🎧 ARTICSUPPORT PS4 ULTIMATE STORE\n\n'+
+  'Номер обращения: '+ticketId+'\n'+
+  'Пользователь: '+username+'\n'+
+  'Категория: '+selectedSupportCategory+'\n\n'+
+  'Описание:\n'+description;
+
+ $('supportDescription').value='';
+
+ output.innerHTML=
+  'Обращение подготовлено. Номер: <b>'+safeText(ticketId)+'</b>. '+
+  'Открой Telegram проекта и отправь подготовленный текст.';
+
+ try{
+  if(navigator.clipboard&&window.isSecureContext){
+   navigator.clipboard.writeText(telegramText).then(()=>{
+    output.innerHTML='Обращение <b>'+safeText(ticketId)+'</b> подготовлено, текст скопирован. <a style="color:#ff737b" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Перейти в Telegram ↗</a>';
+   }).catch(()=>{});
+  }
+ }catch(e){}
+
+ renderLastSupportTicket();
+}
+
+function renderLastSupportTicket(){
+ const el=$('lastSupportTicket');
+ if(!el)return;
+ try{
+  const ticket=JSON.parse(localStorage.getItem('ps4_support_last_ticket')||'null');
+  if(!ticket){
+   el.textContent='Пока обращений нет на этом устройстве.';
+   return;
+  }
+  const date=new Date(ticket.date).toLocaleString('ru-RU');
+  el.innerHTML=
+   '<div class="support-ticket">'+
+   '<b>'+safeText(ticket.id)+'</b>'+
+   '<p>Категория: '+safeText(ticket.category)+'</p>'+
+   '<p>Пользователь: '+safeText(ticket.username)+'</p>'+
+   '<p>'+safeText(ticket.description)+'</p>'+
+   '<span class="muted">'+safeText(date)+'</span>'+
+   '<p class="muted">Статус: сохранено локально, не отправлено на сервер.</p>'+
+   '</div>';
+ }catch(e){
+  el.textContent='Не удалось прочитать последнее обращение.';
+ }
+}
+
+/* ОБРАБОТЧИКИ */
+
+document.querySelectorAll('.filter').forEach(b=>{
+ b.addEventListener('click',()=>{
+  document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  activeCategory=b.dataset.filter;
+  render();
+ });
+});
+
+document.querySelectorAll('.tab').forEach(b=>{
+ b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  activePlatform=b.dataset.platform;
+  render();
+ });
+});
+
+document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
+ b.addEventListener('click',()=>setProfileAvatar(b.dataset.profileAvatar));
+});
+
+document.querySelectorAll('.support-category').forEach(button=>{
+ button.addEventListener('click',()=>{
+  document.querySelectorAll('.support-category').forEach(item=>item.classList.remove('selected'));
+  button.classList.add('selected');
+  selectedSupportCategory=button.dataset.category;
+ });
+});
+
+$('search').addEventListener('input',render);
+$('loginBtn').addEventListener('click',login);
+$('registerBtn').addEventListener('click',register);
+$('logoutBtn').addEventListener('click',logout);
+$('addCatalogBtn').addEventListener('click',addCatalog);
+
+document.querySelectorAll('.avatar-choice').forEach(b=>{
+ b.addEventListener('click',()=>{
+  selectedAvatar=b.dataset.avatar;
+  document.querySelectorAll('.avatar-choice').forEach(x=>x.classList.toggle('selected',x===b));
+ });
+});
+
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape')closeModal();
+});
+
+(async()=>{
+ render();
+ renderFavorites();
+ renderNotifications();
+ renderLastSupportTicket();
+ await refreshMe();
+ await loadCatalog();
+})();
 </script>
-</body></html>
+</body>
+</html>
