@@ -1,0 +1,547 @@
+[
+  {
+    "name": "SHAREfactory",
+    "icon": "🎬",
+    "category": "Медиа",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Редактирование игровых клипов и скриншотов прямо на PS4.",
+    "version": "PS Store",
+    "compat": "PlayStation 4",
+    "source": "PlayStation",
+    "url": "https://www.playstation.com/en-us/support/hardware/ps4/"
+  },
+  {
+    "name": "PS Remote Play",
+    "icon": "📱",
+    "category": "Утилиты",
+    "platforms": [
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Играй на своей PS4 через смартфон, планшет или компьютер.",
+    "version": "Актуальная версия на сайте",
+    "compat": "PS4 и совместимое устройство",
+    "source": "PlayStation Remote Play",
+    "url": "https://remoteplay.dl.playstation.net/remoteplay/"
+  },
+  {
+    "name": "Media Player",
+    "icon": "▶️",
+    "category": "Медиа",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Воспроизведение поддерживаемых видео, музыки и фотографий.",
+    "version": "PS Store",
+    "compat": "PlayStation 4",
+    "source": "PlayStation",
+    "url": "https://www.playstation.com/en-us/support/hardware/ps4/"
+  },
+  {
+    "name": "Spotify",
+    "icon": "🎵",
+    "category": "Медиа",
+    "platforms": [
+      "PS4",
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Музыка и плейлисты во время игры и на других устройствах.",
+    "version": "Актуальная версия",
+    "compat": "Зависит от региона и устройства",
+    "source": "Spotify",
+    "url": "https://www.spotify.com/download/"
+  },
+  {
+    "name": "PlayStation App",
+    "icon": "🎮",
+    "category": "Утилиты",
+    "platforms": [
+      "Телефоны"
+    ],
+    "desc": "Официальное приложение-компаньон PlayStation для смартфонов.",
+    "version": "Актуальная версия",
+    "compat": "Android / iOS",
+    "source": "PlayStation",
+    "url": "https://www.playstation.com/en-us/playstation-app/"
+  },
+  {
+    "name": "GnmScale",
+    "icon": "✨",
+    "category": "Homebrew",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Homebrew-приложение GnmScale.",
+    "version": "PKG",
+    "compat": "Требования не подтверждены",
+    "source": "MediaFire",
+    "url": "https://www.mediafire.com/file/lnrwap92lqeli6y/IV0000-GNMS00001_00-GNMSCALE00000000-nofg.pkg/file",
+    "download": true
+  },
+  {
+    "name": "Jobee'sLair",
+    "icon": "🧰",
+    "category": "Homebrew",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Homebrew-инструмент для PS4.",
+    "version": "1.1.4",
+    "compat": "Проверь требования разработчика",
+    "source": "GitHub",
+    "url": "https://github.com/JVK3R/JobeesLair-PS4/releases"
+  },
+  {
+    "name": "Apollo Save Tool",
+    "icon": "💾",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Управление и резервное копирование сохранений игр.",
+    "version": "Последняя версия",
+    "compat": "PS4 homebrew",
+    "source": "GitHub",
+    "url": "https://github.com/bucanero/apollo-ps4/releases"
+  },
+  {
+    "name": "PS4-Xplorer",
+    "icon": "📁",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Файловый менеджер для PS4.",
+    "version": "Последняя версия",
+    "compat": "PS4 homebrew",
+    "source": "GitHub",
+    "url": "https://github.com/Lapy055/PS4-Xplorer/releases"
+  },
+  {
+    "name": "Itemzflow",
+    "icon": "🗂️",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Менеджер библиотеки приложений и игр.",
+    "version": "Последняя версия",
+    "compat": "PS4 homebrew",
+    "source": "GitHub",
+    "url": "https://github.com/LightningMods/Itemzflow"
+  },
+  {
+    "name": "PS MTP Explorer",
+    "icon": "🔌",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4",
+      "ПК"
+    ],
+    "desc": "Обмен файлами между PS4 и совместимыми устройствами.",
+    "version": "Последняя версия",
+    "compat": "PS4 homebrew; ПК",
+    "source": "GitHub",
+    "url": "https://github.com/nueex/ps-mtp-explorer"
+  },
+  {
+    "name": "Homebrew Store",
+    "icon": "🏪",
+    "category": "Homebrew",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Каталог homebrew-приложений сообщества.",
+    "version": "Последняя версия",
+    "compat": "PS4 homebrew",
+    "source": "ConsoleMods",
+    "url": "https://consolemods.org/wiki/PS4:Recommended_Setup"
+  },
+  {
+    "name": "NULL Store",
+    "icon": "⬇️",
+    "category": "Homebrew",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Сторонний каталог приложений для PS4.",
+    "version": "1.0.0",
+    "compat": "Совместимость не подтверждена",
+    "source": "GitHub Releases",
+    "url": "https://github.com/lastrowcritic/null-store-ps4/releases/download/v1.0.0/NULL_store-PS4-1.0.pkg",
+    "download": true
+  },
+  {
+    "name": "Playtube",
+    "icon": "📺",
+    "category": "Медиа",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "YouTube-клиент для PS4.",
+    "version": "Последняя версия",
+    "compat": "Требования проекта",
+    "source": "GitHub",
+    "url": "https://github.com/LowganDev/PlaytubePS4/releases"
+  },
+  {
+    "name": "Playfin",
+    "icon": "🧊",
+    "category": "Медиа",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Клиент Jellyfin для личной медиатеки.",
+    "version": "Последняя версия",
+    "compat": "Требуется сервер Jellyfin",
+    "source": "GitHub",
+    "url": "https://github.com/LowganDev/PlayfinPS4/releases"
+  },
+  {
+    "name": "JoPlay",
+    "icon": "🎞️",
+    "category": "Медиа",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Медиаплеер для PS4.",
+    "version": "Последняя версия",
+    "compat": "Проверь требования проекта",
+    "source": "GitHub",
+    "url": "https://github.com/JVK3R/JoPlay/releases"
+  },
+  {
+    "name": "PS4 Ambilight",
+    "icon": "💡",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Проект подсветки телевизора с совместимым оборудованием.",
+    "version": "Последняя версия",
+    "compat": "Нужно совместимое оборудование",
+    "source": "GitHub",
+    "url": "https://github.com/mitchshimy/PS4-Ambilight/releases"
+  },
+  {
+    "name": "orbisRPC",
+    "icon": "🟣",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Discord Rich Presence для PS4.",
+    "version": "Последняя версия",
+    "compat": "Проверь требования проекта",
+    "source": "GitHub",
+    "url": "https://github.com/SirHumza/orbisRPC/releases"
+  },
+  {
+    "name": "RemotePad NG",
+    "icon": "🎮",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Управление PS4 с совместимых устройств.",
+    "version": "Последняя версия",
+    "compat": "Требуется совместимая среда",
+    "source": "GitHub",
+    "url": "https://github.com/MoHadiShibli/remotePad-ng/releases"
+  },
+  {
+    "name": "EmuSuNi",
+    "icon": "🕹️",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Лончер ретро-консолей и аркадных систем.",
+    "version": "Последняя версия",
+    "compat": "PS4 homebrew",
+    "source": "GitHub",
+    "url": "https://github.com/arturofuentes1988/EmuSuNi/releases"
+  },
+  {
+    "name": "Iconit (PS4)",
+    "icon": "🖼️",
+    "category": "Утилиты",
+    "platforms": [
+      "ПК"
+    ],
+    "desc": "Windows-программа для настройки иконок и аватаров PS4.",
+    "version": "Последняя версия",
+    "compat": "Windows",
+    "source": "GitHub",
+    "url": "https://github.com/OfficialAhmed/Iconit-PS4"
+  },
+  {
+    "name": "Remote PKG Installer",
+    "icon": "📡",
+    "category": "Утилиты",
+    "platforms": [
+      "PS4",
+      "ПК"
+    ],
+    "desc": "Инструмент сетевой передачи установочных файлов.",
+    "version": "Последняя версия",
+    "compat": "Проверь требования проекта",
+    "source": "GitHub",
+    "url": "https://github.com/AldySan/ps4_remote_pkg_installer_nextgen/releases"
+  },
+  {
+    "name": "RetroArch (PS4)",
+    "icon": "🕹️",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Мультисистемная оболочка с ядрами NES, SNES, Genesis, GBA и других платформ.",
+    "version": "Зависит от сборки",
+    "compat": "Неофициальный порт PS4",
+    "source": "RArch PS4",
+    "url": "https://github.com/gen04177/rarch-ps4"
+  },
+  {
+    "name": "PCSX ReARMed",
+    "icon": "🎮",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Эмуляционное ядро PlayStation 1 для RetroArch.",
+    "version": "Зависит от сборки",
+    "compat": "Зависит от сборки RetroArch",
+    "source": "RArch PS4",
+    "url": "https://github.com/gen04177/rarch-ps4"
+  },
+  {
+    "name": "PPSSPP (PS4)",
+    "icon": "🎯",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Эмулятор портативной консоли PSP.",
+    "version": "Зависит от сборки",
+    "compat": "Совместимость требует проверки",
+    "source": "PS4 RetroBox",
+    "url": "https://github.com/danyboy666/ps4-retrobox/releases"
+  },
+  {
+    "name": "Mupen64Plus",
+    "icon": "🟢",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Эмуляционное ядро Nintendo 64.",
+    "version": "Зависит от сборки",
+    "compat": "Совместимость требует проверки",
+    "source": "PS4 RetroBox",
+    "url": "https://github.com/danyboy666/ps4-retrobox/releases"
+  },
+  {
+    "name": "Flycast",
+    "icon": "💿",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Эмулятор Sega Dreamcast.",
+    "version": "Не подтверждена",
+    "compat": "Наличие рабочего порта PS4 не подтверждено",
+    "source": "Поиск GitHub",
+    "url": "https://github.com/search?q=Flycast+PS4&type=repositories"
+  },
+  {
+    "name": "FinalBurn Neo",
+    "icon": "👾",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Ядро для эмуляции аркадных автоматов.",
+    "version": "Зависит от сборки",
+    "compat": "Зависит от RetroArch-сборки",
+    "source": "PS4 RetroBox",
+    "url": "https://github.com/danyboy666/ps4-retrobox/releases"
+  },
+  {
+    "name": "Snes9x",
+    "icon": "🟣",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Эмуляционное ядро Super Nintendo.",
+    "version": "Зависит от сборки",
+    "compat": "Зависит от RetroArch-сборки",
+    "source": "PS4 RetroBox",
+    "url": "https://github.com/danyboy666/ps4-retrobox/releases"
+  },
+  {
+    "name": "DobieStation",
+    "icon": "⚙️",
+    "category": "Эмуляторы",
+    "platforms": [
+      "PS4"
+    ],
+    "desc": "Экспериментальный эмулятор PlayStation 2.",
+    "version": "Не подтверждена",
+    "compat": "Отдельный порт PS4 не подтверждён",
+    "source": "Поиск GitHub",
+    "url": "https://github.com/search?q=DobieStation+PS4&type=repositories"
+  },
+  {
+    "name": "ZArchiver",
+    "icon": "📦",
+    "category": "Утилиты",
+    "platforms": [
+      "Телефоны"
+    ],
+    "desc": "Архиватор для Android: работа с ZIP и другими архивами.",
+    "version": "Google Play",
+    "compat": "Android",
+    "source": "Google Play",
+    "url": "https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver"
+  },
+  {
+    "name": "VLC",
+    "icon": "🎬",
+    "category": "Медиа",
+    "platforms": [
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Универсальный медиаплеер для видео и музыки.",
+    "version": "Последняя версия",
+    "compat": "Android, iOS, Windows, macOS, Linux",
+    "source": "Официальный сайт VLC",
+    "url": "https://www.videolan.org/vlc/"
+  },
+  {
+    "name": "Discord",
+    "icon": "💬",
+    "category": "Утилиты",
+    "platforms": [
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Общение, голосовые каналы и сообщества.",
+    "version": "Последняя версия",
+    "compat": "Android, iOS, Windows, macOS",
+    "source": "Официальный сайт Discord",
+    "url": "https://discord.com/download"
+  },
+  {
+    "name": "Telegram",
+    "icon": "✈️",
+    "category": "Утилиты",
+    "platforms": [
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Мессенджер для общения и передачи файлов.",
+    "version": "Последняя версия",
+    "compat": "Android, iOS, Windows, macOS, Linux",
+    "source": "Официальный сайт Telegram",
+    "url": "https://telegram.org/apps"
+  },
+  {
+    "name": "7-Zip",
+    "icon": "🗜️",
+    "category": "Утилиты",
+    "platforms": [
+      "ПК"
+    ],
+    "desc": "Бесплатный архиватор для Windows.",
+    "version": "Последняя версия",
+    "compat": "Windows",
+    "source": "Официальный сайт",
+    "url": "https://www.7-zip.org/"
+  },
+  {
+    "name": "ShareX",
+    "icon": "📸",
+    "category": "Утилиты",
+    "platforms": [
+      "ПК"
+    ],
+    "desc": "Инструмент для скриншотов и записи экрана Windows.",
+    "version": "Последняя версия",
+    "compat": "Windows",
+    "source": "Официальный сайт",
+    "url": "https://getsharex.com/"
+  },
+  {
+    "name": "GIMP",
+    "icon": "🎨",
+    "category": "Утилиты",
+    "platforms": [
+      "ПК"
+    ],
+    "desc": "Бесплатный редактор изображений.",
+    "version": "Последняя версия",
+    "compat": "Windows, macOS, Linux",
+    "source": "Официальный сайт",
+    "url": "https://www.gimp.org/"
+  },
+  {
+    "name": "Android Studio",
+    "icon": "🤖",
+    "category": "Утилиты",
+    "platforms": [
+      "ПК"
+    ],
+    "desc": "Среда разработки Android-приложений.",
+    "version": "Последняя версия",
+    "compat": "Windows, macOS, Linux",
+    "source": "Официальный сайт",
+    "url": "https://developer.android.com/studio"
+  },
+  {
+    "name": "Chiaki-ng",
+    "icon": "🎮",
+    "category": "Утилиты",
+    "platforms": [
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Клиент удалённой игры для подключения к PlayStation через совместимую сеть.",
+    "version": "Последняя версия",
+    "compat": "Проверь список поддерживаемых устройств и настройку сети",
+    "source": "GitHub Releases",
+    "url": "https://github.com/streetpea/chiaki-ng/releases"
+  },
+  {
+    "name": "Jellyfin",
+    "icon": "📺",
+    "category": "Медиа",
+    "platforms": [
+      "Телефоны",
+      "ПК"
+    ],
+    "desc": "Бесплатная медиасистема для собственной библиотеки фильмов, музыки и видео.",
+    "version": "Последняя версия",
+    "compat": "Нужен сервер Jellyfin",
+    "source": "Официальный сайт",
+    "url": "https://jellyfin.org/downloads/"
+  },
+  {
+    "name": "OBS Studio",
+    "icon": "🎥",
+    "category": "Медиа",
+    "platforms": [
+      "ПК"
+    ],
+    "desc": "Программа для записи экрана и трансляций с гибкими сценами и источниками.",
+    "version": "Последняя версия",
+    "compat": "Windows, macOS, Linux",
+    "source": "Официальный сайт",
+    "url": "https://obsproject.com/download"
+  }
+]
