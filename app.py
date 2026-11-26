@@ -8,18 +8,23 @@ import sqlite3
 import urllib.request
 import urllib.parse
 
-from datetime import timedelta
 from pathlib import Path
+from datetime import timedelta
 from functools import wraps
-from flask import Flask, request, jsonify, session, g
+
+from flask import (
+    Flask, request, jsonify, session, g
+)
 from flask_cors import CORS
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash
+)
 
 
 # ==========================================
-# PS4 ULTIMATE STORE 0.9.9
-# BACKEND + ARTICSUPPORT
-# PERMANENT LOGIN
+# PS4 ULTIMATE STORE 1.0.0
+# BACKEND
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -33,43 +38,32 @@ DB_PATH = Path(
 
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
+FRONTEND_ORIGIN = os.getenv(
+    "FRONTEND_ORIGIN",
+    "https://backlicks.github.io"
+).rstrip("/")
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    SECRET_KEY = secrets.token_hex(32)
+    print("WARNING: SECRET_KEY is temporary. Set it in Render.")
+
 app = Flask(__name__)
 
-secret = os.getenv("SECRET_KEY", "")
-
-if len(secret) < 32:
-    raise RuntimeError(
-        "SECRET_KEY must contain at least 32 characters"
-    )
-
 app.config.update(
-    SECRET_KEY=secret,
-
+    SECRET_KEY=SECRET_KEY,
     SESSION_COOKIE_NAME="ps4_ultimate_store_session",
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=os.getenv("COOKIE_SECURE", "1") == "1",
+    SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_SAMESITE="None",
-
-    # Практически постоянная авторизация: 100 лет.
-    # Браузер всё равно может удалить cookie самостоятельно.
-    PERMANENT_SESSION_LIFETIME=timedelta(days=36500),
-
-    # Не продлеваем срок cookie при каждом запросе.
-    SESSION_REFRESH_EACH_REQUEST=False,
+    PERMANENT_SESSION_LIFETIME=timedelta(days=30),
+    MAX_CONTENT_LENGTH=2 * 1024 * 1024
 )
-
-allowed_origins = [
-    x.strip()
-    for x in os.getenv(
-        "FRONTEND_ORIGIN",
-        "https://backlicks.github.io"
-    ).split(",")
-    if x.strip()
-]
 
 CORS(
     app,
-    origins=allowed_origins,
+    origins=[FRONTEND_ORIGIN],
     supports_credentials=True,
     allow_headers=[
         "Content-Type",
@@ -92,7 +86,10 @@ CORS(
 
 def db():
     if "db" not in g:
-        g.db = sqlite3.connect(DB_PATH)
+        g.db = sqlite3.connect(
+            DB_PATH,
+            timeout=20
+        )
         g.db.row_factory = sqlite3.Row
         g.db.execute("PRAGMA foreign_keys = ON")
 
@@ -100,42 +97,40 @@ def db():
 
 
 @app.teardown_appcontext
-def close_db(_error=None):
-    conn = g.pop("db", None)
+def close_db(error=None):
+    connection = g.pop("db", None)
 
-    if conn is not None:
-        conn.close()
+    if connection is not None:
+        connection.close()
 
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    connection = sqlite3.connect(DB_PATH)
+    connection.execute("PRAGMA foreign_keys = ON")
 
-    conn.execute("PRAGMA foreign_keys = ON")
-
-    conn.executescript("""
+    connection.executescript("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL COLLATE NOCASE UNIQUE,
+        username TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
-        avatar TEXT NOT NULL DEFAULT '🎮',
-        role TEXT NOT NULL DEFAULT 'user'
-            CHECK(role IN ('user','admin','owner')),
+        role TEXT NOT NULL DEFAULT 'user',
         is_banned INTEGER NOT NULL DEFAULT 0,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        avatar TEXT DEFAULT '🎮',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS catalog (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        category TEXT NOT NULL DEFAULT 'Другое',
-        description TEXT NOT NULL DEFAULT '',
-        version TEXT NOT NULL DEFAULT '',
-        compatibility TEXT NOT NULL DEFAULT '',
-        source TEXT NOT NULL DEFAULT '',
-        url TEXT NOT NULL DEFAULT '',
-        icon TEXT NOT NULL DEFAULT '📦',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        category TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        version TEXT DEFAULT '',
+        compatibility TEXT DEFAULT '',
+        source TEXT DEFAULT '',
+        url TEXT DEFAULT '',
+        icon TEXT DEFAULT '📦',
+        platforms TEXT DEFAULT '[]',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS support_tickets (
@@ -143,412 +138,366 @@ def init_db():
         user_id INTEGER NOT NULL,
         category TEXT NOT NULL,
         description TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'open'
-            CHECK(status IN ('open','closed')),
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        status TEXT NOT NULL DEFAULT 'open',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
-            ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS support_messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         ticket_id INTEGER NOT NULL,
-        sender_type TEXT NOT NULL
-            CHECK(sender_type IN ('user','admin')),
-        sender_name TEXT NOT NULL DEFAULT '',
+        user_id INTEGER,
+        sender_type TEXT NOT NULL DEFAULT 'user',
+        username TEXT NOT NULL,
         message TEXT NOT NULL,
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(ticket_id) REFERENCES support_tickets(id)
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(ticket_id)
+            REFERENCES support_tickets(id)
             ON DELETE CASCADE
     );
 
-    CREATE INDEX IF NOT EXISTS idx_support_user
-        ON support_tickets(user_id);
+    CREATE INDEX IF NOT EXISTS idx_ticket_user
+    ON support_tickets(user_id);
 
-    CREATE INDEX IF NOT EXISTS idx_support_status
-        ON support_tickets(status);
-
-    CREATE INDEX IF NOT EXISTS idx_support_messages_ticket
-        ON support_messages(ticket_id);
+    CREATE INDEX IF NOT EXISTS idx_messages_ticket
+    ON support_messages(ticket_id);
     """)
 
-    conn.commit()
+    connection.commit()
+    connection.close()
 
-    # Bootstrap owner/admin.
-    # Existing accounts are not overwritten.
-    for prefix, role in [
-        ("OWNER", "owner"),
-        ("ADMIN", "admin")
-    ]:
-        username = os.getenv(
-            f"{prefix}_USERNAME",
-            ""
-        ).strip()
 
-        password = os.getenv(
-            f"{prefix}_PASSWORD",
-            ""
-        )
+# ==========================================
+# INITIAL CATALOG
+# ==========================================
 
-        if username and password:
-            if len(password) < 12:
-                raise RuntimeError(
-                    f"{prefix}_PASSWORD must contain at least 12 characters"
-                )
+INITIAL_CATALOG = [
+    {
+        "name": "PS Remote Play",
+        "category": "Утилиты",
+        "description": "Официальное приложение удалённой игры PlayStation.",
+        "version": "Актуальная",
+        "compatibility": "Android / iOS / Windows / macOS",
+        "source": "PlayStation",
+        "url": "https://remoteplay.dl.playstation.net/remoteplay/",
+        "icon": "📱",
+        "platforms": ["Телефоны", "ПК"]
+    },
+    {
+        "name": "Apollo Save Tool",
+        "category": "Утилиты",
+        "description": "Инструмент управления сохранениями PS4.",
+        "version": "Последняя",
+        "compatibility": "PS4 homebrew",
+        "source": "GitHub",
+        "url": "https://github.com/bucanero/apollo-ps4/releases",
+        "icon": "💾",
+        "platforms": ["PS4"]
+    },
+    {
+        "name": "PS4-Xplorer",
+        "category": "Утилиты",
+        "description": "Файловый менеджер для PS4.",
+        "version": "Последняя",
+        "compatibility": "PS4 homebrew",
+        "source": "GitHub",
+        "url": "https://github.com/Lapy055/PS4-Xplorer/releases",
+        "icon": "📁",
+        "platforms": ["PS4"]
+    },
+    {
+        "name": "VLC",
+        "category": "Медиа",
+        "description": "Универсальный медиаплеер.",
+        "version": "Последняя",
+        "compatibility": "Android / iOS / Windows / macOS / Linux",
+        "source": "VideoLAN",
+        "url": "https://www.videolan.org/vlc/",
+        "icon": "🎬",
+        "platforms": ["Телефоны", "ПК"]
+    },
+    {
+        "name": "Telegram",
+        "category": "Утилиты",
+        "description": "Мессенджер для общения и передачи файлов.",
+        "version": "Последняя",
+        "compatibility": "Android / iOS / Windows / macOS",
+        "source": "Telegram",
+        "url": "https://telegram.org/apps",
+        "icon": "✈️",
+        "platforms": ["Телефоны", "ПК"]
+    },
+    {
+        "name": "7-Zip",
+        "category": "Утилиты",
+        "description": "Бесплатный архиватор.",
+        "version": "Последняя",
+        "compatibility": "Windows",
+        "source": "Официальный сайт",
+        "url": "https://www.7-zip.org/",
+        "icon": "🗜️",
+        "platforms": ["ПК"]
+    },
+    {
+        "name": "OBS Studio",
+        "category": "Медиа",
+        "description": "Запись экрана и трансляции.",
+        "version": "Последняя",
+        "compatibility": "Windows / macOS / Linux",
+        "source": "OBS",
+        "url": "https://obsproject.com/download",
+        "icon": "🎥",
+        "platforms": ["ПК"]
+    }
+]
 
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO users
-                    (username, password_hash, role)
-                VALUES (?, ?, ?)
-                """,
-                (
-                    username,
-                    generate_password_hash(password),
-                    role
-                )
-            )
 
-    conn.commit()
-
-    # Seed catalogue only when empty.
-    count = conn.execute(
+def seed_catalog():
+    connection = sqlite3.connect(DB_PATH)
+    count = connection.execute(
         "SELECT COUNT(*) FROM catalog"
     ).fetchone()[0]
 
-    catalog_file = BASE_DIR / "catalog.json"
-
-    if count == 0 and catalog_file.exists():
-        try:
-            items = json.loads(
-                catalog_file.read_text(encoding="utf-8")
-            )
-
-            if isinstance(items, dict):
-                items = items.get("apps", [])
-
-            for item in items if isinstance(items, list) else []:
-                conn.execute(
-                    """
-                    INSERT INTO catalog
-                    (
-                        name,
-                        category,
-                        description,
-                        version,
-                        compatibility,
-                        source,
-                        url,
-                        icon
-                    )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        str(item.get("name", "Без названия")),
-                        str(item.get("category", "Другое")),
-                        str(item.get("desc", item.get("description", ""))),
-                        str(item.get("version", "")),
-                        str(item.get("compat", item.get("compatibility", ""))),
-                        str(item.get("source", "")),
-                        str(item.get("url", "")),
-                        str(item.get("icon", "📦"))[:16]
-                    )
+    if count == 0:
+        for item in INITIAL_CATALOG:
+            connection.execute("""
+                INSERT INTO catalog (
+                    name, category, description,
+                    version, compatibility, source,
+                    url, icon, platforms
                 )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                item["name"],
+                item["category"],
+                item["description"],
+                item["version"],
+                item["compatibility"],
+                item["source"],
+                item["url"],
+                item["icon"],
+                json.dumps(item["platforms"], ensure_ascii=False)
+            ))
 
-            conn.commit()
+    connection.commit()
+    connection.close()
 
-        except (ValueError, OSError):
-            app.logger.exception(
-                "Could not seed catalog.json"
+
+# ==========================================
+# OWNER / ADMIN BOOTSTRAP
+# ==========================================
+
+def create_bootstrap_user(username_env, password_env, role):
+    username = os.getenv(username_env)
+    password = os.getenv(password_env)
+
+    if not username or not password:
+        return
+
+    if len(password) < 12:
+        print(f"WARNING: {username_env} password must be at least 12 characters.")
+        return
+
+    connection = sqlite3.connect(DB_PATH)
+
+    exists = connection.execute(
+        "SELECT id FROM users WHERE username = ?",
+        (username,)
+    ).fetchone()
+
+    if not exists:
+        connection.execute("""
+            INSERT INTO users (
+                username,
+                password_hash,
+                role
             )
+            VALUES (?, ?, ?)
+        """, (
+            username,
+            generate_password_hash(password),
+            role
+        ))
 
-    conn.close()
+    connection.commit()
+    connection.close()
 
 
 # ==========================================
-# AUTHENTICATION
+# HELPERS
 # ==========================================
 
-def user_from_session():
-    uid = session.get("user_id")
+def response_error(message, status=400):
+    return jsonify({"error": message}), status
 
-    if not uid:
+
+def public_user(user):
+    return {
+        "id": user["id"],
+        "username": user["username"],
+        "role": user["role"],
+        "is_banned": bool(user["is_banned"]),
+        "avatar": user["avatar"],
+        "created_at": user["created_at"]
+    }
+
+
+def current_user():
+    user_id = session.get("user_id")
+
+    if not user_id:
         return None
 
-    return db().execute(
-        """
-        SELECT id, username, avatar, role, is_banned, created_at
-        FROM users
-        WHERE id=?
-        """,
-        (uid,)
+    user = db().execute(
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,)
     ).fetchone()
+
+    if not user or user["is_banned"]:
+        session.clear()
+        return None
+
+    return user
 
 
 def require_login(fn):
     @wraps(fn)
-    def wrapped(*args, **kwargs):
-        user = user_from_session()
+    def wrapper(*args, **kwargs):
+        user = current_user()
 
         if not user:
-            return jsonify(
-                error="Требуется вход в аккаунт"
-            ), 401
-
-        if user["is_banned"]:
-            session.clear()
-
-            return jsonify(
-                error="Аккаунт заблокирован"
-            ), 403
+            return response_error(
+                "Требуется авторизация",
+                401
+            )
 
         g.current_user = user
-
         return fn(*args, **kwargs)
 
-    return wrapped
+    return wrapper
 
 
 def require_roles(*roles):
     def decorator(fn):
         @wraps(fn)
         @require_login
-        def wrapped(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             if g.current_user["role"] not in roles:
-                return jsonify(
-                    error="Недостаточно прав"
-                ), 403
+                return response_error(
+                    "Недостаточно прав",
+                    403
+                )
 
             return fn(*args, **kwargs)
 
-        return wrapped
+        return wrapper
 
     return decorator
 
 
 def require_csrf(fn):
     @wraps(fn)
-    def wrapped(*args, **kwargs):
-        expected = session.get("csrf_token")
-        supplied = request.headers.get("X-CSRF-Token", "")
+    def wrapper(*args, **kwargs):
+        token = request.headers.get("X-CSRF-Token", "")
+        expected = session.get("csrf_token", "")
 
-        if (
-            not expected
-            or not supplied
-            or not hmac.compare_digest(expected, supplied)
-        ):
-            return jsonify(
-                error="CSRF-проверка не пройдена. Обнови страницу и попробуй снова."
-            ), 403
+        if not token or not expected:
+            return response_error(
+                "CSRF-токен отсутствует",
+                403
+            )
+
+        if not hmac.compare_digest(token, expected):
+            return response_error(
+                "Неверный CSRF-токен",
+                403
+            )
 
         return fn(*args, **kwargs)
 
-    return wrapped
+    return wrapper
 
 
-def public_user(row):
-    return {
-        "id": row["id"],
-        "username": row["username"],
-        "avatar": row["avatar"],
-        "role": row["role"],
-        "is_banned": bool(row["is_banned"]),
-        "created_at": row["created_at"]
-    }
-
-
-# ==========================================
-# TELEGRAM NOTIFICATIONS
-# ==========================================
-
-def notify_owner_about_ticket(ticket_id, username, category, description):
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "")
-    owner_id = os.getenv("OWNER_ID", "")
-
-    if not token or not owner_id.isdigit():
-        app.logger.warning(
-            "Telegram notification skipped: bot settings are missing"
+def validate_username(username):
+    return bool(
+        re.fullmatch(
+            r"[A-Za-z0-9_.-]{3,20}",
+            username or ""
         )
-        return False
-
-    message = (
-        f"🆕 НОВОЕ ОБРАЩЕНИЕ #{ticket_id}\n\n"
-        f"👤 Пользователь: {username}\n"
-        f"📂 Категория: {category}\n\n"
-        f"Описание:\n{description[:3000]}\n\n"
-        f"Открой админ-панель ArticSupport для ответа."
     )
 
-    payload = urllib.parse.urlencode({
-        "chat_id": owner_id,
-        "text": message
-    }).encode("utf-8")
 
-    url = (
-        f"https://api.telegram.org/bot{token}/sendMessage"
+def valid_url(url):
+    if not url:
+        return True
+
+    return bool(
+        re.match(r"^https?://", url, re.I)
     )
+
+
+def catalog_item(row, hide_url=False):
+    platforms = []
 
     try:
+        platforms = json.loads(row["platforms"] or "[]")
+    except Exception:
+        pass
+
+    result = {
+        "id": row["id"],
+        "name": row["name"],
+        "category": row["category"],
+        "desc": row["description"],
+        "description": row["description"],
+        "version": row["version"],
+        "compat": row["compatibility"],
+        "source": row["source"],
+        "icon": row["icon"],
+        "platforms": platforms
+    }
+
+    if not hide_url:
+        result["url"] = row["url"]
+
+    return result
+
+
+def notify_owner(text):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    owner_id = os.getenv("OWNER_ID")
+
+    if not token or not owner_id:
+        return
+
+    try:
+        url = (
+            f"https://api.telegram.org/bot{token}/sendMessage"
+        )
+
+        payload = urllib.parse.urlencode({
+            "chat_id": owner_id,
+            "text": text
+        }).encode()
+
         req = urllib.request.Request(
             url,
             data=payload,
             method="POST"
         )
 
-        with urllib.request.urlopen(req, timeout=10) as response:
-            result = json.loads(
-                response.read().decode("utf-8")
-            )
+        urllib.request.urlopen(req, timeout=8)
 
-        if not result.get("ok"):
-            app.logger.warning(
-                "Telegram API did not accept the notification"
-            )
-            return False
-
-        return True
-
-    except Exception:
-        app.logger.exception(
-            "Could not send Telegram support notification"
-        )
-        return False
+    except Exception as error:
+        print("Telegram notification error:", error)
 
 
 # ==========================================
-# SUPPORT HELPERS
+# CSRF
 # ==========================================
 
-SUPPORT_CATEGORIES = [
-    "🎮 Проблема с PS4",
-    "📱 Проблема с телефоном",
-    "💻 Проблема с ПК",
-    "🔗 Не работает ссылка",
-    "💡 Предложение",
-    "❓ Другая проблема"
-]
-
-
-def ticket_public(row):
-    return {
-        "id": row["id"],
-        "user_id": row["user_id"],
-        "username": row["username"],
-        "category": row["category"],
-        "description": row["description"],
-        "status": row["status"],
-        "created_at": row["created_at"],
-        "updated_at": row["updated_at"]
-    }
-
-
-def message_public(row):
-    return {
-        "id": row["id"],
-        "sender_type": row["sender_type"],
-        "sender_name": row["sender_name"],
-        "message": row["message"],
-        "created_at": row["created_at"]
-    }
-
-
-def get_ticket_for_user(ticket_id, user_id):
-    return db().execute(
-        """
-        SELECT
-            t.*,
-            u.username
-        FROM support_tickets t
-        JOIN users u ON u.id = t.user_id
-        WHERE t.id=? AND t.user_id=?
-        """,
-        (ticket_id, user_id)
-    ).fetchone()
-
-
-def get_ticket_details(ticket_id):
-    ticket = db().execute(
-        """
-        SELECT
-            t.*,
-            u.username
-        FROM support_tickets t
-        JOIN users u ON u.id = t.user_id
-        WHERE t.id=?
-        """,
-        (ticket_id,)
-    ).fetchone()
-
-    if not ticket:
-        return None
-
-    messages = db().execute(
-        """
-        SELECT *
-        FROM support_messages
-        WHERE ticket_id=?
-        ORDER BY id ASC
-        """,
-        (ticket_id,)
-    ).fetchall()
-
-    result = ticket_public(ticket)
-    result["messages"] = [
-        message_public(message)
-        for message in messages
-    ]
-
-    return result
-
-
-def support_api_key_required(fn):
-    @wraps(fn)
-    def wrapped(*args, **kwargs):
-        expected = os.getenv("SUPPORT_API_KEY", "")
-        supplied = request.headers.get("X-Support-Key", "")
-
-        if len(expected) < 32:
-            return jsonify(
-                error="Внутренний API поддержки не настроен."
-            ), 503
-
-        if (
-            not supplied
-            or not hmac.compare_digest(expected, supplied)
-        ):
-            return jsonify(
-                error="Доступ запрещён."
-            ), 403
-
-        return fn(*args, **kwargs)
-
-    return wrapped
-
-
-# ==========================================
-# GENERAL API
-# ==========================================
-
-@app.get("/")
-def index():
-    return jsonify(
-        service="PS4 ULTIMATE STORE API",
-        version="0.9.9",
-        status="ok"
-    )
-
-
-@app.get("/api/health")
-def health():
-    return jsonify(
-        status="ok",
-        service="ps4-ultimate-store-api",
-        version="0.9.9"
-    )
-
-
-@app.get("/api/csrf")
+@app.route("/api/csrf", methods=["GET"])
 def csrf():
     token = session.get("csrf_token")
 
@@ -556,762 +505,828 @@ def csrf():
         token = secrets.token_urlsafe(32)
         session["csrf_token"] = token
 
-    # Постоянная cookie для сохранения входа.
-    session.permanent = True
+    return jsonify({
+        "csrf_token": token
+    })
 
-    return jsonify(csrf_token=token)
 
+# ==========================================
+# AUTH
+# ==========================================
 
-@app.get("/api/me")
+@app.route("/api/me", methods=["GET"])
 def me():
-    user = user_from_session()
+    user = current_user()
 
-    if not user:
-        return jsonify(user=None)
-
-    if user["is_banned"]:
-        session.clear()
-        return jsonify(user=None), 403
-
-    return jsonify(user=public_user(user))
+    return jsonify({
+        "user": public_user(user) if user else None
+    })
 
 
-# ==========================================
-# REGISTER / LOGIN / LOGOUT
-# ==========================================
-
-def validate_credentials(username, password):
-    if not re.fullmatch(
-        r"[A-Za-z0-9_.-]{3,20}",
-        username or ""
-    ):
-        return (
-            "Логин должен содержать 3–20 символов: "
-            "латиницу, цифры, точку, дефис или подчёркивание."
-        )
-
-    if not isinstance(password, str) or not 10 <= len(password) <= 128:
-        return "Пароль должен содержать от 10 до 128 символов."
-
-    return None
-
-
-@app.post("/api/register")
+@app.route("/api/register", methods=["POST"])
 @require_csrf
 def register():
     data = request.get_json(silent=True) or {}
 
     username = str(data.get("username", "")).strip()
-    password = data.get("password", "")
+    password = str(data.get("password", ""))
+    avatar = str(data.get("avatar", "🎮"))[:10]
 
-    error = validate_credentials(username, password)
+    if not validate_username(username):
+        return response_error(
+            "Ник должен содержать 3–20 символов: латиница, цифры, _ . -"
+        )
 
-    if error:
-        return jsonify(error=error), 400
+    if len(password) < 10 or len(password) > 128:
+        return response_error(
+            "Пароль должен содержать от 10 до 128 символов"
+        )
+
+    if db().execute(
+        "SELECT id FROM users WHERE username = ?",
+        (username,)
+    ).fetchone():
+        return response_error(
+            "Этот ник уже занят",
+            409
+        )
 
     try:
-        cur = db().execute(
-            """
-            INSERT INTO users
-                (username, password_hash, avatar, role)
-            VALUES (?, ?, ?, 'user')
-            """,
-            (
+        cursor = db().execute("""
+            INSERT INTO users (
                 username,
-                generate_password_hash(password),
-                str(data.get("avatar", "🎮"))[:16]
+                password_hash,
+                avatar
             )
-        )
+            VALUES (?, ?, ?)
+        """, (
+            username,
+            generate_password_hash(password),
+            avatar
+        ))
 
         db().commit()
 
+        user = db().execute(
+            "SELECT * FROM users WHERE id = ?",
+            (cursor.lastrowid,)
+        ).fetchone()
+
+        session.clear()
+        session.permanent = True
+        session["user_id"] = user["id"]
+        session["csrf_token"] = secrets.token_urlsafe(32)
+
+        notify_owner(
+            f"Новый пользователь PS4 ULTIMATE STORE: {username}"
+        )
+
+        return jsonify({
+            "user": public_user(user),
+            "csrf_token": session["csrf_token"]
+        }), 201
+
     except sqlite3.IntegrityError:
-        return jsonify(
-            error="Такой логин уже занят."
-        ), 409
-
-    session.clear()
-    session["user_id"] = cur.lastrowid
-    session["csrf_token"] = secrets.token_urlsafe(32)
-    session.permanent = True
-
-    return jsonify(
-        user=public_user(user_from_session()),
-        csrf_token=session["csrf_token"]
-    ), 201
+        return response_error(
+            "Не удалось создать аккаунт",
+            409
+        )
 
 
-@app.post("/api/login")
+@app.route("/api/login", methods=["POST"])
 @require_csrf
 def login():
     data = request.get_json(silent=True) or {}
 
     username = str(data.get("username", "")).strip()
-    password = data.get("password", "")
+    password = str(data.get("password", ""))
 
-    row = db().execute(
-        """
-        SELECT *
-        FROM users
-        WHERE username=? COLLATE NOCASE
-        """,
+    user = db().execute(
+        "SELECT * FROM users WHERE username = ?",
         (username,)
     ).fetchone()
 
-    if (
-        not row
-        or not check_password_hash(
-            row["password_hash"],
-            password if isinstance(password, str) else ""
-        )
+    if not user or not check_password_hash(
+        user["password_hash"],
+        password
     ):
-        return jsonify(
-            error="Неверный логин или пароль."
-        ), 401
+        return response_error(
+            "Неверный ник или пароль",
+            401
+        )
 
-    if row["is_banned"]:
-        return jsonify(
-            error="Аккаунт заблокирован."
-        ), 403
+    if user["is_banned"]:
+        return response_error(
+            "Этот аккаунт заблокирован",
+            403
+        )
 
     session.clear()
-    session["user_id"] = row["id"]
-    session["csrf_token"] = secrets.token_urlsafe(32)
     session.permanent = True
+    session["user_id"] = user["id"]
+    session["csrf_token"] = secrets.token_urlsafe(32)
 
-    return jsonify(
-        user=public_user(user_from_session()),
-        csrf_token=session["csrf_token"]
-    )
+    return jsonify({
+        "user": public_user(user),
+        "csrf_token": session["csrf_token"]
+    })
 
 
-@app.post("/api/logout")
-@require_login
+@app.route("/api/logout", methods=["POST"])
 @require_csrf
+@require_login
 def logout():
     session.clear()
-
-    return jsonify(ok=True)
+    return jsonify({"success": True})
 
 
 # ==========================================
 # CATALOG
 # ==========================================
 
-@app.get("/api/catalog")
+@app.route("/api/catalog", methods=["GET"])
 def get_catalog():
+    user = current_user()
+
     rows = db().execute(
         "SELECT * FROM catalog ORDER BY id DESC"
     ).fetchall()
 
-    return jsonify(
-        apps=[
-            {
-                "id": r["id"],
-                "name": r["name"],
-                "category": r["category"],
-                "desc": r["description"],
-                "version": r["version"],
-                "compat": r["compatibility"],
-                "source": r["source"],
-                "url": r["url"],
-                "icon": r["icon"]
-            }
-            for r in rows
+    return jsonify({
+        "apps": [
+            catalog_item(row, hide_url=not bool(user))
+            for row in rows
         ]
-    )
+    })
 
 
 # ==========================================
-# ADMIN: USERS
+# ADMIN USERS
 # ==========================================
 
-@app.get("/api/admin/users")
-@require_roles("admin", "owner")
+@app.route("/api/admin/users", methods=["GET"])
+@require_roles("owner", "admin")
 def admin_users():
-    rows = db().execute(
-        """
-        SELECT id, username, avatar, role, is_banned, created_at
-        FROM users
-        ORDER BY id
-        """
-    ).fetchall()
+    rows = db().execute("""
+        SELECT * FROM users
+        ORDER BY id DESC
+    """).fetchall()
 
-    return jsonify(
-        users=[public_user(r) for r in rows]
-    )
+    return jsonify({
+        "users": [
+            public_user(row)
+            for row in rows
+        ]
+    })
 
 
-@app.patch("/api/admin/users/<int:user_id>")
-@require_roles("admin", "owner")
+@app.route("/api/admin/users/<int:user_id>", methods=["PATCH"])
 @require_csrf
+@require_roles("owner", "admin")
 def update_user(user_id):
     data = request.get_json(silent=True) or {}
 
     target = db().execute(
-        "SELECT * FROM users WHERE id=?",
+        "SELECT * FROM users WHERE id = ?",
         (user_id,)
     ).fetchone()
 
     if not target:
-        return jsonify(error="Пользователь не найден"), 404
+        return response_error("Пользователь не найден", 404)
 
-    actor_role = g.current_user["role"]
+    actor = g.current_user
 
     if target["role"] == "owner":
-        return jsonify(
-            error="Аккаунт владельца нельзя изменять через эту операцию."
-        ), 403
+        return response_error(
+            "Нельзя изменять владельца",
+            403
+        )
 
-    if target["role"] == "admin" and actor_role != "owner":
-        return jsonify(
-            error="Только владелец может управлять администраторами."
-        ), 403
-
-    if "role" in data:
-        if actor_role != "owner":
-            return jsonify(
-                error="Только владелец может менять роли."
-            ), 403
-
-        new_role = data["role"]
-
-        if new_role not in ("user", "admin"):
-            return jsonify(
-                error="Допустимые роли: user или admin."
-            ), 400
-
-        db().execute(
-            "UPDATE users SET role=? WHERE id=?",
-            (new_role, user_id)
+    if actor["role"] == "admin" and target["role"] == "admin":
+        return response_error(
+            "Администратор не может изменять другого администратора",
+            403
         )
 
     if "is_banned" in data:
+        is_banned = bool(data["is_banned"])
+
         db().execute(
-            "UPDATE users SET is_banned=? WHERE id=?",
-            (1 if data["is_banned"] else 0, user_id)
+            "UPDATE users SET is_banned = ? WHERE id = ?",
+            (int(is_banned), user_id)
+        )
+
+    if "role" in data:
+        new_role = data["role"]
+
+        if actor["role"] != "owner":
+            return response_error(
+                "Только владелец может менять роли",
+                403
+            )
+
+        if new_role not in ("user", "admin"):
+            return response_error(
+                "Недопустимая роль"
+            )
+
+        db().execute(
+            "UPDATE users SET role = ? WHERE id = ?",
+            (new_role, user_id)
         )
 
     db().commit()
 
-    row = db().execute(
-        """
-        SELECT id, username, avatar, role, is_banned, created_at
-        FROM users
-        WHERE id=?
-        """,
-        (user_id,)
-    ).fetchone()
-
-    return jsonify(user=public_user(row))
+    return jsonify({"success": True})
 
 
-@app.delete("/api/admin/users/<int:user_id>")
-@require_roles("admin", "owner")
+@app.route("/api/admin/users/<int:user_id>", methods=["DELETE"])
 @require_csrf
-def delete_user(user_id):
+@require_roles("owner", "admin")
+def remove_user(user_id):
     target = db().execute(
-        "SELECT * FROM users WHERE id=?",
+        "SELECT * FROM users WHERE id = ?",
         (user_id,)
     ).fetchone()
 
     if not target:
-        return jsonify(error="Пользователь не найден"), 404
+        return response_error("Пользователь не найден", 404)
+
+    if target["role"] == "owner":
+        return response_error(
+            "Нельзя удалить владельца",
+            403
+        )
 
     if (
-        target["role"] == "owner"
-        or (
-            target["role"] == "admin"
-            and g.current_user["role"] != "owner"
-        )
+        g.current_user["role"] == "admin"
+        and target["role"] == "admin"
     ):
-        return jsonify(
-            error="Недостаточно прав для удаления этого аккаунта."
-        ), 403
-
-    if target["id"] == g.current_user["id"]:
-        return jsonify(
-            error="Нельзя удалить текущий аккаунт."
-        ), 400
+        return response_error(
+            "Администратор не может удалить другого администратора",
+            403
+        )
 
     db().execute(
-        "DELETE FROM users WHERE id=?",
+        "DELETE FROM support_tickets WHERE user_id = ?",
+        (user_id,)
+    )
+
+    db().execute(
+        "DELETE FROM users WHERE id = ?",
         (user_id,)
     )
 
     db().commit()
 
-    return jsonify(ok=True)
+    return jsonify({"success": True})
 
 
 # ==========================================
-# ADMIN: CATALOG
+# ADMIN CATALOG
 # ==========================================
 
 def catalog_payload(data):
+    name = str(data.get("name", "")).strip()
+    category = str(data.get("category", "")).strip()
+    url = str(data.get("url", "")).strip()
+
+    if not name or not category:
+        raise ValueError("Название и категория обязательны")
+
+    if len(name) > 100 or len(category) > 60:
+        raise ValueError("Слишком длинное название или категория")
+
+    if not valid_url(url):
+        raise ValueError("Ссылка должна начинаться с http:// или https://")
+
+    platforms = data.get("platforms", [])
+
+    if isinstance(platforms, str):
+        platforms = [
+            x.strip()
+            for x in platforms.split(",")
+            if x.strip()
+        ]
+
+    if not isinstance(platforms, list):
+        platforms = []
+
+    platforms = [
+        str(x)[:30]
+        for x in platforms[:10]
+    ]
+
     return (
-        str(data.get("name", "")).strip(),
-        str(data.get("category", "Другое")).strip(),
-        str(data.get("desc", data.get("description", ""))),
-        str(data.get("version", "")),
-        str(data.get("compat", data.get("compatibility", ""))),
-        str(data.get("source", "")),
-        str(data.get("url", "")),
-        str(data.get("icon", "📦"))[:16]
+        name,
+        category,
+        str(data.get("desc", data.get("description", "")))[:3000],
+        str(data.get("version", ""))[:50],
+        str(data.get("compat", data.get("compatibility", "")))[:200],
+        str(data.get("source", ""))[:100],
+        url,
+        str(data.get("icon", "📦"))[:10],
+        json.dumps(platforms, ensure_ascii=False)
     )
 
 
-@app.post("/api/admin/catalog")
-@require_roles("admin", "owner")
+@app.route("/api/admin/catalog", methods=["POST"])
 @require_csrf
-def add_catalog_item():
+@require_roles("owner", "admin")
+def add_catalog():
     data = request.get_json(silent=True) or {}
-    values = catalog_payload(data)
 
-    if not values[0] or not values[6]:
-        return jsonify(
-            error="Название и ссылка обязательны."
-        ), 400
+    try:
+        values = catalog_payload(data)
+    except ValueError as error:
+        return response_error(str(error))
 
-    cur = db().execute(
-        """
-        INSERT INTO catalog
-        (
-            name, category, description, version,
-            compatibility, source, url, icon
+    db().execute("""
+        INSERT INTO catalog (
+            name, category, description,
+            version, compatibility, source,
+            url, icon, platforms
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        values
-    )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, values)
 
     db().commit()
 
-    return jsonify(id=cur.lastrowid), 201
+    return jsonify({"success": True}), 201
 
 
-@app.patch("/api/admin/catalog/<int:item_id>")
-@require_roles("admin", "owner")
+@app.route("/api/admin/catalog/<int:item_id>", methods=["PATCH"])
 @require_csrf
-def edit_catalog_item(item_id):
+@require_roles("owner", "admin")
+def update_catalog(item_id):
+    if not db().execute(
+        "SELECT id FROM catalog WHERE id = ?",
+        (item_id,)
+    ).fetchone():
+        return response_error("Запись не найдена", 404)
+
     data = request.get_json(silent=True) or {}
 
-    current = db().execute(
-        "SELECT * FROM catalog WHERE id=?",
-        (item_id,)
-    ).fetchone()
+    try:
+        values = catalog_payload(data)
+    except ValueError as error:
+        return response_error(str(error))
 
-    if not current:
-        return jsonify(error="Запись не найдена."), 404
+    db().execute("""
+        UPDATE catalog SET
+            name = ?,
+            category = ?,
+            description = ?,
+            version = ?,
+            compatibility = ?,
+            source = ?,
+            url = ?,
+            icon = ?,
+            platforms = ?
+        WHERE id = ?
+    """, values + (item_id,))
 
-    merged = {
-        "name": current["name"],
-        "category": current["category"],
-        "desc": current["description"],
-        "version": current["version"],
-        "compat": current["compatibility"],
-        "source": current["source"],
-        "url": current["url"],
-        "icon": current["icon"]
-    }
+    db().commit()
 
-    merged.update(data)
+    return jsonify({"success": True})
 
-    values = catalog_payload(merged)
 
-    if not values[0] or not values[6]:
-        return jsonify(
-            error="Название и ссылка обязательны."
-        ), 400
-
+@app.route("/api/admin/catalog/<int:item_id>", methods=["DELETE"])
+@require_csrf
+@require_roles("owner", "admin")
+def delete_catalog(item_id):
     db().execute(
-        """
-        UPDATE catalog
-        SET
-            name=?,
-            category=?,
-            description=?,
-            version=?,
-            compatibility=?,
-            source=?,
-            url=?,
-            icon=?
-        WHERE id=?
-        """,
-        (*values, item_id)
-    )
-
-    db().commit()
-
-    return jsonify(ok=True)
-
-
-@app.delete("/api/admin/catalog/<int:item_id>")
-@require_roles("admin", "owner")
-@require_csrf
-def remove_catalog_item(item_id):
-    cur = db().execute(
-        "DELETE FROM catalog WHERE id=?",
+        "DELETE FROM catalog WHERE id = ?",
         (item_id,)
     )
 
     db().commit()
 
-    if not cur.rowcount:
-        return jsonify(error="Запись не найдена."), 404
-
-    return jsonify(ok=True)
+    return jsonify({"success": True})
 
 
 # ==========================================
-# SUPPORT: USER API
-# Only logged-in users can use these routes.
+# SUPPORT CATEGORIES
 # ==========================================
 
-@app.get("/api/support/categories")
-@require_login
+SUPPORT_CATEGORIES = [
+    {"value": "PS4", "label": "🎮 Проблема с PS4"},
+    {"value": "Телефон", "label": "📱 Проблема с телефоном"},
+    {"value": "ПК", "label": "💻 Проблема с ПК"},
+    {"value": "Ссылка/скачивание", "label": "🔗 Не работает ссылка"},
+    {"value": "Предложение", "label": "💡 Предложение"},
+    {"value": "Другая проблема", "label": "❔ Другая проблема"}
+]
+
+
+@app.route("/api/support/categories", methods=["GET"])
 def support_categories():
-    return jsonify(categories=SUPPORT_CATEGORIES)
+    return jsonify({
+        "categories": SUPPORT_CATEGORIES
+    })
 
 
-@app.get("/api/support/tickets")
+# ==========================================
+# SUPPORT USER API
+# ==========================================
+
+@app.route("/api/support/tickets", methods=["GET"])
 @require_login
-def support_my_tickets():
-    rows = db().execute(
-        """
-        SELECT
-            t.*,
-            u.username
-        FROM support_tickets t
-        JOIN users u ON u.id = t.user_id
-        WHERE t.user_id=?
-        ORDER BY t.id DESC
-        """,
-        (g.current_user["id"],)
-    ).fetchall()
+def support_tickets():
+    rows = db().execute("""
+        SELECT * FROM support_tickets
+        WHERE user_id = ?
+        ORDER BY id DESC
+    """, (g.current_user["id"],)).fetchall()
 
-    return jsonify(
-        tickets=[ticket_public(row) for row in rows]
-    )
+    return jsonify({
+        "tickets": [
+            {
+                "id": row["id"],
+                "category": row["category"],
+                "description": row["description"],
+                "status": row["status"],
+                "created_at": row["created_at"],
+                "updated_at": row["updated_at"]
+            }
+            for row in rows
+        ]
+    })
 
 
-@app.post("/api/support/tickets")
-@require_login
+@app.route("/api/support/tickets", methods=["POST"])
 @require_csrf
-def support_create_ticket():
+@require_login
+def create_ticket():
     data = request.get_json(silent=True) or {}
 
     category = str(data.get("category", "")).strip()
     description = str(data.get("description", "")).strip()
 
-    if category not in SUPPORT_CATEGORIES:
-        return jsonify(
-            error="Выбери категорию из списка."
-        ), 400
+    allowed = [
+        item["value"]
+        for item in SUPPORT_CATEGORIES
+    ]
 
-    if len(description) < 5:
-        return jsonify(
-            error="Опиши проблему подробнее. Минимум 5 символов."
-        ), 400
+    if category not in allowed:
+        return response_error("Выбери корректную категорию")
 
-    if len(description) > 3000:
-        return jsonify(
-            error="Максимальная длина обращения — 3000 символов."
-        ), 400
+    if len(description) < 10 or len(description) > 2000:
+        return response_error(
+            "Описание должно содержать от 10 до 2000 символов"
+        )
 
-    cur = db().execute(
-        """
-        INSERT INTO support_tickets
-            (user_id, category, description)
+    cursor = db().execute("""
+        INSERT INTO support_tickets (
+            user_id, category, description
+        )
         VALUES (?, ?, ?)
-        """,
-        (
-            g.current_user["id"],
-            category,
-            description
-        )
-    )
+    """, (
+        g.current_user["id"],
+        category,
+        description
+    ))
 
-    ticket_id = cur.lastrowid
+    ticket_id = cursor.lastrowid
 
-    db().execute(
-        """
-        INSERT INTO support_messages
-            (ticket_id, sender_type, sender_name, message)
-        VALUES (?, 'user', ?, ?)
-        """,
-        (
+    db().execute("""
+        INSERT INTO support_messages (
             ticket_id,
-            g.current_user["username"],
-            description
+            user_id,
+            sender_type,
+            username,
+            message
         )
-    )
+        VALUES (?, ?, 'user', ?, ?)
+    """, (
+        ticket_id,
+        g.current_user["id"],
+        g.current_user["username"],
+        description
+    ))
 
     db().commit()
 
-    notify_owner_about_ticket(
-        ticket_id,
-        g.current_user["username"],
-        category,
-        description
+    notify_owner(
+        "Новое обращение ArticSupport\n"
+        f"Пользователь: {g.current_user['username']}\n"
+        f"Категория: {category}\n"
+        f"Обращение: #{ticket_id}"
     )
 
-    return jsonify(
-        ok=True,
-        ticket_id=ticket_id,
-        message="Обращение создано."
-    ), 201
+    return jsonify({
+        "success": True,
+        "ticket": {
+            "id": ticket_id,
+            "category": category,
+            "status": "open"
+        }
+    }), 201
 
 
-@app.get("/api/support/tickets/<int:ticket_id>")
+@app.route("/api/support/tickets/<int:ticket_id>", methods=["GET"])
 @require_login
-def support_ticket_detail(ticket_id):
-    ticket = get_ticket_for_user(
+def get_ticket(ticket_id):
+    ticket = db().execute("""
+        SELECT * FROM support_tickets
+        WHERE id = ? AND user_id = ?
+    """, (
         ticket_id,
         g.current_user["id"]
-    )
+    )).fetchone()
 
     if not ticket:
-        return jsonify(
-            error="Обращение не найдено."
-        ), 404
+        return response_error("Обращение не найдено", 404)
 
-    result = ticket_public(ticket)
-
-    messages = db().execute(
-        """
-        SELECT *
-        FROM support_messages
-        WHERE ticket_id=?
+    messages = db().execute("""
+        SELECT * FROM support_messages
+        WHERE ticket_id = ?
         ORDER BY id ASC
-        """,
-        (ticket_id,)
-    ).fetchall()
+    """, (ticket_id,)).fetchall()
 
-    result["messages"] = [
-        message_public(message)
-        for message in messages
-    ]
+    return jsonify({
+        "ticket": {
+            "id": ticket["id"],
+            "category": ticket["category"],
+            "description": ticket["description"],
+            "status": ticket["status"],
+            "created_at": ticket["created_at"],
+            "updated_at": ticket["updated_at"],
+            "messages": [
+                {
+                    "id": m["id"],
+                    "username": m["username"],
+                    "sender_type": m["sender_type"],
+                    "message": m["message"],
+                    "created_at": m["created_at"]
+                }
+                for m in messages
+            ]
+        }
+    })
 
-    return jsonify(ticket=result)
 
-
-@app.post("/api/support/tickets/<int:ticket_id>/messages")
-@require_login
+@app.route(
+    "/api/support/tickets/<int:ticket_id>/messages",
+    methods=["POST"]
+)
 @require_csrf
-def support_user_message(ticket_id):
-    ticket = get_ticket_for_user(
+@require_login
+def send_ticket_message(ticket_id):
+    ticket = db().execute("""
+        SELECT * FROM support_tickets
+        WHERE id = ? AND user_id = ?
+    """, (
         ticket_id,
         g.current_user["id"]
-    )
+    )).fetchone()
 
     if not ticket:
-        return jsonify(
-            error="Обращение не найдено."
-        ), 404
+        return response_error("Обращение не найдено", 404)
 
-    if ticket["status"] != "open":
-        return jsonify(
-            error="Это обращение закрыто."
-        ), 409
+    if ticket["status"] == "closed":
+        return response_error("Обращение закрыто", 403)
 
     data = request.get_json(silent=True) or {}
     message = str(data.get("message", "")).strip()
 
-    if len(message) < 1:
-        return jsonify(
-            error="Напиши сообщение."
-        ), 400
+    if not message or len(message) > 2000:
+        return response_error(
+            "Сообщение должно содержать от 1 до 2000 символов"
+        )
 
-    if len(message) > 3000:
-        return jsonify(
-            error="Максимальная длина сообщения — 3000 символов."
-        ), 400
-
-    db().execute(
-        """
-        INSERT INTO support_messages
-            (ticket_id, sender_type, sender_name, message)
-        VALUES (?, 'user', ?, ?)
-        """,
-        (
+    db().execute("""
+        INSERT INTO support_messages (
             ticket_id,
-            g.current_user["username"],
+            user_id,
+            sender_type,
+            username,
             message
         )
-    )
+        VALUES (?, ?, 'user', ?, ?)
+    """, (
+        ticket_id,
+        g.current_user["id"],
+        g.current_user["username"],
+        message
+    ))
 
-    db().execute(
-        """
+    db().execute("""
         UPDATE support_tickets
-        SET updated_at=CURRENT_TIMESTAMP
-        WHERE id=?
-        """,
-        (ticket_id,)
-    )
+        SET updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (ticket_id,))
 
     db().commit()
 
-    return jsonify(
-        ok=True,
-        message="Сообщение отправлено."
-    ), 201
-
-
-# ==========================================
-# SUPPORT: INTERNAL API FOR ARTICSUPPORT BOT
-# Protected by SUPPORT_API_KEY.
-# ==========================================
-
-@app.get("/api/support/bot/tickets")
-@support_api_key_required
-def support_bot_tickets():
-    mode = request.args.get("status", "open")
-
-    if mode not in ("open", "closed", "all"):
-        return jsonify(
-            error="Допустимые статусы: open, closed, all."
-        ), 400
-
-    if mode == "all":
-        rows = db().execute(
-            """
-            SELECT
-                t.*,
-                u.username
-            FROM support_tickets t
-            JOIN users u ON u.id = t.user_id
-            ORDER BY t.id DESC
-            LIMIT 100
-            """
-        ).fetchall()
-
-    else:
-        rows = db().execute(
-            """
-            SELECT
-                t.*,
-                u.username
-            FROM support_tickets t
-            JOIN users u ON u.id = t.user_id
-            WHERE t.status=?
-            ORDER BY t.id DESC
-            LIMIT 100
-            """,
-            (mode,)
-        ).fetchall()
-
-    return jsonify(
-        tickets=[ticket_public(row) for row in rows]
+    notify_owner(
+        f"Новое сообщение в ArticSupport #{ticket_id}\n"
+        f"От: {g.current_user['username']}\n"
+        f"{message[:500]}"
     )
 
+    return jsonify({"success": True}), 201
 
-@app.get("/api/support/bot/tickets/<int:ticket_id>")
-@support_api_key_required
-def support_bot_ticket_detail(ticket_id):
-    ticket = get_ticket_details(ticket_id)
+
+# ==========================================
+# PRIVATE SUPPORT BOT API
+# ==========================================
+
+def require_support_key(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        expected = os.getenv("SUPPORT_API_KEY", "")
+        received = request.headers.get("X-Support-Key", "")
+
+        if not expected:
+            return response_error(
+                "Support bot API is disabled",
+                503
+            )
+
+        if not hmac.compare_digest(expected, received):
+            return response_error(
+                "Invalid support key",
+                403
+            )
+
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
+@app.route("/api/support/bot/tickets", methods=["GET"])
+@require_support_key
+def bot_tickets():
+    status = request.args.get("status", "open")
+
+    if status not in ("open", "closed", "all"):
+        return response_error("Invalid status")
+
+    if status == "all":
+        rows = db().execute("""
+            SELECT t.*, u.username
+            FROM support_tickets t
+            JOIN users u ON u.id = t.user_id
+            ORDER BY t.updated_at DESC
+            LIMIT 100
+        """).fetchall()
+    else:
+        rows = db().execute("""
+            SELECT t.*, u.username
+            FROM support_tickets t
+            JOIN users u ON u.id = t.user_id
+            WHERE t.status = ?
+            ORDER BY t.updated_at DESC
+            LIMIT 100
+        """, (status,)).fetchall()
+
+    return jsonify({
+        "tickets": [
+            {
+                "id": r["id"],
+                "username": r["username"],
+                "category": r["category"],
+                "description": r["description"],
+                "status": r["status"],
+                "created_at": r["created_at"],
+                "updated_at": r["updated_at"]
+            }
+            for r in rows
+        ]
+    })
+
+
+@app.route("/api/support/bot/tickets/<int:ticket_id>", methods=["GET"])
+@require_support_key
+def bot_get_ticket(ticket_id):
+    ticket = db().execute("""
+        SELECT t.*, u.username
+        FROM support_tickets t
+        JOIN users u ON u.id = t.user_id
+        WHERE t.id = ?
+    """, (ticket_id,)).fetchone()
 
     if not ticket:
-        return jsonify(
-            error="Обращение не найдено."
-        ), 404
+        return response_error("Ticket not found", 404)
 
-    return jsonify(ticket=ticket)
+    messages = db().execute("""
+        SELECT * FROM support_messages
+        WHERE ticket_id = ?
+        ORDER BY id ASC
+    """, (ticket_id,)).fetchall()
+
+    return jsonify({
+        "ticket": {
+            "id": ticket["id"],
+            "username": ticket["username"],
+            "category": ticket["category"],
+            "description": ticket["description"],
+            "status": ticket["status"],
+            "messages": [
+                {
+                    "id": m["id"],
+                    "username": m["username"],
+                    "sender_type": m["sender_type"],
+                    "message": m["message"],
+                    "created_at": m["created_at"]
+                }
+                for m in messages
+            ]
+        }
+    })
 
 
-@app.post("/api/support/bot/tickets/<int:ticket_id>/messages")
-@support_api_key_required
-def support_bot_reply(ticket_id):
+@app.route(
+    "/api/support/bot/tickets/<int:ticket_id>/messages",
+    methods=["POST"]
+)
+@require_support_key
+def bot_send_message(ticket_id):
     ticket = db().execute(
-        """
-        SELECT id, status
-        FROM support_tickets
-        WHERE id=?
-        """,
+        "SELECT * FROM support_tickets WHERE id = ?",
         (ticket_id,)
     ).fetchone()
 
     if not ticket:
-        return jsonify(
-            error="Обращение не найдено."
-        ), 404
+        return response_error("Ticket not found", 404)
 
-    if ticket["status"] != "open":
-        return jsonify(
-            error="Обращение закрыто."
-        ), 409
+    if ticket["status"] == "closed":
+        return response_error("Ticket is closed", 403)
 
     data = request.get_json(silent=True) or {}
     message = str(data.get("message", "")).strip()
 
-    if not message:
-        return jsonify(
-            error="Сообщение не может быть пустым."
-        ), 400
+    if not message or len(message) > 2000:
+        return response_error("Invalid message")
 
-    if len(message) > 3000:
-        return jsonify(
-            error="Максимальная длина сообщения — 3000 символов."
-        ), 400
+    db().execute("""
+        INSERT INTO support_messages (
+            ticket_id,
+            user_id,
+            sender_type,
+            username,
+            message
+        )
+        VALUES (?, NULL, 'admin', 'Поддержка', ?)
+    """, (ticket_id, message))
 
-    db().execute(
-        """
-        INSERT INTO support_messages
-            (ticket_id, sender_type, sender_name, message)
-        VALUES (?, 'admin', 'ArticSupport', ?)
-        """,
-        (ticket_id, message)
-    )
-
-    db().execute(
-        """
+    db().execute("""
         UPDATE support_tickets
-        SET updated_at=CURRENT_TIMESTAMP
-        WHERE id=?
-        """,
-        (ticket_id,)
-    )
+        SET updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (ticket_id,))
 
     db().commit()
 
-    return jsonify(
-        ok=True,
-        message="Ответ сохранён."
-    ), 201
+    return jsonify({"success": True}), 201
 
 
-@app.patch("/api/support/bot/tickets/<int:ticket_id>")
-@support_api_key_required
-def support_bot_update_ticket(ticket_id):
+@app.route(
+    "/api/support/bot/tickets/<int:ticket_id>",
+    methods=["PATCH"]
+)
+@require_support_key
+def bot_update_ticket(ticket_id):
     data = request.get_json(silent=True) or {}
     status = data.get("status")
 
     if status not in ("open", "closed"):
-        return jsonify(
-            error="Статус должен быть open или closed."
-        ), 400
+        return response_error("Invalid status")
 
-    cur = db().execute(
-        """
+    cursor = db().execute("""
         UPDATE support_tickets
-        SET status=?, updated_at=CURRENT_TIMESTAMP
-        WHERE id=?
-        """,
-        (status, ticket_id)
-    )
+        SET status = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """, (status, ticket_id))
 
     db().commit()
 
-    if not cur.rowcount:
-        return jsonify(
-            error="Обращение не найдено."
-        ), 404
+    if cursor.rowcount == 0:
+        return response_error("Ticket not found", 404)
 
-    return jsonify(
-        ok=True,
-        ticket_id=ticket_id,
-        status=status
-    )
+    return jsonify({"success": True})
+
+
+# ==========================================
+# HEALTH CHECK
+# ==========================================
+
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({
+        "name": "PS4 ULTIMATE STORE",
+        "version": "1.0.0",
+        "status": "online"
+    })
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({
+        "status": "ok"
+    })
 
 
 # ==========================================
@@ -1319,11 +1334,24 @@ def support_bot_update_ticket(ticket_id):
 # ==========================================
 
 init_db()
+seed_catalog()
+
+create_bootstrap_user(
+    "OWNER_USERNAME",
+    "OWNER_PASSWORD",
+    "owner"
+)
+
+create_bootstrap_user(
+    "ADMIN_USERNAME",
+    "ADMIN_PASSWORD",
+    "admin"
+)
 
 
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
-        port=int(os.getenv("PORT", "5000")),
+        port=int(os.getenv("PORT", 5000)),
         debug=False
     )
