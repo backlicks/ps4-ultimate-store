@@ -109,7 +109,7 @@ border-radius:17px;padding:18px
 
 .view-top{
 display:flex;justify-content:space-between;
-align-items:center;margin-bottom:20px
+align-items:center;margin-bottom:20px;gap:12px
 }
 .back{border:0;background:transparent;color:#ddd;cursor:pointer}
 .heading h1{font-size:clamp(30px,5vw,46px);margin:0 0 6px}
@@ -135,10 +135,11 @@ background:#401318;border-color:#8e2831;color:#fff
 .card{
 position:relative;display:flex;flex-direction:column;min-height:245px
 }
-.cardtop{display:flex;gap:12px;align-items:center}
+.cardtop{display:flex;gap:12px;align-items:center;padding-right:25px}
 .appicon{
 width:48px;height:48px;border-radius:14px;
-background:#261316;display:grid;place-items:center;font-size:25px
+background:#261316;display:grid;place-items:center;font-size:25px;
+flex-shrink:0
 }
 .card h3{margin:0 0 3px}
 .tag{
@@ -536,6 +537,8 @@ PS4 ULTIMATE STORE — независимый каталог полезных п
 </div>
 
 <script>
+'use strict';
+
 const API='https://ps4-ultimate-store-db.onrender.com';
 const FAV='ps4_ultimate_store_favorites_v1';
 const READ='ps4_ultimate_store_notice_read_v1';
@@ -553,17 +556,24 @@ let supportCategories=[];
 const $=id=>document.getElementById(id);
 
 const safeText=v=>String(v??'').replace(/[&<>"']/g,c=>({
-'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
 }[c]));
 
 function showView(id){
 document.querySelectorAll('.view').forEach(v=>{
 v.classList.toggle('active',v.id===id);
 });
+
 document.querySelectorAll('[data-view]').forEach(b=>{
 b.classList.toggle('active',b.dataset.view===id);
 });
+
 window.scrollTo({top:0,behavior:'smooth'});
+
 if(id==='storeView')render();
 if(id==='favoritesView')renderFavorites();
 if(id==='adminView')loadAdmin();
@@ -572,14 +582,24 @@ if(id==='supportView')renderLastSupportTicket();
 }
 
 function readFav(){
-try{return JSON.parse(localStorage.getItem(FAV)||'[]')}
-catch{return []}
+try{
+const value=JSON.parse(localStorage.getItem(FAV)||'[]');
+return Array.isArray(value)?value:[];
+}catch{
+return [];
+}
 }
 
 function toggleFav(name){
 let f=readFav();
 f=f.includes(name)?f.filter(x=>x!==name):[...f,name];
+
+try{
 localStorage.setItem(FAV,JSON.stringify(f));
+}catch(e){
+console.error('Не удалось сохранить избранное:',e);
+}
+
 render();
 renderFavorites();
 }
@@ -588,99 +608,109 @@ function getSafeUrl(v){
 try{
 let u=new URL(String(v||''));
 return ['https:','http:'].includes(u.protocol)?u.href:null;
-}catch{return null}
+}catch{
+return null;
 }
 
+}
+
+/* CSRF */
 
 async function getCsrf(){
-    const r = await fetch(API + '/api/csrf', {
-        method: 'GET',
-        credentials: 'include',
-        mode: 'cors',
-        cache: 'no-store',
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
+const r=await fetch(API+'/api/csrf',{
+method:'GET',
+credentials:'include',
+mode:'cors',
+cache:'no-store',
+headers:{'Accept':'application/json'}
+});
 
-    let d = {};
-    try {
-        d = await r.json();
-    } catch {}
+let d={};
+try{
+d=await r.json();
+}catch{}
 
-    if (!r.ok) {
-        throw Error(d.error || 'Не удалось получить CSRF-токен');
-    }
-
-    if (!d.csrf_token) {
-        throw Error('Сервер не вернул CSRF-токен');
-    }
-
-    csrfToken = d.csrf_token;
-    return csrfToken;
+if(!r.ok){
+throw Error(d.error||'Не удалось получить CSRF-токен');
 }
 
-async function api(path, options = {}) {
-    const method = (options.method || 'GET').toUpperCase();
-    const needsCsrf = !['GET', 'HEAD', 'OPTIONS'].includes(method);
-
-    const makeRequest = async (token = '') => {
-        const headers = {
-            'Content-Type': 'application/json',
-            ...(options.headers || {})
-        };
-
-        if (needsCsrf) {
-            headers['X-CSRF-Token'] = token;
-        }
-
-        return fetch(API + path, {
-            ...options,
-            method,
-            headers,
-            credentials: 'include',
-            mode: 'cors'
-        });
-    };
-
-    let r;
-
-    if (needsCsrf) {
-        const token = await getCsrf();
-        r = await makeRequest(token);
-    } else {
-        r = await makeRequest();
-    }
-
-    let d = {};
-    try {
-        d = await r.json();
-    } catch {}
-
-    // Если сервер отклонил CSRF-токен — обновляем и повторяем запрос один раз.
-    if (
-        needsCsrf &&
-        r.status === 403 &&
-        /csrf/i.test(d.error || '')
-    ) {
-        const freshToken = await getCsrf();
-        r = await makeRequest(freshToken);
-
-        d = {};
-        try {
-            d = await r.json();
-        } catch {}
-    }
-
-    if (!r.ok) {
-        throw Error(d.error || `Ошибка API (${r.status})`);
-    }
-
-    return d;
+if(!d.csrf_token){
+throw Error('Сервер не вернул CSRF-токен');
 }
 
+csrfToken=d.csrf_token;
+return csrfToken;
+}
+
+/* API */
+
+async function api(path,options={}){
+const method=(options.method||'GET').toUpperCase();
+const needsCsrf=!['GET','HEAD','OPTIONS'].includes(method);
+
+const makeRequest=async(token='')=>{
+const headers={
+'Content-Type':'application/json',
+...(options.headers||{})
+};
+
+if(needsCsrf){
+headers['X-CSRF-Token']=token;
+}
+
+return fetch(API+path,{
+...options,
+method,
+headers,
+credentials:'include',
+mode:'cors'
+});
+};
+
+let r;
+
+if(needsCsrf){
+const token=await getCsrf();
+r=await makeRequest(token);
+}else{
+r=await makeRequest();
+}
+
+let d={};
+
+try{
+d=await r.json();
+}catch{}
+
+if(
+needsCsrf&&
+r.status===403&&
+/csrf/i.test(d.error||'')
+){
+const freshToken=await getCsrf();
+r=await makeRequest(freshToken);
+
+d={};
+try{
+d=await r.json();
+}catch{}
+}
+
+if(!r.ok){
+throw Error(d.error||`Ошибка API (${r.status})`);
+}
+
+return d;
+}
+
+/* Локальный каталог на случай недоступности сервера */
+
+function fallback(){
+return [
 {
-name:'PS Remote Play',icon:'📱',category:'Утилиты',
+name:'PS Remote Play',
+icon:'📱',
+category:'Утилиты',
 platforms:['Телефоны','ПК'],
 desc:'Официальное приложение удалённой игры PlayStation.',
 version:'Актуальная',
@@ -689,31 +719,42 @@ source:'PlayStation',
 url:'https://remoteplay.dl.playstation.net/remoteplay/'
 },
 {
-name:'Apollo Save Tool',icon:'💾',category:'Утилиты',
+name:'Apollo Save Tool',
+icon:'💾',
+category:'Утилиты',
 platforms:['PS4'],
 desc:'Инструмент управления сохранениями PS4.',
-version:'Последняя',compat:'PS4 homebrew',
+version:'Последняя',
+compat:'PS4 homebrew',
 source:'GitHub',
 url:'https://github.com/bucanero/apollo-ps4/releases'
 },
 {
-name:'PS4-Xplorer',icon:'📁',category:'Утилиты',
+name:'PS4-Xplorer',
+icon:'📁',
+category:'Утилиты',
 platforms:['PS4'],
 desc:'Файловый менеджер для PS4.',
-version:'Последняя',compat:'PS4 homebrew',
+version:'Последняя',
+compat:'PS4 homebrew',
 source:'GitHub',
 url:'https://github.com/Lapy055/PS4-Xplorer/releases'
 },
 {
-name:'Itemzflow',icon:'🗂️',category:'Утилиты',
+name:'Itemzflow',
+icon:'🗂️',
+category:'Утилиты',
 platforms:['PS4'],
 desc:'Менеджер приложений.',
-version:'Последняя',compat:'PS4 homebrew',
+version:'Последняя',
+compat:'PS4 homebrew',
 source:'GitHub',
 url:'https://github.com/LightningMods/Itemzflow'
 },
 {
-name:'RetroArch (PS4)',icon:'🕹️',category:'Эмуляторы',
+name:'RetroArch (PS4)',
+icon:'🕹️',
+category:'Эмуляторы',
 platforms:['PS4'],
 desc:'Мультисистемная оболочка ретро-эмуляции.',
 version:'Зависит от сборки',
@@ -722,7 +763,9 @@ source:'GitHub',
 url:'https://github.com/gen04177/rarch-ps4'
 },
 {
-name:'VLC',icon:'🎬',category:'Медиа',
+name:'VLC',
+icon:'🎬',
+category:'Медиа',
 platforms:['Телефоны','ПК'],
 desc:'Универсальный медиаплеер.',
 version:'Последняя',
@@ -731,7 +774,9 @@ source:'VideoLAN',
 url:'https://www.videolan.org/vlc/'
 },
 {
-name:'Telegram',icon:'✈️',category:'Утилиты',
+name:'Telegram',
+icon:'✈️',
+category:'Утилиты',
 platforms:['Телефоны','ПК'],
 desc:'Мессенджер для общения и передачи файлов.',
 version:'Последняя',
@@ -740,15 +785,20 @@ source:'Telegram',
 url:'https://telegram.org/apps'
 },
 {
-name:'7-Zip',icon:'🗜️',category:'Утилиты',
+name:'7-Zip',
+icon:'🗜️',
+category:'Утилиты',
 platforms:['ПК'],
 desc:'Бесплатный архиватор.',
-version:'Последняя',compat:'Windows',
+version:'Последняя',
+compat:'Windows',
 source:'Официальный сайт',
 url:'https://www.7-zip.org/'
 },
 {
-name:'OBS Studio',icon:'🎥',category:'Медиа',
+name:'OBS Studio',
+icon:'🎥',
+category:'Медиа',
 platforms:['ПК'],
 desc:'Запись экрана и трансляции.',
 version:'Последняя',
@@ -758,6 +808,8 @@ url:'https://obsproject.com/download'
 }
 ];
 }
+
+/* Магазин */
 
 function openDownload(i){
 let a=apps[i];
@@ -770,10 +822,12 @@ return;
 }
 
 let u=getSafeUrl(a.url);
+
 if(!u){
 alert('Ссылка недоступна.');
 return;
 }
+
 window.open(u,'_blank','noopener,noreferrer');
 }
 
@@ -805,6 +859,8 @@ ${currentUser?'Открыть ↗':'🔒 Войти для скачивания'
 }
 
 function render(){
+if(!$('search')||!$('grid'))return;
+
 let q=$('search').value.toLowerCase().trim();
 
 let list=apps.filter(a=>
@@ -822,6 +878,8 @@ $('count').textContent=apps.length;
 }
 
 function renderFavorites(){
+if(!$('favoriteGrid'))return;
+
 let list=apps.filter(a=>readFav().includes(a.name));
 
 $('favoriteGrid').innerHTML=list.length
@@ -854,6 +912,8 @@ function closeModal(){
 $('modal').classList.remove('open');
 }
 
+/* Аккаунт */
+
 function updateAccount(){
 let yes=!!currentUser;
 
@@ -861,13 +921,21 @@ $('authForms').hidden=yes;
 $('signedIn').hidden=!yes;
 
 $('profileName').textContent=yes?currentUser.username:'Гость';
-$('profileRole').textContent=yes?currentUser.role.toUpperCase():'USER';
+$('profileRole').textContent=yes?String(currentUser.role||'user').toUpperCase():'USER';
 
-$('profileAvatar').textContent=yes
-?(localStorage.getItem('ps4_avatar_'+currentUser.username)||currentUser.avatar||'👤')
-:'👤';
+let avatar='👤';
 
-$('navAvatar').textContent=yes?$('profileAvatar').textContent:'👤';
+if(yes){
+try{
+avatar=localStorage.getItem('ps4_avatar_'+currentUser.username)||
+currentUser.avatar||'👤';
+}catch{
+avatar=currentUser.avatar||'👤';
+}
+}
+
+$('profileAvatar').textContent=avatar;
+$('navAvatar').textContent=yes?avatar:'👤';
 $('navName').textContent=yes?currentUser.username:'Аккаунт';
 
 $('homeStatus').textContent=yes
@@ -886,12 +954,13 @@ renderLastSupportTicket();
 
 async function refreshMe(){
 try{
-await getCsrf();
 let d=await api('/api/me');
 currentUser=d.user||null;
-}catch{
+}catch(e){
+console.warn('Не удалось восстановить сессию:',e.message);
 currentUser=null;
 }
+
 updateAccount();
 }
 
@@ -908,13 +977,14 @@ let b=$('loginBtn');
 b.disabled=true;
 
 try{
-await getCsrf();
 let d=await api('/api/login',{
 method:'POST',
 body:JSON.stringify({username,password})
 });
-currentUser=d.user;
+
+currentUser=d.user||null;
 csrfToken=d.csrf_token||csrfToken;
+
 $('accountMessage').textContent='Вход выполнен.';
 updateAccount();
 }catch(e){
@@ -933,19 +1003,32 @@ $('accountMessage').textContent='Введи ник и пароль.';
 return;
 }
 
+if(username.length<3||username.length>20){
+$('accountMessage').textContent='Ник должен содержать от 3 до 20 символов.';
+return;
+}
+
+if(password.length<10){
+$('accountMessage').textContent='Пароль должен содержать минимум 10 символов.';
+return;
+}
+
 let b=$('registerBtn');
 b.disabled=true;
 
 try{
-await getCsrf();
 let d=await api('/api/register',{
 method:'POST',
 body:JSON.stringify({
-username,password,avatar:selectedAvatar
+username,
+password,
+avatar:selectedAvatar
 })
 });
-currentUser=d.user;
+
+currentUser=d.user||null;
 csrfToken=d.csrf_token||csrfToken;
+
 $('accountMessage').textContent='Аккаунт создан!';
 updateAccount();
 }catch(e){
@@ -957,7 +1040,11 @@ b.disabled=false;
 
 async function logout(){
 try{
-await api('/api/logout',{method:'POST',body:'{}'});
+await api('/api/logout',{
+method:'POST',
+body:'{}'
+});
+
 currentUser=null;
 csrfToken='';
 $('accountMessage').textContent='Ты вышел из аккаунта.';
@@ -967,28 +1054,40 @@ $('accountMessage').textContent=e.message;
 }
 }
 
+/* Каталог */
+
 async function loadCatalog(){
 try{
 let d=await api('/api/catalog');
+
 apps=(d.apps||[]).map(a=>({
 ...a,
 platforms:a.platforms||inferPlatforms(a),
 desc:a.desc||a.description||''
 }));
-if(!apps.length)apps=fallback();
-}catch{
+
+if(!apps.length){
 apps=fallback();
 }
+}catch(e){
+console.warn('Используется локальный каталог:',e.message);
+apps=fallback();
+}
+
 render();
 renderFavorites();
 }
 
 function inferPlatforms(a){
 let s=((a.name||'')+' '+(a.category||'')+' '+(a.compat||'')).toLowerCase();
+
 if(/android|телефон|ios|mobile/.test(s))return ['Телефоны'];
 if(/windows|linux|macos|пк|pc/.test(s))return ['ПК'];
+
 return ['PS4'];
 }
+
+/* Админ-панель */
 
 async function loadAdmin(){
 if(!currentUser||!['owner','admin'].includes(currentUser.role)){
@@ -1003,18 +1102,18 @@ let d=await api('/api/admin/users');
 
 $('usersBody').innerHTML=(d.users||[]).map(u=>`
 <tr>
-<td>${u.id}</td>
+<td>${safeText(u.id)}</td>
 <td>${safeText(u.username)}</td>
 <td>${safeText(u.role)}</td>
 <td>${u.is_banned?'Блок':'Активен'}</td>
 <td>
 ${u.role!=='owner'?`
-<button class="btn ghost" onclick="toggleBan(${u.id},${!u.is_banned})">
+<button class="btn ghost" onclick="toggleBan(${Number(u.id)},${!u.is_banned})">
 ${u.is_banned?'Разблок.':'Блок.'}
 </button>
-<button class="btn danger" onclick="deleteUser(${u.id})">Удалить</button>
+<button class="btn danger" onclick="deleteUser(${Number(u.id)})">Удалить</button>
 ${currentUser.role==='owner'?`
-<button class="btn" onclick="changeRole(${u.id},'${u.role==='admin'?'user':'admin'}')">
+<button class="btn" onclick="changeRole(${Number(u.id)},'${u.role==='admin'?'user':'admin'}')">
 ${u.role==='admin'?'Снять ADMIN':'Назначить ADMIN'}
 </button>`:''}
 `:'—'}
@@ -1027,16 +1126,18 @@ $('usersBody').innerHTML=`<tr><td colspan="5">${safeText(e.message)}</td></tr>`;
 
 try{
 let d=await api('/api/catalog');
+
 $('catalogBody').innerHTML=(d.apps||[]).map(a=>`
 <tr>
-<td>${a.id}</td>
+<td>${safeText(a.id)}</td>
 <td>${safeText(a.name)}</td>
 <td>${safeText(a.category)}</td>
 <td>
-<button class="btn ghost" onclick="editCatalogItem(${a.id})">Изменить</button>
-<button class="btn danger" onclick="deleteCatalogItem(${a.id})">Удалить</button>
+<button class="btn ghost" onclick="editCatalogItem(${Number(a.id)})">Изменить</button>
+<button class="btn danger" onclick="deleteCatalogItem(${Number(a.id)})">Удалить</button>
 </td>
-</tr>`).join('');
+</tr>`).join('')||'<tr><td colspan="4">Каталог пуст</td></tr>';
+
 }catch(e){
 $('catalogBody').innerHTML=`<tr><td colspan="4">${safeText(e.message)}</td></tr>`;
 }
@@ -1048,8 +1149,10 @@ await api('/api/admin/users/'+id,{
 method:'PATCH',
 body:JSON.stringify({is_banned})
 });
-loadAdmin();
-}catch(e){alert(e.message)}
+await loadAdmin();
+}catch(e){
+alert(e.message);
+}
 }
 
 async function changeRole(id,role){
@@ -1058,16 +1161,24 @@ await api('/api/admin/users/'+id,{
 method:'PATCH',
 body:JSON.stringify({role})
 });
-loadAdmin();
-}catch(e){alert(e.message)}
+await loadAdmin();
+}catch(e){
+alert(e.message);
+}
 }
 
 async function deleteUser(id){
 if(!confirm('Удалить пользователя?'))return;
+
 try{
-await api('/api/admin/users/'+id,{method:'DELETE',body:'{}'});
-loadAdmin();
-}catch(e){alert(e.message)}
+await api('/api/admin/users/'+id,{
+method:'DELETE',
+body:'{}'
+});
+await loadAdmin();
+}catch(e){
+alert(e.message);
+}
 }
 
 async function addCatalog(){
@@ -1083,13 +1194,25 @@ icon:$('newIcon').value,
 platforms:$('newPlatforms').value.split(',').map(x=>x.trim()).filter(Boolean)
 };
 
+if(!data.name||!data.category||!data.url){
+$('catalogMessage').textContent='Заполни название, категорию и ссылку.';
+return;
+}
+
+if(!getSafeUrl(data.url)){
+$('catalogMessage').textContent='Укажи корректную HTTP или HTTPS ссылку.';
+return;
+}
+
 try{
 await api('/api/admin/catalog',{
 method:'POST',
 body:JSON.stringify(data)
 });
+
 $('catalogMessage').textContent='Приложение добавлено.';
 $('catalogForm').querySelectorAll('input,textarea').forEach(x=>x.value='');
+
 await loadCatalog();
 await loadAdmin();
 }catch(e){
@@ -1098,8 +1221,10 @@ $('catalogMessage').textContent=e.message;
 }
 
 async function editCatalogItem(id){
+try{
 let d=await api('/api/catalog');
-let a=(d.apps||[]).find(x=>x.id===id);
+let a=(d.apps||[]).find(x=>Number(x.id)===Number(id));
+
 if(!a)return;
 
 let name=prompt('Название',a.name);
@@ -1108,24 +1233,41 @@ if(name===null)return;
 let url=prompt('Ссылка',a.url||'');
 if(url===null)return;
 
-try{
+if(!getSafeUrl(url)){
+alert('Укажи корректную HTTP или HTTPS ссылку.');
+return;
+}
+
 await api('/api/admin/catalog/'+id,{
 method:'PATCH',
 body:JSON.stringify({...a,name,url})
 });
+
 await loadCatalog();
 await loadAdmin();
-}catch(e){alert(e.message)}
+
+}catch(e){
+alert(e.message);
+}
 }
 
 async function deleteCatalogItem(id){
 if(!confirm('Удалить запись?'))return;
+
 try{
-await api('/api/admin/catalog/'+id,{method:'DELETE',body:'{}'});
+await api('/api/admin/catalog/'+id,{
+method:'DELETE',
+body:'{}'
+});
+
 await loadCatalog();
 await loadAdmin();
-}catch(e){alert(e.message)}
+}catch(e){
+alert(e.message);
 }
+}
+
+/* Уведомления */
 
 const notices=[
 {
@@ -1144,14 +1286,18 @@ date:'26.11.2026'
 
 function renderNotifications(){
 let read=[];
-try{read=JSON.parse(localStorage.getItem(READ)||'[]')}catch{}
+
+try{
+read=JSON.parse(localStorage.getItem(READ)||'[]');
+if(!Array.isArray(read))read=[];
+}catch{}
 
 $('notificationsList').innerHTML=notices.map(n=>`
 <article class="notice-item ${read.includes(n.id)?'':'unread'}">
-<h3>${n.title}</h3>
-<p>${n.body}</p>
+<h3>${safeText(n.title)}</h3>
+<p>${safeText(n.body)}</p>
 <div class="notice-meta">
-<span>${n.date}</span>
+<span>${safeText(n.date)}</span>
 <span>${read.includes(n.id)?'Прочитано':'Новое'}</span>
 </div>
 </article>`).join('');
@@ -1161,9 +1307,15 @@ $('notificationCount').textContent=count;
 }
 
 function markAllNotificationsRead(){
+try{
 localStorage.setItem(READ,JSON.stringify(notices.map(n=>n.id)));
+}catch(e){
+console.error(e);
+}
 renderNotifications();
 }
+
+/* Поддержка */
 
 function supportStatus(s){
 return s==='closed'
@@ -1173,6 +1325,7 @@ return s==='closed'
 
 function supportDate(v){
 if(!v)return '';
+
 let d=new Date(v);
 return Number.isNaN(d.getTime())?'':d.toLocaleString('ru-RU');
 }
@@ -1199,12 +1352,16 @@ selectedSupportCategory=supportCategories[0]?.value||supportCategories[0]||'';
 $('supportCategories').innerHTML=supportCategories.map(c=>{
 let v=c.value||c;
 let l=c.label||c;
-return `<button class="support-category ${v===selectedSupportCategory?'selected':''}" data-category="${safeText(v)}">${safeText(l)}</button>`;
+
+return `
+<button class="support-category ${v===selectedSupportCategory?'selected':''}"
+data-category="${safeText(v)}">${safeText(l)}</button>`;
 }).join('');
 
 document.querySelectorAll('.support-category').forEach(b=>{
 b.onclick=()=>{
 selectedSupportCategory=b.dataset.category;
+
 document.querySelectorAll('.support-category').forEach(x=>{
 x.classList.toggle('selected',x===b);
 });
@@ -1219,6 +1376,7 @@ if(!selectedSupportCategory){
 $('supportMessage').textContent='Выбери категорию.';
 return;
 }
+
 if(description.length<10){
 $('supportMessage').textContent='Минимум 10 символов.';
 return;
@@ -1238,7 +1396,9 @@ description
 
 $('supportDescription').value='';
 $('supportMessage').textContent='Обращение создано: #'+(d.ticket?.id||d.id);
+
 await loadSupportData();
+
 }catch(e){
 $('supportMessage').textContent=e.message;
 }finally{
@@ -1264,12 +1424,12 @@ let ts=d.tickets||[];
 $('supportTicketsList').innerHTML=ts.length
 ?ts.map(t=>`
 <div class="support-ticket">
-<b>Обращение #${t.id}</b>
+<b>Обращение #${safeText(t.id)}</b>
 <p>${safeText(t.category)}</p>
 <p class="muted">${safeText((t.description||'').slice(0,160))}</p>
 ${supportStatus(t.status)}
-<p class="muted">${supportDate(t.created_at)}</p>
-<button class="btn ghost" onclick="openSupportTicket(${t.id})">Открыть переписку →</button>
+<p class="muted">${safeText(supportDate(t.created_at))}</p>
+<button class="btn ghost" onclick="openSupportTicket(${Number(t.id)})">Открыть переписку →</button>
 </div>`).join('')
 :'<div class="empty">Обращений пока нет.</div>';
 
@@ -1292,7 +1452,7 @@ $('supportChatTitle').textContent='Обращение #'+t.id+' · '+t.category;
 
 $('supportChatMessages').innerHTML=ms.map(m=>`
 <div class="support-message ${['admin','owner','support'].includes(m.sender_type)?'admin':''}">
-<small>${safeText(m.username||'Поддержка')} · ${supportDate(m.created_at)}</small>
+<small>${safeText(m.username||'Поддержка')} · ${safeText(supportDate(m.created_at))}</small>
 <p>${safeText(m.message)}</p>
 </div>`).join('')||'<p class="muted">Сообщений пока нет.</p>';
 
@@ -1300,7 +1460,10 @@ $('supportReplyArea').hidden=t.status==='closed';
 
 if(t.status==='closed'){
 $('supportChatMessage').textContent='Обращение закрыто.';
+}else{
+$('supportChatMessage').textContent='';
 }
+
 }catch(e){
 $('supportChatMessages').textContent=e.message;
 }
@@ -1308,7 +1471,11 @@ $('supportChatMessages').textContent=e.message;
 
 async function sendSupportReply(){
 let message=$('supportReply').value.trim();
+
 if(!message||!activeSupportTicket)return;
+
+let b=$('supportReplyBtn');
+b.disabled=true;
 
 try{
 await api('/api/support/tickets/'+activeSupportTicket+'/messages',{
@@ -1318,10 +1485,14 @@ body:JSON.stringify({message})
 
 $('supportReply').value='';
 $('supportChatMessage').textContent='Отправлено.';
+
 await openSupportTicket(activeSupportTicket);
 await loadSupportData();
+
 }catch(e){
 $('supportChatMessage').textContent=e.message;
+}finally{
+b.disabled=false;
 }
 }
 
@@ -1342,11 +1513,15 @@ $('supportUserArea').hidden=true;
 }
 }
 
+/* Обработчики интерфейса */
+
 document.querySelectorAll('.filter').forEach(b=>{
 b.addEventListener('click',()=>{
 document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
+
 b.classList.add('active');
 activeCategory=b.dataset.filter;
+
 render();
 });
 });
@@ -1354,8 +1529,10 @@ render();
 document.querySelectorAll('.tab').forEach(b=>{
 b.addEventListener('click',()=>{
 document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+
 b.classList.add('active');
 activePlatform=b.dataset.platform;
+
 render();
 });
 });
@@ -1363,6 +1540,7 @@ render();
 document.querySelectorAll('.avatar-choice[data-avatar]').forEach(b=>{
 b.onclick=()=>{
 selectedAvatar=b.dataset.avatar;
+
 document.querySelectorAll('.avatar-choice[data-avatar]').forEach(x=>{
 x.classList.toggle('selected',x===b);
 });
@@ -1372,7 +1550,13 @@ x.classList.toggle('selected',x===b);
 document.querySelectorAll('[data-profile-avatar]').forEach(b=>{
 b.onclick=()=>{
 if(!currentUser)return;
+
+try{
 localStorage.setItem('ps4_avatar_'+currentUser.username,b.dataset.profileAvatar);
+}catch(e){
+console.error(e);
+}
+
 updateAccount();
 };
 });
@@ -1389,13 +1573,18 @@ document.addEventListener('keydown',e=>{
 if(e.key==='Escape')closeModal();
 });
 
+/* Запуск */
+
 (async()=>{
 apps=fallback();
+
 render();
 renderFavorites();
 renderNotifications();
+
 await refreshMe();
 await loadCatalog();
+
 })();
 </script>
 </body>
