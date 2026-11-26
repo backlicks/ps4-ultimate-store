@@ -12,7 +12,7 @@ from datetime import timedelta
 from functools import wraps
 
 from flask import (
-    Flask, request, jsonify, session, g
+    Flask, request, jsonify, session, g
 )
 from flask_cors import CORS
 from werkzeug.security import (
