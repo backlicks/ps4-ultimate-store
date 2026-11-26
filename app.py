@@ -1928,7 +1928,217 @@ def bot_update_ticket(ticket_id):
 
     return jsonify({"success": True})
 
+# ==========================================
+# TORRENTS API — PS4 ULTIMATE STORE
+# ==========================================
 
+def init_torrents_db():
+    connection = sqlite3.connect(DB_PATH)
+    try:
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS torrents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT DEFAULT '',
+                category TEXT DEFAULT 'Homebrew',
+                version TEXT DEFAULT '',
+                size TEXT DEFAULT '',
+                download_url TEXT DEFAULT '',
+                magnet_url TEXT DEFAULT '',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def torrent_payload(data):
+    title = str(data.get("title", data.get("name", ""))).strip()
+    description = str(data.get("description", data.get("desc", ""))).strip()
+    category = str(data.get("category", "Homebrew")).strip()
+    version = str(data.get("version", "")).strip()
+    size = str(data.get("size", "")).strip()
+
+    download_url = str(
+        data.get("download_url", data.get("url", ""))
+    ).strip()
+
+    magnet_url = str(
+        data.get("magnet_url", data.get("magnet", ""))
+    ).strip()
+
+    if not title or len(title) > 120:
+        raise ValueError("Название обязательно и не должно превышать 120 символов")
+
+    if len(description) > 3000:
+        raise ValueError("Описание слишком длинное")
+
+    if len(category) > 60 or len(version) > 50 or len(size) > 50:
+        raise ValueError("Одно из полей слишком длинное")
+
+    if download_url and not re.match(
+        r"^https?://.+\.torrent(?:\?.*)?$",
+        download_url,
+        re.I
+    ):
+        raise ValueError("Ссылка должна вести на файл .torrent по HTTP или HTTPS")
+
+    if magnet_url and not magnet_url.lower().startswith("magnet:?"):
+        raise ValueError("Некорректная magnet-ссылка")
+
+    if not download_url and not magnet_url:
+        raise ValueError("Добавь .torrent-ссылку или magnet-ссылку")
+
+    return (
+        title,
+        description,
+        category or "Homebrew",
+        version,
+        size,
+        download_url,
+        magnet_url
+    )
+
+
+def torrent_item(row):
+    return {
+        "id": row["id"],
+        "title": row["title"],
+        "name": row["title"],
+        "description": row["description"],
+        "desc": row["description"],
+        "category": row["category"],
+        "version": row["version"],
+        "size": row["size"],
+        "download_url": row["download_url"],
+        "url": row["download_url"],
+        "magnet_url": row["magnet_url"],
+        "magnet": row["magnet_url"],
+        "created_at": row["created_at"]
+    }
+
+
+@app.route("/api/torrents", methods=["GET"])
+def get_torrents():
+    rows = db().execute("""
+        SELECT * FROM torrents
+        ORDER BY id DESC
+    """).fetchall()
+
+    return jsonify({
+        "torrents": [torrent_item(row) for row in rows]
+    })
+
+
+@app.route("/api/admin/torrents", methods=["GET"])
+@require_roles("owner", "admin")
+def admin_get_torrents():
+    rows = db().execute("""
+        SELECT * FROM torrents
+        ORDER BY id DESC
+    """).fetchall()
+
+    return jsonify({
+        "torrents": [torrent_item(row) for row in rows]
+    })
+
+
+@app.route("/api/admin/torrents", methods=["POST"])
+@require_csrf
+@require_roles("owner", "admin")
+def admin_add_torrent():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        values = torrent_payload(data)
+    except ValueError as error:
+        return response_error(str(error))
+
+    cursor = db().execute("""
+        INSERT INTO torrents (
+            title, description, category,
+            version, size, download_url, magnet_url
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, values)
+
+    db().commit()
+
+    row = db().execute(
+        "SELECT * FROM torrents WHERE id = ?",
+        (cursor.lastrowid,)
+    ).fetchone()
+
+    return jsonify({
+        "success": True,
+        "torrent": torrent_item(row)
+    }), 201
+
+
+@app.route("/api/admin/torrents/<int:torrent_id>", methods=["PATCH"])
+@require_csrf
+@require_roles("owner", "admin")
+def admin_update_torrent(torrent_id):
+    existing = db().execute(
+        "SELECT id FROM torrents WHERE id = ?",
+        (torrent_id,)
+    ).fetchone()
+
+    if not existing:
+        return response_error("Раздача не найдена", 404)
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        values = torrent_payload(data)
+    except ValueError as error:
+        return response_error(str(error))
+
+    db().execute("""
+        UPDATE torrents SET
+            title = ?,
+            description = ?,
+            category = ?,
+            version = ?,
+            size = ?,
+            download_url = ?,
+            magnet_url = ?
+        WHERE id = ?
+    """, values + (torrent_id,))
+
+    db().commit()
+
+    row = db().execute(
+        "SELECT * FROM torrents WHERE id = ?",
+        (torrent_id,)
+    ).fetchone()
+
+    return jsonify({
+        "success": True,
+        "torrent": torrent_item(row)
+    })
+
+
+@app.route("/api/admin/torrents/<int:torrent_id>", methods=["DELETE"])
+@require_csrf
+@require_roles("owner", "admin")
+def admin_delete_torrent(torrent_id):
+    cursor = db().execute(
+        "DELETE FROM torrents WHERE id = ?",
+        (torrent_id,)
+    )
+
+    db().commit()
+
+    if cursor.rowcount == 0:
+        return response_error("Раздача не найдена", 404)
+
+    return jsonify({"success": True})
+
+
+# Создаём таблицу при запуске приложения
+init_torrents_db()
 # ==========================================
 # HEALTH CHECK
 # ==========================================
