@@ -20,7 +20,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # ==========================================
 # PS4 ULTIMATE STORE 1.0.0
-# BACKEND + TEMP REGISTRATION DIAGNOSTICS
+# BACKEND
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -45,6 +45,7 @@ if not SECRET_KEY:
     raise RuntimeError(
         "SECRET_KEY is missing. Set a permanent SECRET_KEY in Render."
     )
+
 
 # ==========================================
 # LOGGING
@@ -94,7 +95,7 @@ CORS(
 
 
 # ==========================================
-# TEMP REGISTRATION DIAGNOSTICS
+# REGISTRATION DIAGNOSTICS
 # ==========================================
 
 @app.before_request
@@ -112,12 +113,6 @@ def diagnostic_request_start():
             request.path,
             request.headers.get("Origin", "missing"),
             bool(request.cookies)
-        )
-
-    elif request.path == "/api/register":
-        diag_logger.info(
-            "REGISTER_REQUEST method=%s",
-            request.method
         )
 
 
@@ -916,9 +911,7 @@ def notify_owner(message):
         return
 
     try:
-        url = (
-            f"https://api.telegram.org/bot{token}/sendMessage"
-        )
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
 
         payload = urllib.parse.urlencode({
             "chat_id": owner_id,
@@ -1510,6 +1503,7 @@ def support_tickets():
         "tickets": [
             {
                 "id": row["id"],
+                "user_id": row["user_id"],
                 "category": row["category"],
                 "description": row["description"],
                 "status": row["status"],
@@ -1585,6 +1579,7 @@ def create_ticket():
         "success": True,
         "ticket": {
             "id": ticket_id,
+            "user_id": g.current_user["id"],
             "category": category,
             "status": "open"
         }
@@ -1614,6 +1609,7 @@ def get_ticket(ticket_id):
     return jsonify({
         "ticket": {
             "id": ticket["id"],
+            "user_id": ticket["user_id"],
             "category": ticket["category"],
             "description": ticket["description"],
             "status": ticket["status"],
@@ -1622,6 +1618,7 @@ def get_ticket(ticket_id):
             "messages": [
                 {
                     "id": m["id"],
+                    "user_id": m["user_id"],
                     "username": m["username"],
                     "sender_type": m["sender_type"],
                     "message": m["message"],
@@ -1753,6 +1750,7 @@ def bot_tickets():
         "tickets": [
             {
                 "id": r["id"],
+                "user_id": r["user_id"],
                 "username": r["username"],
                 "category": r["category"],
                 "description": r["description"],
@@ -1787,13 +1785,17 @@ def bot_get_ticket(ticket_id):
     return jsonify({
         "ticket": {
             "id": ticket["id"],
+            "user_id": ticket["user_id"],
             "username": ticket["username"],
             "category": ticket["category"],
             "description": ticket["description"],
             "status": ticket["status"],
+            "created_at": ticket["created_at"],
+            "updated_at": ticket["updated_at"],
             "messages": [
                 {
                     "id": m["id"],
+                    "user_id": m["user_id"],
                     "username": m["username"],
                     "sender_type": m["sender_type"],
                     "message": m["message"],
