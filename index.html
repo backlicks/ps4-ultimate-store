@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080808">
-<title>PS4 ULTIMATE STORE 0.8.0</title>
+<title>PS4 ULTIMATE STORE 0.9.1</title>
 <style>
 :root{
   --bg:#080808;
@@ -251,6 +251,39 @@ a.inline{color:#ff737b}
 .footer-links button{border:0;background:none;color:#999;cursor:pointer;font:inherit;font-size:11px}
 .footer-links button:hover,.footer-links a:hover{color:#ff6b73}
 
+
+/* ACCOUNT 0.9.1 */
+.account-nav{
+  display:flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #512126;
+  border-radius:10px;background:#1b1011;color:#fff;cursor:pointer;font:800 12px inherit;transition:.2s
+}
+.account-nav:hover{border-color:#e50914;background:#291012}
+#navAvatar{font-size:17px}
+.account-page{padding:42px 0 65px}
+.account-page h1{font-size:clamp(38px,6vw,62px);margin:8px 0}
+.account-lead{color:#999;max-width:650px;margin:0 0 25px}
+.account-card{
+  max-width:760px;padding:24px;border:1px solid #393939;border-radius:18px;
+  background:linear-gradient(145deg,#191919,#101010);box-shadow:0 18px 55px rgba(0,0,0,.22)
+}
+.profile-preview{display:flex;align-items:center;gap:16px;padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid #303030}
+.profile-avatar{width:72px;height:72px;display:grid;place-items:center;border-radius:20px;
+  background:linear-gradient(145deg,#3c1116,#1a1011);border:1px solid #78232b;font-size:34px}
+.profile-kicker{font-size:9px;letter-spacing:2px;color:#ff6a73;font-weight:900}
+.profile-preview h2{font-size:23px;margin:3px 0}
+.account-form{display:flex;flex-direction:column;gap:9px}
+.account-form label{font-size:12px;font-weight:850;color:#ddd;margin-top:7px}
+.account-input{padding:13px 14px}
+.form-hint{font-size:10px;color:#777}
+.avatar-choices{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 10px}
+.avatar-choice{width:48px;height:48px;border-radius:12px;border:1px solid #383838;background:#171717;color:white;font-size:23px;cursor:pointer;transition:.18s}
+.avatar-choice:hover{border-color:#9d333a;transform:translateY(-2px)}
+.avatar-choice.selected{border-color:#e50914;background:#321013;box-shadow:0 0 0 2px rgba(229,9,20,.12)}
+.account-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.account-message{min-height:18px;font-size:12px;color:#ff858c}
+.account-notice{max-width:760px;margin-top:16px}
+.account-tile{background:linear-gradient(145deg,#1b1515,#101010)}
+
 @media(max-width:900px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .home-panels{grid-template-columns:1fr 1fr}
@@ -264,6 +297,11 @@ a.inline{color:#ff737b}
   .brand-mark{width:33px;height:33px}
   .version{font-size:9px;padding:5px 8px}
   .nav-link{display:none}
+  .account-nav{padding:7px 9px;font-size:11px}
+  .account-nav-label{display:none}
+  .account-card{padding:18px}
+  .account-actions .btn{flex:1}
+  .profile-avatar{width:62px;height:62px}
   .hero{padding:54px 0 38px}
   h1{letter-spacing:-1.6px}
   .hero p{font-size:14px}
@@ -293,7 +331,7 @@ a.inline{color:#ff737b}
       <button class="nav-link" onclick="showView('homeView')">Главная</button>
       <button class="nav-link" onclick="showView('storeView')">Магазин</button>
       <a class="nav-link" href="https://t.me/proshivkaj" target="_blank" rel="noopener noreferrer">Telegram ↗</a>
-      <div class="version">0.9.0 · BLACK RED</div>
+      <button class="account-nav" onclick="showView('accountView')" aria-label="Личный кабинет"><span id="navAvatar">👤</span><span class="account-nav-label">Аккаунт</span></button><div class="version">0.9.1 · BLACK RED</div>
     </div>
   </div>
 </header>
@@ -312,7 +350,7 @@ a.inline{color:#ff737b}
       <div class="stats">
         <span><b id="count">0</b>приложений в каталоге</span>
         <span><b>03</b>платформы</span>
-        <span><b>0.9.0</b>версия магазина</span>
+        <span><b>0.9.1</b>версия магазина</span>
       </div>
     </div>
   </section>
@@ -332,7 +370,14 @@ a.inline{color:#ff737b}
       <span class="tile-desc">Узнать больше о PS4 ULTIMATE STORE</span>
       <span class="tile-arrow">↗</span>
     </button>
-    <a class="home-tile support-tile" href="https://t.me/ArticSupport_bot" target="_blank" rel="noopener noreferrer">
+    <button class="home-tile account-tile" onclick="showView('accountView')">
+      <span class="tile-icon">👤</span>
+      <span class="tile-kicker">ПЕРСОНАЛЬНОЕ ПРОСТРАНСТВО</span>
+      <strong>Мой аккаунт</strong>
+      <span class="tile-desc" id="homeAccountStatus">Создай локальный профиль и настрой его под себя</span>
+      <span class="tile-arrow">↗</span>
+    </button>
+    <a class="home-tile support-tile" href="https://t.me/ArticSupport_bot"  target="_blank" rel="noopener noreferrer">
       <span class="tile-icon">🎫</span>
       <span class="tile-kicker">МЫ ПОМОЖЕМ</span>
       <strong>Поддержка</strong>
@@ -383,6 +428,50 @@ a.inline{color:#ff737b}
   <div class="grid" id="grid"></div>
 </section>
 
+<section class="view" id="accountView">
+  <div class="view-top">
+    <button class="back-btn" onclick="showView('homeView')">← Главная</button>
+    <div class="view-label">ACCOUNT / ЛИЧНЫЙ КАБИНЕТ</div>
+  </div>
+  <section class="account-page">
+    <div class="eyebrow">ТВОЁ ПРОСТРАНСТВО</div>
+    <h1>Мой аккаунт<span class="accent">.</span></h1>
+    <p class="account-lead">Настрой профиль PS4 ULTIMATE STORE. Сейчас профиль хранится только в этом браузере на этом устройстве.</p>
+    <div class="account-card">
+      <div class="profile-preview">
+        <div class="profile-avatar" id="profileAvatarPreview">👤</div>
+        <div>
+          <div class="profile-kicker">ТВОЙ ПРОФИЛЬ</div>
+          <h2 id="profileNamePreview">Гость</h2>
+          <div class="muted" id="profileStatus">Профиль ещё не создан</div>
+        </div>
+      </div>
+      <div class="account-form">
+        <label for="accountName">Имя пользователя</label>
+        <input id="accountName" class="search account-input" maxlength="20" placeholder="Например, Player_01" autocomplete="nickname">
+        <div class="form-hint">От 2 до 20 символов. Не указывай пароль или личные данные.</div>
+        <label>Выбери аватар</label>
+        <div class="avatar-choices" id="avatarChoices">
+          <button type="button" class="avatar-choice selected" data-avatar="🎮">🎮</button>
+          <button type="button" class="avatar-choice" data-avatar="👾">👾</button>
+          <button type="button" class="avatar-choice" data-avatar="🦊">🦊</button>
+          <button type="button" class="avatar-choice" data-avatar="🐺">🐺</button>
+          <button type="button" class="avatar-choice" data-avatar="🤖">🤖</button>
+          <button type="button" class="avatar-choice" data-avatar="👑">👑</button>
+          <button type="button" class="avatar-choice" data-avatar="⚡">⚡</button>
+          <button type="button" class="avatar-choice" data-avatar="🔥">🔥</button>
+        </div>
+        <div class="account-actions">
+          <button class="btn btn-primary" id="saveAccount">Сохранить профиль</button>
+          <button class="btn btn-ghost" id="deleteAccount" type="button">Удалить профиль</button>
+        </div>
+        <div id="accountMessage" class="account-message" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="notice account-notice"><span>🔒</span><div><strong>Важно о хранении данных.</strong> Это локальный профиль для оформления сайта, а не регистрация с сервером. Данные сохраняются в хранилище браузера на этом устройстве. Очистка данных браузера может удалить профиль. Не используй здесь пароль.</div></div>
+  </section>
+</section>
+
 <section class="view" id="aboutView">
   <div class="view-top">
     <button class="back-btn" onclick="showView('homeView')">← Главная</button>
@@ -402,11 +491,12 @@ a.inline{color:#ff737b}
 </section>
 </main>
 <footer><div class="wrap footer-row">
-  <div><div class="footer-brand">PS4 <span>ULTIMATE STORE</span></div><div>Независимый каталог сообщества · Версия 0.9.0</div></div>
+  <div><div class="footer-brand">PS4 <span>ULTIMATE STORE</span></div><div>Независимый каталог сообщества · Версия 0.9.1</div></div>
   <div class="footer-links">
     <button onclick="showView('homeView')">Главная</button>
     <button onclick="showView('storeView')">Магазин</button>
     <button onclick="showView('aboutView')">О проекте</button>
+    <button onclick="showView('accountView')">Аккаунт</button>
     <a href="https://t.me/ArticSupport_bot" target="_blank" rel="noopener noreferrer">Поддержка</a>
   </div>
 </div></footer>
@@ -542,8 +632,70 @@ function details(index){
     <p class="muted">Проверяй требования разработчика и используй только приложения и материалы, на которые у тебя есть права.</p>
   `);
 }
+
+// Локальный профиль пользователя — без регистрации и передачи данных на сервер.
+const ACCOUNT_KEY = "ps4_ultimate_store_profile_v1";
+let selectedAvatar = "🎮";
+
+function readAccount(){
+  try{
+    const raw = localStorage.getItem(ACCOUNT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(error){ return null; }
+}
+function updateAccountUI(){
+  const profile = readAccount();
+  const avatar = profile && profile.avatar ? profile.avatar : "👤";
+  const name = profile && profile.name ? profile.name : "Гость";
+  document.getElementById("navAvatar").textContent = avatar;
+  document.getElementById("profileAvatarPreview").textContent = avatar;
+  document.getElementById("profileNamePreview").textContent = name;
+  document.getElementById("profileStatus").textContent = profile ? "Профиль сохранён на этом устройстве" : "Профиль ещё не создан";
+  document.getElementById("homeAccountStatus").textContent = profile ? "Добро пожаловать, " + name + "!" : "Создай локальный профиль и настрой его под себя";
+  document.getElementById("accountName").value = profile ? profile.name : "";
+  selectedAvatar = profile ? avatar : "🎮";
+  document.querySelectorAll(".avatar-choice").forEach(button=>{
+    button.classList.toggle("selected",button.dataset.avatar===selectedAvatar);
+  });
+}
+document.querySelectorAll(".avatar-choice").forEach(button=>{
+  button.addEventListener("click",()=>{
+    selectedAvatar = button.dataset.avatar;
+    document.querySelectorAll(".avatar-choice").forEach(item=>item.classList.toggle("selected",item===button));
+    document.getElementById("profileAvatarPreview").textContent = selectedAvatar;
+  });
+});
+document.getElementById("accountName").addEventListener("input",event=>{
+  document.getElementById("profileNamePreview").textContent = event.target.value.trim() || "Гость";
+});
+document.getElementById("saveAccount").addEventListener("click",()=>{
+  const name = document.getElementById("accountName").value.trim();
+  const message = document.getElementById("accountMessage");
+  if(name.length < 2 || name.length > 20){
+    message.textContent = "Имя должно содержать от 2 до 20 символов.";
+    return;
+  }
+  if(/[<>]/.test(name)){
+    message.textContent = "Убери символы < и > из имени.";
+    return;
+  }
+  try{
+    localStorage.setItem(ACCOUNT_KEY,JSON.stringify({name,avatar:selectedAvatar}));
+    message.textContent = "Профиль сохранён!";
+    updateAccountUI();
+  }catch(error){ message.textContent = "Не удалось сохранить профиль. Проверь настройки браузера."; }
+});
+document.getElementById("deleteAccount").addEventListener("click",()=>{
+  try{
+    localStorage.removeItem(ACCOUNT_KEY);
+    document.getElementById("accountMessage").textContent = "Локальный профиль удалён.";
+    updateAccountUI();
+  }catch(error){ document.getElementById("accountMessage").textContent = "Не удалось удалить профиль."; }
+});
+
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 render();
+updateAccountUI();
 showView("homeView");
 </script>
 </body>
