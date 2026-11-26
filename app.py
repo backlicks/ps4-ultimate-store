@@ -7,6 +7,7 @@ import secrets
 import sqlite3
 import urllib.request
 import urllib.parse
+import logging
 
 from pathlib import Path
 from datetime import timedelta
@@ -19,7 +20,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # ==========================================
 # PS4 ULTIMATE STORE 1.0.0
-# BACKEND
+# BACKEND + TEMP REGISTRATION DIAGNOSTICS
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -44,6 +45,18 @@ if not SECRET_KEY:
     raise RuntimeError(
         "SECRET_KEY is missing. Set a permanent SECRET_KEY in Render."
     )
+
+# ==========================================
+# LOGGING
+# ==========================================
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s"
+)
+
+diag_logger = logging.getLogger("registration_diagnostics")
+
 
 app = Flask(__name__)
 
@@ -73,8 +86,61 @@ CORS(
         "PATCH",
         "DELETE",
         "OPTIONS"
+    ],
+    expose_headers=[
+        "X-Diagnostic-ID"
     ]
 )
+
+
+# ==========================================
+# TEMP REGISTRATION DIAGNOSTICS
+# ==========================================
+
+@app.before_request
+def diagnostic_request_start():
+    if request.path in (
+        "/api/register",
+        "/api/csrf"
+    ):
+        g.diag_id = secrets.token_hex(4)
+
+        diag_logger.info(
+            "REQUEST_START id=%s method=%s path=%s origin=%s cookie=%s",
+            g.diag_id,
+            request.method,
+            request.path,
+            request.headers.get("Origin", "missing"),
+            bool(request.cookies)
+        )
+
+    elif request.path == "/api/register":
+        diag_logger.info(
+            "REGISTER_REQUEST method=%s",
+            request.method
+        )
+
+
+@app.after_request
+def diagnostic_request_end(response):
+    diag_id = getattr(g, "diag_id", None)
+
+    if diag_id:
+        response.headers["X-Diagnostic-ID"] = diag_id
+
+        diag_logger.info(
+            "REQUEST_END id=%s method=%s path=%s status=%s cors_origin=%s",
+            diag_id,
+            request.method,
+            request.path,
+            response.status_code,
+            response.headers.get(
+                "Access-Control-Allow-Origin",
+                "missing"
+            )
+        )
+
+    return response
 
 
 # ==========================================
@@ -163,6 +229,7 @@ def init_db():
         """)
 
         connection.commit()
+
     finally:
         connection.close()
 
@@ -678,6 +745,7 @@ def create_bootstrap_user(username_env, password_env, role):
             ))
 
         connection.commit()
+
     finally:
         connection.close()
 
@@ -759,18 +827,36 @@ def require_csrf(fn):
     def wrapper(*args, **kwargs):
         token = request.headers.get("X-CSRF-Token", "")
         expected = session.get("csrf_token", "")
+        diag_id = getattr(g, "diag_id", "no-id")
 
         if not token or not expected:
+            diag_logger.warning(
+                "CSRF_FAILED id=%s header_present=%s session_token_present=%s",
+                diag_id,
+                bool(token),
+                bool(expected)
+            )
+
             return response_error(
                 "CSRF-токен отсутствует",
                 403
             )
 
         if not hmac.compare_digest(token, expected):
+            diag_logger.warning(
+                "CSRF_MISMATCH id=%s",
+                diag_id
+            )
+
             return response_error(
                 "Неверный CSRF-токен",
                 403
             )
+
+        diag_logger.info(
+            "CSRF_OK id=%s",
+            diag_id
+        )
 
         return fn(*args, **kwargs)
 
@@ -910,32 +996,80 @@ def me():
 @app.route("/api/register", methods=["POST"])
 @require_csrf
 def register():
-    data = request.get_json(silent=True) or {}
+    diag_id = getattr(g, "diag_id", "no-id")
 
-    username = str(data.get("username", "")).strip()
-    password = str(data.get("password", ""))
-    avatar = str(data.get("avatar", "🎮"))[:10]
-
-    if not validate_username(username):
-        return response_error(
-            "Ник должен содержать 3–20 символов: латиница, цифры, _ . -"
-        )
-
-    if len(password) < 10 or len(password) > 128:
-        return response_error(
-            "Пароль должен содержать от 10 до 128 символов"
-        )
-
-    if db().execute(
-        "SELECT id FROM users WHERE username = ?",
-        (username,)
-    ).fetchone():
-        return response_error(
-            "Этот ник уже занят",
-            409
-        )
+    diag_logger.info(
+        "REGISTER_ENTER id=%s content_type=%s",
+        diag_id,
+        request.content_type
+    )
 
     try:
+        data = request.get_json(silent=True)
+
+        if not isinstance(data, dict):
+            diag_logger.warning(
+                "REGISTER_BAD_JSON id=%s",
+                diag_id
+            )
+
+            return response_error(
+                "Некорректные данные регистрации",
+                400
+            )
+
+        username = str(data.get("username", "")).strip()
+        password = str(data.get("password", ""))
+        avatar = str(data.get("avatar", "🎮"))[:10]
+
+        diag_logger.info(
+            "REGISTER_DATA_OK id=%s username_length=%s password_length=%s",
+            diag_id,
+            len(username),
+            len(password)
+        )
+
+        if not validate_username(username):
+            diag_logger.warning(
+                "REGISTER_INVALID_USERNAME id=%s",
+                diag_id
+            )
+
+            return response_error(
+                "Ник должен содержать 3–20 символов: латиница, цифры, _ . -"
+            )
+
+        if len(password) < 10 or len(password) > 128:
+            diag_logger.warning(
+                "REGISTER_INVALID_PASSWORD_LENGTH id=%s",
+                diag_id
+            )
+
+            return response_error(
+                "Пароль должен содержать от 10 до 128 символов"
+            )
+
+        exists = db().execute(
+            "SELECT id FROM users WHERE username = ?",
+            (username,)
+        ).fetchone()
+
+        if exists:
+            diag_logger.warning(
+                "REGISTER_USERNAME_TAKEN id=%s",
+                diag_id
+            )
+
+            return response_error(
+                "Этот ник уже занят",
+                409
+            )
+
+        diag_logger.info(
+            "REGISTER_VALIDATION_OK id=%s",
+            diag_id
+        )
+
         cursor = db().execute("""
             INSERT INTO users (
                 username,
@@ -951,30 +1085,76 @@ def register():
 
         db().commit()
 
+        diag_logger.info(
+            "REGISTER_DATABASE_INSERT_OK id=%s",
+            diag_id
+        )
+
         user = db().execute(
             "SELECT * FROM users WHERE id = ?",
             (cursor.lastrowid,)
         ).fetchone()
+
+        if not user:
+            diag_logger.error(
+                "REGISTER_USER_NOT_FOUND_AFTER_INSERT id=%s",
+                diag_id
+            )
+
+            return response_error(
+                "Не удалось получить созданный аккаунт",
+                500
+            )
 
         session.clear()
         session.permanent = True
         session["user_id"] = user["id"]
         session["csrf_token"] = secrets.token_urlsafe(32)
 
+        diag_logger.info(
+            "REGISTER_SESSION_CREATED id=%s",
+            diag_id
+        )
+
         notify_owner(
             f"Новый пользователь PS4 ULTIMATE STORE: {username}"
         )
 
+        diag_logger.info(
+            "REGISTER_SUCCESS id=%s",
+            diag_id
+        )
+
         return jsonify({
             "user": public_user(user),
-            "csrf_token": session["csrf_token"]
+            "csrf_token": session["csrf_token"],
+            "diagnostic_id": diag_id
         }), 201
 
     except sqlite3.IntegrityError:
         db().rollback()
+
+        diag_logger.exception(
+            "REGISTER_DATABASE_INTEGRITY_ERROR id=%s",
+            diag_id
+        )
+
         return response_error(
             "Не удалось создать аккаунт",
             409
+        )
+
+    except Exception:
+        db().rollback()
+
+        diag_logger.exception(
+            "REGISTER_UNEXPECTED_ERROR id=%s",
+            diag_id
+        )
+
+        return response_error(
+            "Внутренняя ошибка регистрации",
+            500
         )
 
 
@@ -1558,6 +1738,7 @@ def bot_tickets():
             ORDER BY t.updated_at DESC
             LIMIT 100
         """).fetchall()
+
     else:
         rows = db().execute("""
             SELECT t.*, u.username
