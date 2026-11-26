@@ -19,8 +19,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # ==========================================
-# PS4 ULTIMATE STORE 1.0.0
-# BACKEND
+# PS4 ULTIMATE STORE 1.0.1
+# BACKEND + ARTICSUPPORT NOTIFICATIONS
 # ==========================================
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -903,28 +903,69 @@ def catalog_item(row, hide_url=False):
     return result
 
 
-def notify_owner(message):
+# ==========================================
+# TELEGRAM NOTIFICATIONS
+# ==========================================
+
+def notify_owner(message, ticket_id=None):
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     owner_id = os.getenv("OWNER_ID")
 
     if not token or not owner_id:
+        print(
+            "Telegram notification skipped: "
+            "TELEGRAM_BOT_TOKEN or OWNER_ID is missing"
+        )
         return
+
+    payload = {
+        "chat_id": owner_id,
+        "text": message
+    }
+
+    # Если уведомление связано с тикетом,
+    # добавляем кнопку открытия этого тикета в ArticSupport.
+    if ticket_id is not None:
+        payload["reply_markup"] = {
+            "inline_keyboard": [[
+                {
+                    "text": f"📂 Открыть обращение #{ticket_id}",
+                    "callback_data": f"ticket:{ticket_id}"
+                }
+            ]]
+        }
 
     try:
         url = f"https://api.telegram.org/bot{token}/sendMessage"
 
-        payload = urllib.parse.urlencode({
-            "chat_id": owner_id,
-            "text": message
-        }).encode()
+        body = json.dumps(
+            payload,
+            ensure_ascii=False
+        ).encode("utf-8")
 
         req = urllib.request.Request(
             url,
-            data=payload,
+            data=body,
+            headers={
+                "Content-Type": "application/json"
+            },
             method="POST"
         )
 
-        urllib.request.urlopen(req, timeout=8)
+        with urllib.request.urlopen(req, timeout=10) as response:
+            result = json.loads(
+                response.read().decode("utf-8")
+            )
+
+            if not result.get("ok"):
+                print(
+                    "Telegram notification failed:",
+                    result
+                )
+            else:
+                print(
+                    "Telegram notification sent successfully"
+                )
 
     except Exception as error:
         print("Telegram notification error:", error)
@@ -1109,6 +1150,8 @@ def register():
             diag_id
         )
 
+        # Обычное уведомление о регистрации.
+        # Кнопка тикета здесь не нужна.
         notify_owner(
             f"Новый пользователь PS4 ULTIMATE STORE: {username}"
         )
@@ -1568,11 +1611,15 @@ def create_ticket():
 
     db().commit()
 
+    # Уведомление о новом обращении с полным описанием
+    # и кнопкой открытия тикета в Telegram.
     notify_owner(
-        "Новое обращение ArticSupport\n"
-        f"Пользователь: {g.current_user['username']}\n"
-        f"Категория: {category}\n"
-        f"Обращение: #{ticket_id}"
+        "🔔 НОВОЕ ОБРАЩЕНИЕ ARTICSUPPORT!\n\n"
+        f"👤 Пользователь: {g.current_user['username']}\n"
+        f"📂 Категория: {category}\n"
+        f"📝 Сообщение:\n{description[:1500]}\n\n"
+        f"🎫 Обращение: #{ticket_id}",
+        ticket_id=ticket_id
     )
 
     return jsonify({
@@ -1683,10 +1730,13 @@ def send_ticket_message(ticket_id):
 
     db().commit()
 
+    # Уведомление о новом сообщении с кнопкой открытия тикета.
     notify_owner(
-        f"Новое сообщение в ArticSupport #{ticket_id}\n"
-        f"От: {g.current_user['username']}\n"
-        f"{message[:500]}"
+        "💬 НОВОЕ СООБЩЕНИЕ ARTICSUPPORT!\n\n"
+        f"👤 Пользователь: {g.current_user['username']}\n"
+        f"🎫 Обращение: #{ticket_id}\n\n"
+        f"📝 Сообщение:\n{message[:1500]}",
+        ticket_id=ticket_id
     )
 
     return jsonify({"success": True}), 201
@@ -1887,7 +1937,7 @@ def bot_update_ticket(ticket_id):
 def index():
     return jsonify({
         "name": "PS4 ULTIMATE STORE",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "status": "online"
     })
 
