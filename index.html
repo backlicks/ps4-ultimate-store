@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080808">
-<title>PS4 ULTIMATE STORE 0.9.8</title>
+<title>PS4 ULTIMATE STORE 0.9.9</title>
 <style>
 :root{--bg:#080808;--surface:#111;--surface2:#191919;--red:#ed1421;--red2:#ff3845;--text:#f5f5f5;--muted:#999;--line:#303030}
 *{box-sizing:border-box}
@@ -66,6 +66,7 @@ h1{font-size:clamp(38px,7vw,76px);line-height:1;letter-spacing:-2px;margin:18px 
 .cardactions>*{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:11px;font-weight:800;text-decoration:none;cursor:pointer}
 .details{background:#1b1b1b;color:#ddd;border:1px solid #3a3a3a}
 .source{background:#c10a14;color:white;border:1px solid #ed101d}
+.source.guest-download{background:#292020;border-color:#654044;color:#ffb1b5}
 .fav{position:absolute;right:14px;top:13px;border:1px solid #493033;background:#211416;color:#ffcc4d;border-radius:50%;width:32px;height:32px;cursor:pointer}
 .empty{grid-column:1/-1;text-align:center;padding:40px;color:#888;border:1px dashed #393939;border-radius:15px}
 .home-panels,.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 40px}
@@ -123,6 +124,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 .support-message small{display:block;color:#888;font-size:10px;margin-bottom:5px}
 .support-message p{margin:0;white-space:pre-wrap}
 .support-categories button{min-height:55px}
+[hidden]{display:none!important}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.account-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.wrap{width:calc(100% - 28px)}.nav{min-height:66px}.brand{font-size:13px}.nav-link{display:none}.version{display:none}.grid,.home-panels,.info-grid{grid-template-columns:1fr}.hero{padding:48px 0 35px}.stats{gap:15px}.grid{gap:11px}.support-categories{grid-template-columns:1fr}}
 </style>
@@ -136,9 +138,9 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <button class="nav-link" onclick="showView('storeView')">Магазин</button>
 <button class="nav-link" onclick="showView('supportView')">Поддержка</button>
 <a class="nav-link" href="https://t.me/proshivkaj" target="_blank" rel="noopener">Telegram ↗</a>
-<button class="account-nav" onclick="showView('notificationsView')">🔔 <span id="notificationCount" class="notification-dot">2</span></button>
+<button class="account-nav" onclick="showView('notificationsView')">🔔 <span id="notificationCount" class="notification-dot">3</span></button>
 <button class="account-nav" onclick="showView('accountView')"><span id="navAvatar">👤</span> <span id="navName">Аккаунт</span></button>
-<span class="version">0.9.8 · BLACK RED</span>
+<span class="version">0.9.9 · BLACK RED</span>
 </div>
 </div>
 </header>
@@ -157,14 +159,14 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="stats">
 <span><b id="count">41</b>приложение</span>
 <span><b>03</b>платформы</span>
-<span><b>0.9.8</b>версия</span>
+<span><b>0.9.9</b>версия</span>
 </div>
 </section>
 <div class="home-panels">
 <button class="tile" onclick="showView('storeView')"><span>БИБЛИОТЕКА</span><strong>Магазин</strong>Каталог приложений</button>
 <button class="tile" onclick="showView('favoritesView')"><span>ТВОЯ БИБЛИОТЕКА</span><strong>Избранное</strong>Сохранённые приложения</button>
 <button class="tile" onclick="showView('accountView')"><span>ЛИЧНЫЙ КАБИНЕТ</span><strong>Мой аккаунт</strong><div id="homeStatus">Войди или создай аккаунт</div></button>
-<button class="tile" onclick="showView('updatesView')"><span>CHANGELOG</span><strong>Обновления</strong>Версия 0.9.8</button>
+<button class="tile" onclick="showView('updatesView')"><span>CHANGELOG</span><strong>Обновления</strong>Версия 0.9.9</button>
 <button class="tile" onclick="showView('newsView')"><span>ЛЕНТА ПРОЕКТА</span><strong>Новости</strong>Объявления и планы</button>
 <button class="tile" onclick="showView('supportView')"><span>ARTICSUPPORT</span><strong>Поддержка 🎧</strong>Помощь и обращения</button>
 <button class="tile" onclick="showView('aboutView')"><span>ИНФОРМАЦИЯ</span><strong>О проекте</strong>Подробнее о магазине</button>
@@ -173,7 +175,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 
 <section class="view" id="storeView">
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">STORE / КАТАЛОГ</span></div>
-<div class="heading"><div class="eyebrow">БИБЛИОТЕКА ПРИЛОЖЕНИЙ</div><h1>Магазин<span class="accent">.</span></h1><p class="lead">Каталог загружается с сервера. Если серверный каталог пуст или недоступен, используется встроенный список.</p></div>
+<div class="heading"><div class="eyebrow">БИБЛИОТЕКА ПРИЛОЖЕНИЙ</div><h1>Магазин<span class="accent">.</span></h1><p class="lead">Каталог доступен для просмотра всем посетителям. Для скачивания необходимо войти в аккаунт.</p></div>
 <div class="toolbar">
 <div class="tabs" id="platformTabs">
 <button class="tab active" data-platform="PS4">🎮 PS4</button>
@@ -203,7 +205,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 
 <section class="view" id="accountView">
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">ACCOUNT / ЛИЧНЫЙ КАБИНЕТ</span></div>
-<div class="heading"><div class="eyebrow">ТВОЁ ПРОСТРАНСТВО</div><h1>Мой аккаунт<span class="accent">.</span></h1><p class="lead">Регистрация и вход используют серверную сессию. Не используй один и тот же пароль на других сайтах.</p></div>
+<div class="heading"><div class="eyebrow">ТВОЁ ПРОСТРАНСТВО</div><h1>Мой аккаунт<span class="accent">.</span></h1><p class="lead">Войди в аккаунт, чтобы скачивать приложения и пользоваться поддержкой. Сессия сохраняется в защищённой cookie браузера.</p></div>
 <div class="account-layout">
 <div class="panel">
 <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px">
@@ -255,7 +257,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="panel">
 <h2>Информация</h2>
 <p class="muted">Ник: 3–20 символов, латиница, цифры, точка, дефис или подчёркивание. Пароль: 10–128 символов.</p>
-<div class="notice">Если вход не работает, проверь доступность API и настройки cookie в браузере. Некоторые браузеры ограничивают сторонние cookies для GitHub Pages и Render.</div>
+<div class="notice">Для сохранения входа backend должен устанавливать постоянную cookie с параметрами Secure и SameSite=None. Некоторые браузеры ограничивают сторонние cookies для GitHub Pages и Render.</div>
 </div>
 </div>
 </section>
@@ -305,6 +307,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">CHANGELOG</span></div>
 <div class="heading"><div class="eyebrow">CHANGELOG</div><h1>История релизов<span class="accent">.</span></h1><p class="lead">Основные изменения PS4 ULTIMATE STORE.</p></div>
 <div class="panel">
+<div class="release-item"><div class="release-version">0.9.9</div><div><h3>Download Access & Persistent Login</h3><p>Доступ к скачиванию только после входа, сохранение авторизации, обновление интерфейса магазина.</p></div></div>
 <div class="release-item"><div class="release-version">0.9.8</div><div><h3>ArticSupport Integration</h3><p>Серверные обращения, история тикетов, переписка с поддержкой и авторизация для создания обращений.</p></div></div>
 <div class="release-item"><div class="release-version">0.9.7</div><div><h3>ArticSupport & Redesign</h3><p>Новая страница поддержки, обновлённый интерфейс, улучшенные карточки и навигация.</p></div></div>
 <div class="release-item"><div class="release-version">0.9.6</div><div><h3>Notifications & Profile</h3><p>Центр уведомлений, отметка прочитанного, выбор локального аватара и история релизов.</p></div></div>
@@ -317,7 +320,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <section class="view" id="newsView">
 <div class="view-top"><button class="back" onclick="showView('homeView')">← Главная</button><span class="muted">NEWS</span></div>
 <div class="heading"><h1>Новости<span class="accent">.</span></h1><p class="lead">Следующий этап проекта — расширение панели управления и профилей.</p></div>
-<div class="panel"><h2>PS4 ULTIMATE STORE 0.9.8</h2><p class="muted">Поддержка подключена к серверу. Теперь обращения сохраняются в аккаунте.</p></div>
+<div class="panel"><h2>PS4 ULTIMATE STORE 0.9.9</h2><p class="muted">Добавлена проверка входа перед переходом к скачиванию. Авторизация сохраняется между посещениями сайта.</p></div>
 </section>
 
 <section class="view" id="supportView">
@@ -331,13 +334,11 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <h2>🎧 ArticSupport</h2>
 <p class="muted">Официальная система обращений PS4 ULTIMATE STORE.</p>
 </div>
-
 <div id="supportGuest" class="panel" hidden>
 <h2>🔒 Требуется авторизация</h2>
 <p class="muted">Чтобы пользоваться поддержкой, войди в аккаунт или зарегистрируйся.</p>
 <button class="btn primary" onclick="showView('accountView')">Перейти к аккаунту</button>
 </div>
-
 <div id="supportUserArea" hidden>
 <div class="panel">
 <h2>Создать обращение</h2>
@@ -351,14 +352,12 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 </div>
 <div class="notice">Не отправляй пароли, токены и другие секретные данные.</div>
 </div>
-
 <div class="panel" style="margin-top:15px">
 <h2>Мои обращения</h2>
 <p class="muted">Здесь отображаются все твои обращения с сервера.</p>
 <div id="supportTicketsList" class="muted">Загрузка...</div>
 <button class="btn ghost" onclick="loadSupportData()">↻ Обновить</button>
 </div>
-
 <div class="panel" id="supportChatPanel" style="margin-top:15px" hidden>
 <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
 <h2 id="supportChatTitle">Обращение</h2>
@@ -372,7 +371,6 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 <div class="message" id="supportChatMessage"></div>
 </div>
 </div>
-
 <div class="panel" style="margin-top:15px">
 <h2>Другие способы связи</h2>
 <p class="muted">Telegram проекта:</p>
@@ -392,7 +390,7 @@ footer{border-top:1px solid #292929;padding:25px 0 35px;color:#777;font-size:11p
 
 <footer>
 <div class="wrap footerrow">
-<b>PS4 <span style="color:#e50914">ULTIMATE STORE</span> · 0.9.8</b>
+<b>PS4 <span style="color:#e50914">ULTIMATE STORE</span> · 0.9.9</b>
 <span>Независимый каталог сообщества</span>
 <a href="#" onclick="showView('supportView');return false">Поддержка</a>
 </div>
@@ -470,6 +468,43 @@ function safeText(v){
  }[c]));
 }
 
+/* Безопасная проверка ссылки */
+function getSafeDownloadUrl(value){
+ try{
+  const url=new URL(String(value||''));
+  if(url.protocol!=='https:'&&url.protocol!=='http:')return null;
+  return url.href;
+ }catch(e){
+  return null;
+ }
+}
+
+/* Авторизация обязательна для перехода к скачиванию */
+function openDownload(index){
+ const app=apps[index];
+
+ if(!app){
+  alert('Приложение не найдено.');
+  return;
+ }
+
+ if(!currentUser){
+  closeModal();
+  message('Для скачивания сначала войди в аккаунт.');
+  showView('accountView');
+  return;
+ }
+
+ const url=getSafeDownloadUrl(app.url);
+
+ if(!url){
+  alert('Ссылка отсутствует или недействительна.');
+  return;
+ }
+
+ window.open(url,'_blank','noopener,noreferrer');
+}
+
 function showView(id){
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
  window.scrollTo({top:0,behavior:'smooth'});
@@ -495,6 +530,8 @@ function toggleFav(name){
 
 function cardHTML(a){
  const index=apps.indexOf(a);
+ const downloadLabel=currentUser?'Скачать / открыть ↗':'🔒 Войти для скачивания';
+
  return `<article class="card">
  <button class="fav" onclick="toggleFav('${safeText(a.name).replace(/'/g,"&#39;")}')">${isFav(a.name)?'★':'☆'}</button>
  <div class="cardtop">
@@ -505,7 +542,7 @@ function cardHTML(a){
  <p class="desc">${safeText(a.desc||'')}</p>
  <div class="cardactions">
  <button class="details" onclick="details(${index})">Подробнее</button>
- <a class="source" href="${safeText(a.url||'#')}" target="_blank" rel="noopener noreferrer">Источник ↗</a>
+ <button class="source ${currentUser?'':'guest-download'}" onclick="openDownload(${index})">${downloadLabel}</button>
  </div></article>`;
 }
 
@@ -529,6 +566,7 @@ function renderFavorites(){
 function details(i){
  const a=apps[i];
  if(!a)return;
+
  $('modalContent').innerHTML=`<h2>${safeText(a.icon)} ${safeText(a.name)}</h2>
  <span class="tag">${safeText(a.category)}</span>
  <p>${safeText(a.desc)}</p>
@@ -536,20 +574,30 @@ function details(i){
  Версия: ${safeText(a.version)}<br>
  Совместимость: ${safeText(a.compat)}<br>
  Источник: ${safeText(a.source)}</p>
- <a style="color:#ff737b" href="${safeText(a.url)}" target="_blank" rel="noopener">Открыть источник ↗</a>`;
+ <button class="btn primary" onclick="openDownload(${i})">
+ ${currentUser?'Открыть источник ↗':'🔒 Войти для скачивания'}
+ </button>`;
  $('modal').classList.add('open');
 }
 function closeModal(){$('modal').classList.remove('open')}
 
 async function api(path,options={}){
  const headers={'Content-Type':'application/json',...(options.headers||{})};
+
  if(options.method&&options.method!=='GET'){
   if(!csrfToken)await getCsrf();
   headers['X-CSRF-Token']=csrfToken;
  }
- const response=await fetch(API+path,{...options,headers,credentials:'include'});
+
+ const response=await fetch(API+path,{
+  ...options,
+  headers,
+  credentials:'include'
+ });
+
  let data={};
  try{data=await response.json()}catch(e){}
+
  if(!response.ok)throw new Error(data.error||`Ошибка API (${response.status})`);
  return data;
 }
@@ -582,6 +630,7 @@ function setProfileAvatar(avatar){
 
 function updateAccount(){
  const signed=!!currentUser;
+
  $('authForms').hidden=signed;
  $('signedIn').hidden=!signed;
  $('profileName').textContent=signed?currentUser.username:'Гость';
@@ -590,9 +639,19 @@ function updateAccount(){
  $('navAvatar').textContent=signed?getProfileAvatar(currentUser):'👤';
  $('navName').textContent=signed?currentUser.username:'Аккаунт';
  $('homeStatus').textContent=signed?'Добро пожаловать, '+currentUser.username+'!':'Войди или создай аккаунт';
+
  if(signed)renderProfileAvatarChoices();
+
  if(signed&&['owner','admin'].includes(currentUser.role)){
   $('profileRole').innerHTML=`${safeText(currentUser.role.toUpperCase())} · <button class="btn ghost" style="padding:4px 8px" onclick="showView('adminView')">Панель управления</button>`;
+ }
+
+ /* Обновляем карточки после входа или выхода */
+ render();
+ renderFavorites();
+
+ if($('supportView').classList.contains('active')){
+  renderLastSupportTicket();
  }
 }
 
@@ -605,7 +664,7 @@ async function refreshMe(){
   currentUser=d.user||null;
  }catch(e){
   currentUser=null;
-  console.warn(e.message);
+  console.warn('Проверка сессии:',e.message);
  }
  updateAccount();
 }
@@ -613,36 +672,82 @@ async function refreshMe(){
 async function login(){
  const username=$('authUsername').value.trim();
  const password=$('authPassword').value;
+
+ if(!username||!password){
+  message('Введи ник и пароль.');
+  return;
+ }
+
+ const button=$('loginBtn');
+ button.disabled=true;
+ button.textContent='Вход...';
+
  try{
   await getCsrf();
-  const d=await api('/api/login',{method:'POST',body:JSON.stringify({username,password})});
+  const d=await api('/api/login',{
+   method:'POST',
+   body:JSON.stringify({username,password})
+  });
+
   csrfToken=d.csrf_token||csrfToken;
   currentUser=d.user;
-  message('Вход выполнен.');
+  message('Вход выполнен. Теперь скачивание доступно.');
   updateAccount();
- }catch(e){message(e.message)}
+ }catch(e){
+  message(e.message);
+ }finally{
+  button.disabled=false;
+  button.textContent='Войти';
+ }
 }
 
 async function register(){
  const username=$('authUsername').value.trim();
  const password=$('authPassword').value;
+
+ if(!username||!password){
+  message('Введи ник и пароль.');
+  return;
+ }
+
+ const button=$('registerBtn');
+ button.disabled=true;
+ button.textContent='Создание...';
+
  try{
   await getCsrf();
-  const d=await api('/api/register',{method:'POST',body:JSON.stringify({username,password,avatar:selectedAvatar})});
+  const d=await api('/api/register',{
+   method:'POST',
+   body:JSON.stringify({username,password,avatar:selectedAvatar})
+  });
+
   csrfToken=d.csrf_token||csrfToken;
   currentUser=d.user;
-  message('Аккаунт создан!');
+  message('Аккаунт создан! Теперь скачивание доступно.');
   updateAccount();
- }catch(e){message(e.message)}
+ }catch(e){
+  message(e.message);
+ }finally{
+  button.disabled=false;
+  button.textContent='Создать аккаунт';
+ }
 }
 
 async function logout(){
+ const button=$('logoutBtn');
+ button.disabled=true;
+
  try{
   await api('/api/logout',{method:'POST',body:'{}'});
   currentUser=null;
+  csrfToken='';
   message('Ты вышел из аккаунта.');
   updateAccount();
- }catch(e){message(e.message)}
+ }catch(e){
+  message(e.message);
+ }finally{
+  button.disabled=false;
+ }
 }
 
 function inferPlatforms(a){
@@ -671,6 +776,7 @@ async function loadAdmin(){
   message('Недостаточно прав.');
   return;
  }
+
  $('adminRole').textContent=currentUser.role.toUpperCase();
  $('ownerPanel').hidden=currentUser.role!=='owner';
  $('usersBody').innerHTML='<tr><td colspan="5">Загрузка…</td></tr>';
@@ -729,6 +835,7 @@ async function editCatalogItem(id){
   const d=await api('/api/catalog');
   const item=(d.apps||[]).find(x=>Number(x.id)===Number(id));
   if(!item){alert('Запись не найдена. Обнови панель управления.');return}
+
   const name=prompt('Название приложения:',item.name||'');if(name===null)return;
   const category=prompt('Категория:',item.category||'');if(category===null)return;
   const desc=prompt('Описание:',item.desc||'');if(desc===null)return;
@@ -737,7 +844,12 @@ async function editCatalogItem(id){
   const source=prompt('Источник:',item.source||'');if(source===null)return;
   const url=prompt('Ссылка:',item.url||'');if(url===null)return;
   const icon=prompt('Иконка:',item.icon||'📦');if(icon===null)return;
-  await api('/api/admin/catalog/'+id,{method:'PATCH',body:JSON.stringify({name,category,desc,version,compat,source,url,icon})});
+
+  await api('/api/admin/catalog/'+id,{
+   method:'PATCH',
+   body:JSON.stringify({name,category,desc,version,compat,source,url,icon})
+  });
+
   $('catalogMessage').textContent='Изменения сохранены.';
   await loadCatalog();
   await loadAdmin();
@@ -765,18 +877,21 @@ async function addCatalog(){
   url:$('newUrl').value,
   icon:$('newIcon').value
  };
+
  try{
   await api('/api/admin/catalog',{method:'POST',body:JSON.stringify(data)});
   $('catalogMessage').textContent='Приложение добавлено.';
   $('catalogForm').reset();
   await loadCatalog();
   await loadAdmin();
- }catch(e){$('catalogMessage').textContent=e.message}
+ }catch(e){
+  $('catalogMessage').textContent=e.message;
+ }
 }
 
 /* УВЕДОМЛЕНИЯ */
-
 const releaseNotifications=[
+ {id:'release-099',title:'Вышла версия 0.9.9',body:'Добавлен вход перед скачиванием и обновлена работа авторизации.',date:'26.11.2026'},
  {id:'release-098',title:'Вышла версия 0.9.8',body:'Подключена серверная система обращений ArticSupport.',date:'26.11.2026'},
  {id:'release-097',title:'Вышла версия 0.9.7',body:'Добавлена страница ArticSupport и обновлён дизайн магазина.',date:'26.11.2026'},
  {id:'release-096',title:'Вышла версия 0.9.6',body:'Центр уведомлений, локальная смена аватара и история релизов.',date:'26.11.2026'},
@@ -790,12 +905,14 @@ function getReadNotifications(){
 function renderNotifications(){
  const read=getReadNotifications();
  const items=releaseNotifications.map(n=>({...n,read:read.includes(n.id)}));
+
  $('notificationsList').innerHTML=items.map(n=>`
  <article class="notice-item ${n.read?'':'unread'}">
  <h3>${safeText(n.title)}</h3>
  <p>${safeText(n.body)}</p>
  <div class="notice-meta"><span>${safeText(n.date)}</span><span>${n.read?'Прочитано':'Новое'}</span></div>
  </article>`).join('');
+
  const unread=items.filter(n=>!n.read).length;
  $('notificationCount').textContent=unread;
  $('notificationCount').style.display=unread?'inline-grid':'none';
@@ -805,8 +922,7 @@ function markAllNotificationsRead(){
  renderNotifications();
 }
 
-/* ARTICSUPPORT 0.9.8 */
-
+/* ARTICSUPPORT */
 function supportStatus(status){
  if(status==='closed')return '<span class="support-status closed">Закрыто</span>';
  return '<span class="support-status open">Открыто</span>';
@@ -899,6 +1015,7 @@ async function createSupportTicket(){
    method:'POST',
    body:JSON.stringify({category:selectedSupportCategory,description})
   });
+
   $('supportDescription').value='';
   const ticket=data.ticket||data;
   output.textContent='Обращение успешно создано! Номер: '+(ticket.id??'создан');
@@ -971,6 +1088,7 @@ async function openSupportTicket(id){
    $('supportChatMessages').innerHTML=messages.map(message=>{
     const sender=message.sender_type||message.role||'user';
     const isAdmin=sender==='admin'||sender==='owner'||sender==='support';
+
     return `
      <div class="support-message ${isAdmin?'admin':''}">
       <small>${safeText(message.username||(isAdmin?'ArticSupport':'Ты'))} · ${safeText(supportDate(message.created_at||message.date))}</small>
@@ -996,6 +1114,7 @@ async function sendSupportReply(){
 
  const input=$('supportReply');
  const messageText=input.value.trim();
+
  if(messageText.length<1){
   $('supportChatMessage').textContent='Напиши сообщение.';
   return;
@@ -1014,6 +1133,7 @@ async function sendSupportReply(){
    method:'POST',
    body:JSON.stringify({message:messageText})
   });
+
   input.value='';
   $('supportChatMessage').textContent='Сообщение отправлено.';
   await openSupportTicket(activeSupportTicket);
@@ -1045,7 +1165,6 @@ function renderLastSupportTicket(){
 }
 
 /* ОБРАБОТЧИКИ */
-
 document.querySelectorAll('.filter').forEach(b=>{
  b.addEventListener('click',()=>{
   document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));
@@ -1085,6 +1204,7 @@ document.addEventListener('keydown',e=>{
  if(e.key==='Escape')closeModal();
 });
 
+/* Сначала восстанавливаем серверную сессию, затем загружаем каталог */
 (async()=>{
  render();
  renderFavorites();
